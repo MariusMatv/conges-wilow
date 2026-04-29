@@ -433,23 +433,67 @@ function renderProjection(){
   const projDate=new Date(y,m,0,23,59,59);
   if(projDate<today()){container.innerHTML=`<div class="alert alert-yellow" style="margin-top:.75rem"><span>⚠️</span><div>Choisissez une date future.</div></div>`;return;}
   const mname=MONTHS_FR[m-1];
-  const cpAcq=cpAcquisAt(emp,projDate),cpPos=sumAbsUntil(emp.name,'CP',projDate),cpPend=sumReqsUntil(emp.name,'CP',projDate),cpDispo=cpAcq-cpPos-cpPend;
-  const hasRTT=emp.hours>35,rttAcq=hasRTT?rttAcquisAt(emp,projDate):0,rttPos=hasRTT?sumAbsUntil(emp.name,'RTT',projDate):0,rttPend=hasRTT?sumReqsUntil(emp.name,'RTT',projDate):0,rttDispo=rttAcq-rttPos-rttPend;
+  const arrival=parseD(emp.arrival);
+
+  // Période Syntec : 1er juin → 31 mai
+  const getPeriodStart=d=>{const dy=d.getFullYear(),dm=d.getMonth();return new Date(dm>=5?dy:dy-1,5,1);};
+  const cpInRange=(from,until)=>{const mo=Math.max(0,(until-from)/(1000*60*60*24*30.4375));return Math.min(25,Math.round(mo*2.5*2)/2);};
+
+  const todayPeriodStart=getPeriodStart(today());
+  const projPeriodStart=getPeriodStart(projDate);
+  const isFuturePeriod=projPeriodStart>todayPeriodStart;
+
+  let cpAcqPeriod,cpCarry=0,cpUsed,cpPending,rttAcq=0,rttUsed=0,rttPending=0;
+
+  if(!isFuturePeriod){
+    // Même période qu'aujourd'hui
+    const from=arrival>todayPeriodStart?arrival:todayPeriodStart;
+    cpAcqPeriod=cpInRange(from,projDate)+(emp.credit||0);
+    cpUsed=sumAbsUntil(emp.name,'CP',projDate);
+    cpPending=sumReqsUntil(emp.name,'CP',projDate);
+  } else {
+    // Nouvelle période — calcul du report
+    const currentPeriodEnd=new Date(todayPeriodStart.getFullYear()+1,4,31,23,59,59);
+    const fromCurrent=arrival>todayPeriodStart?arrival:todayPeriodStart;
+    const cpCurrentAcq=cpInRange(fromCurrent,currentPeriodEnd);
+    const cpCurrentUsed=sumAbsUntil(emp.name,'CP',currentPeriodEnd);
+    cpCarry=Math.max(0,cpCurrentAcq-cpCurrentUsed);
+    // CP de la nouvelle période
+    const fromNew=arrival>projPeriodStart?arrival:projPeriodStart;
+    cpAcqPeriod=cpInRange(fromNew,projDate);
+    cpUsed=S.absences.filter(a=>a.name===emp.name&&a.type==='CP'&&parseD(a.start)>=projPeriodStart&&parseD(a.end)<=projDate).reduce((s,a)=>s+(+a.jours||0),0);
+    cpPending=(S.requests||[]).filter(r=>r.name===emp.name&&r.type==='CP'&&r.status!=='rejected'&&parseD(r.start)>=projPeriodStart&&parseD(r.end)<=projDate).reduce((s,r)=>s+(+r.jours||0),0);
+  }
+  const cpDispo=cpCarry+cpAcqPeriod-cpUsed-cpPending;
+
+  // RTT (pas de report sous Syntec)
+  const hasRTT=emp.hours>35;
+  if(hasRTT){
+    const extra=emp.hours-35;
+    const rttFrom=emp.rttSince?(parseD(emp.rttSince)>projPeriodStart?parseD(emp.rttSince):projPeriodStart):(arrival>projPeriodStart?arrival:projPeriodStart);
+    const weeks=Math.max(0,(projDate-rttFrom)/(1000*60*60*24*7));
+    rttAcq=Math.round(weeks*extra/7*2)/2;
+    rttUsed=isFuturePeriod?S.absences.filter(a=>a.name===emp.name&&a.type==='RTT'&&parseD(a.start)>=projPeriodStart&&parseD(a.end)<=projDate).reduce((s,a)=>s+(+a.jours||0),0):sumAbsUntil(emp.name,'RTT',projDate);
+    rttPending=isFuturePeriod?(S.requests||[]).filter(r=>r.name===emp.name&&r.type==='RTT'&&r.status!=='rejected'&&parseD(r.start)>=projPeriodStart&&parseD(r.end)<=projDate).reduce((s,r)=>s+(+r.jours||0),0):sumReqsUntil(emp.name,'RTT',projDate);
+  }
+  const rttDispo=rttAcq-rttUsed-rttPending;
+
   container.innerHTML=`<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--g200)">
     <div style="font-size:.78rem;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.7rem">📊 Fin ${mname} ${y}</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:.7rem">
       <div style="background:var(--green-lt);border:1px solid #86efac;border-radius:10px;padding:.9rem">
         <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary-dk);margin-bottom:.25rem">CP disponibles</div>
         <div style="font-family:'DM Mono',monospace;font-size:1.55rem;font-weight:500;color:${cpDispo<0?'var(--red)':'var(--primary-dk)'}">${cpDispo.toFixed(1)}<span style="font-size:.8rem"> j</span></div>
-        <div style="font-size:.68rem;color:var(--primary-dk);opacity:.7;margin-top:.15rem">${cpAcq.toFixed(1)} acquis · ${cpPos.toFixed(1)} posés${cpPend>0?` · ${cpPend.toFixed(1)} en attente`:''}</div>
+        <div style="font-size:.68rem;color:var(--primary-dk);opacity:.7;margin-top:.15rem">${cpAcqPeriod.toFixed(1)} j acquis${cpCarry>0?` + ${cpCarry.toFixed(1)} j report`:''}${cpUsed>0?` · ${cpUsed.toFixed(1)} posés`:''}${cpPending>0?` · ${cpPending.toFixed(1)} en attente`:''}</div>
       </div>
       ${hasRTT?`<div style="background:var(--purple-lt);border:1px solid #c4b5fd;border-radius:10px;padding:.9rem">
         <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple);margin-bottom:.25rem">RTT disponibles</div>
         <div style="font-family:'DM Mono',monospace;font-size:1.55rem;font-weight:500;color:${rttDispo<0?'var(--red)':'var(--purple)'}">${rttDispo.toFixed(1)}<span style="font-size:.8rem"> j</span></div>
-        <div style="font-size:.68rem;color:var(--purple);opacity:.7;margin-top:.15rem">${rttAcq.toFixed(1)} acquis · ${rttPos.toFixed(1)} posés${rttPend>0?` · ${rttPend.toFixed(1)} en attente`:''}</div>
+        <div style="font-size:.68rem;color:var(--purple);opacity:.7;margin-top:.15rem">${rttAcq.toFixed(1)} acquis${rttUsed>0?` · ${rttUsed.toFixed(1)} posés`:''}</div>
       </div>`:''}
     </div>
-    ${cpDispo<0?`<div class="alert alert-yellow" style="margin-top:.7rem"><span>⚠️</span><div>À cette date, votre solde CP sera négatif de <strong>${Math.abs(cpDispo).toFixed(1)} j</strong>.</div></div>`:''}
+    ${isFuturePeriod?`<div class="alert alert-blue" style="margin-top:.7rem"><span>ℹ️</span><div>Nouvelle période Syntec (1er juin ${projPeriodStart.getFullYear()}) · ${cpCarry>0?`<strong>${cpCarry.toFixed(1)} j</strong> reportés de la période précédente`:'Aucun report de la période précédente (tous les CP auront été utilisés)'}.</div></div>`:''}
+    ${cpDispo<0?`<div class="alert alert-yellow" style="margin-top:.7rem"><span>⚠️</span><div>Solde CP négatif de <strong>${Math.abs(cpDispo).toFixed(1)} j</strong> à cette date.</div></div>`:''}
   </div>`;
 }
 
