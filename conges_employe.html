@@ -417,7 +417,7 @@ function showLogin(){
   document.getElementById('login-screen').classList.remove('hidden');
   const grid=document.getElementById("name-grid");
   if(!S||!S.employees||!S.employees.length){
-    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:1rem;font-size:.88rem;color:var(--g600)">⚠️ Impossible de charger les données.<br>Vérifiez votre connexion internet.</div>`;
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:1.5rem;font-size:.88rem;color:var(--g600)">👋 Aucun employé configuré pour l'instant.<br><span style="font-size:.8rem;opacity:.7">L'administrateur doit d'abord ouvrir la version Admin pour initialiser les données.</span><br><br><button onclick="loadFromCloud().then(showLogin)" style="margin-top:.5rem;padding:.4rem 1rem;border-radius:7px;border:1.5px solid #cbd5e1;background:#f8fafc;cursor:pointer;font-size:.82rem;">🔄 Réessayer</button></div>`;
     return;
   }
   grid.innerHTML=S.employees.map(emp=>`<button class="name-btn" onclick="login('${emp.name}')"><div class="av" style="background:${empColor(emp.name)}">${initials(emp.name)}</div>${emp.name}</button>`).join("");
