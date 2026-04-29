@@ -614,7 +614,8 @@ function renderCal(){
     S.employees.map(e=>`<button class="btn btn-sm" style="background:${calFilter===e.name?empColor(e.name):"var(--g100)"};color:${calFilter===e.name?"#fff":"var(--g600)"};border:none" onclick="calFilter='${e.name}';renderCal()">${e.name}</button>`).join("");
   const byDay={};
   const src=calFilter?S.absences.filter(a=>a.name===calFilter):S.absences;
-  src.forEach(ab=>{const sd=parseD(ab.start),ed=parseD(ab.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=d.toISOString().slice(0,10);if(!byDay[k])byDay[k]=[];byDay[k].push({name:ab.name,type:ab.type});d.setDate(d.getDate()+1);}});
+  const localISO=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  src.forEach(ab=>{const sd=parseD(ab.start),ed=parseD(ab.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=localISO(d);if(!byDay[k])byDay[k]=[];byDay[k].push({name:ab.name,type:ab.type});d.setDate(d.getDate()+1);}});
   const first=new Date(calY,calM,1),last=new Date(calY,calM+1,0),startDow=(first.getDay()+6)%7,now=today();
   let html="";
   for(let i=0;i<startDow;i++) html+=`<div class="cal-day other"></div>`;
