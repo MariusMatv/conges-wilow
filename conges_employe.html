@@ -335,7 +335,7 @@ function setSyncState(state){
 
 async function loadFromCloud(){
   try{
-    const res=await fetch(`${BIN_URL}/latest`,{headers:{'X-Access-Key':JSONBIN_API_KEY}});
+    const res=await fetch(`${BIN_URL}/latest`,{headers:{'X-Master-Key':JSONBIN_API_KEY}});
     if(!res.ok)throw new Error('HTTP '+res.status);
     const json=await res.json();
     S=json.record;
@@ -365,7 +365,7 @@ function save(){
 
 async function saveToCloud(){
   try{
-    const res=await fetch(BIN_URL,{method:'PUT',headers:{'X-Access-Key':JSONBIN_API_KEY,'Content-Type':'application/json'},body:JSON.stringify(S)});
+    const res=await fetch(BIN_URL,{method:'PUT',headers:{'X-Master-Key':JSONBIN_API_KEY,'Content-Type':'application/json'},body:JSON.stringify(S)});
     if(!res.ok)throw new Error('HTTP '+res.status);
     setSyncState('ok');
   }catch(e){setSyncState('error');toast('⚠️ Erreur de sauvegarde');}
