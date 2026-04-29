@@ -436,10 +436,15 @@ async function loadFromCloud() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     S = json.record;
-    // Si le bin est vide (ex: {"init":true}), on charge les données par défaut
+    // Si le bin est vide (ex: {"init":true}), on charge les données par défaut ET on les pousse vers le cloud
     if (!S.employees || !S.employees.length) {
-      const def = defaultData();
-      S = { ...def, ...S, employees: def.employees, absences: def.absences };
+      S = defaultData();
+      // Sauvegarde immédiate dans le cloud pour que les employés puissent charger les données
+      await fetch(BIN_URL, {
+        method: 'PUT',
+        headers: { 'X-Master-Key': JSONBIN_API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify(S)
+      });
     }
     if (!S.requests)  S.requests  = [];
     if (!S.nextReqId) S.nextReqId = 1;
