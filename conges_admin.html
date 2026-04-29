@@ -436,6 +436,11 @@ async function loadFromCloud() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     S = json.record;
+    // Si le bin est vide (ex: {"init":true}), on charge les données par défaut
+    if (!S.employees || !S.employees.length) {
+      const def = defaultData();
+      S = { ...def, ...S, employees: def.employees, absences: def.absences };
+    }
     if (!S.requests)  S.requests  = [];
     if (!S.nextReqId) S.nextReqId = 1;
     // Cache local
