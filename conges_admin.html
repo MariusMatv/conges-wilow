@@ -431,7 +431,7 @@ async function loadFromCloud() {
   try {
     showLoader(true);
     const res = await fetch(`${BIN_URL}/latest`, {
-      headers: { 'X-Access-Key': JSONBIN_API_KEY }
+      headers: { 'X-Master-Key': JSONBIN_API_KEY }
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
@@ -480,7 +480,7 @@ async function saveToCloud() {
   try {
     const res = await fetch(BIN_URL, {
       method: 'PUT',
-      headers: { 'X-Access-Key': JSONBIN_API_KEY, 'Content-Type': 'application/json' },
+      headers: { 'X-Master-Key': JSONBIN_API_KEY, 'Content-Type': 'application/json' },
       body: JSON.stringify(S)
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
