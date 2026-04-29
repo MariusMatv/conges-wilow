@@ -339,6 +339,8 @@ async function loadFromCloud(){
     if(!res.ok)throw new Error('HTTP '+res.status);
     const json=await res.json();
     S=json.record;
+    // Si le bin est vide (ex: {"init":true}), on remet des données vides propres
+    if(!S.employees||!S.employees.length){S={employees:[],absences:[],requests:[],nextEmpId:1,nextAbsId:1,nextReqId:1};}
     if(!S.requests)S.requests=[];
     if(!S.nextReqId)S.nextReqId=1;
     try{localStorage.setItem('wilow_conges_cache',JSON.stringify(S));}catch(e){}
