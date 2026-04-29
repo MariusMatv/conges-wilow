@@ -241,6 +241,7 @@ textarea{resize:vertical;min-height:80px;}
   <div id="page-solde" class="page active">
     <div class="solde-grid" id="solde-kpis"></div>
     <div id="solde-detail"></div>
+    <div id="solde-projection"></div>
   </div>
   <div id="page-calendar" class="page">
     <div class="card">
@@ -293,6 +294,19 @@ textarea{resize:vertical;min-height:80px;}
     <div class="alert alert-blue"><span>ℹ️</span><div>Votre demande sera visible par l'administration. Suivez son statut dans <strong>Mes absences → Mes demandes</strong>.</div></div>
   </div>
 </main>
+</div>
+
+<!-- MODAL AVANCE -->
+<div class="overlay" id="mod-avance">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title">⚠️ Demande en avance sur solde</div>
+    <div id="avance-summary" style="font-size:.88rem;color:var(--g600);line-height:1.85;margin-bottom:.75rem"></div>
+    <div class="alert alert-yellow"><span>⚠️</span><div>Vous posez des congés avant de les avoir acquis. L'administration en sera informée lors de la validation. Vous pouvez tout de même envoyer la demande.</div></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mod-avance')">Annuler</button>
+      <button class="btn btn-primary" onclick="confirmAvanceSubmit()">Envoyer quand même</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL CONFIRMATION -->
@@ -403,6 +417,39 @@ function monthsBetween(fromStr,toDate){const from=parseD(fromStr);if(!from)retur
 function cpAcquis(emp){return Math.min(25,Math.round(monthsBetween(emp.arrival,today())*2.5*2)/2);}
 function rttAcquis(emp){if(emp.hours<=35)return 0;const extra=emp.hours-35;const weeks=monthsBetween(emp.rttSince||emp.arrival,today())*4.35;return Math.round(weeks*extra/7*2)/2;}
 function sumAbs(name,type){return S.absences.filter(a=>a.name===name&&a.type===type).reduce((s,a)=>s+(+a.jours||0),0);}
+// Projection helpers
+function cpAcquisAt(emp,date){return Math.min(25,Math.round(monthsBetween(emp.arrival,date)*2.5*2)/2)+(emp.credit||0);}
+function rttAcquisAt(emp,date){if(emp.hours<=35)return 0;const extra=emp.hours-35;const weeks=monthsBetween(emp.rttSince||emp.arrival,date)*4.35;return Math.round(weeks*extra/7*2)/2;}
+function sumAbsUntil(name,type,date){return S.absences.filter(a=>a.name===name&&a.type===type&&parseD(a.end)<=date).reduce((s,a)=>s+(+a.jours||0),0);}
+function sumReqsUntil(name,type,date){return(S.requests||[]).filter(r=>r.name===name&&r.status!=='rejected'&&r.type===type&&parseD(r.end)<=date).reduce((s,r)=>s+(+r.jours||0),0);}
+function renderProjection(){
+  const emp=currentEmployee;if(!emp)return;
+  const input=document.getElementById('proj-month');if(!input)return;
+  const val=input.value,container=document.getElementById('proj-result');
+  if(!val){container.innerHTML='';return;}
+  const[y,m]=val.split('-').map(Number);
+  const projDate=new Date(y,m,0,23,59,59);
+  if(projDate<today()){container.innerHTML=`<div class="alert alert-yellow" style="margin-top:.75rem"><span>⚠️</span><div>Choisissez une date future.</div></div>`;return;}
+  const mname=MONTHS_FR[m-1];
+  const cpAcq=cpAcquisAt(emp,projDate),cpPos=sumAbsUntil(emp.name,'CP',projDate),cpPend=sumReqsUntil(emp.name,'CP',projDate),cpDispo=cpAcq-cpPos-cpPend;
+  const hasRTT=emp.hours>35,rttAcq=hasRTT?rttAcquisAt(emp,projDate):0,rttPos=hasRTT?sumAbsUntil(emp.name,'RTT',projDate):0,rttPend=hasRTT?sumReqsUntil(emp.name,'RTT',projDate):0,rttDispo=rttAcq-rttPos-rttPend;
+  container.innerHTML=`<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--g200)">
+    <div style="font-size:.78rem;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.7rem">📊 Fin ${mname} ${y}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:.7rem">
+      <div style="background:var(--green-lt);border:1px solid #86efac;border-radius:10px;padding:.9rem">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary-dk);margin-bottom:.25rem">CP disponibles</div>
+        <div style="font-family:'DM Mono',monospace;font-size:1.55rem;font-weight:500;color:${cpDispo<0?'var(--red)':'var(--primary-dk)'}">${cpDispo.toFixed(1)}<span style="font-size:.8rem"> j</span></div>
+        <div style="font-size:.68rem;color:var(--primary-dk);opacity:.7;margin-top:.15rem">${cpAcq.toFixed(1)} acquis · ${cpPos.toFixed(1)} posés${cpPend>0?` · ${cpPend.toFixed(1)} en attente`:''}</div>
+      </div>
+      ${hasRTT?`<div style="background:var(--purple-lt);border:1px solid #c4b5fd;border-radius:10px;padding:.9rem">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple);margin-bottom:.25rem">RTT disponibles</div>
+        <div style="font-family:'DM Mono',monospace;font-size:1.55rem;font-weight:500;color:${rttDispo<0?'var(--red)':'var(--purple)'}">${rttDispo.toFixed(1)}<span style="font-size:.8rem"> j</span></div>
+        <div style="font-size:.68rem;color:var(--purple);opacity:.7;margin-top:.15rem">${rttAcq.toFixed(1)} acquis · ${rttPos.toFixed(1)} posés${rttPend>0?` · ${rttPend.toFixed(1)} en attente`:''}</div>
+      </div>`:''}
+    </div>
+    ${cpDispo<0?`<div class="alert alert-yellow" style="margin-top:.7rem"><span>⚠️</span><div>À cette date, votre solde CP sera négatif de <strong>${Math.abs(cpDispo).toFixed(1)} j</strong>.</div></div>`:''}
+  </div>`;
+}
 
 // ══════════════════════════════════════════════════════════════════════════
 // TOAST
@@ -452,16 +499,12 @@ async function refreshAndRender(page){
 // ROUTING
 // ══════════════════════════════════════════════════════════════════════════
 function goPage(id,btn){
-  // Refresh data silently on page switch
-  loadFromCloud().then(()=>{
-    if(currentEmployee)currentEmployee=S.employees.find(e=>e.name===currentEmployee.name)||currentEmployee;
-    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-    document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-    document.getElementById("page-"+id).classList.add("active");
-    btn.classList.add("active");
-    const renders={solde:renderSolde,calendar:renderCalEmployee,absences:renderMyAbs,demande:renderDemandeForm};
-    renders[id]?.();
-  });
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  btn.classList.add("active");
+  const renders={solde:renderSolde,calendar:renderCalEmployee,absences:renderMyAbs,demande:renderDemandeForm};
+  renders[id]?.();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -493,6 +536,17 @@ function renderSolde(){
       </div>
     </div>
     <div class="alert alert-yellow"><span>ℹ️</span><div><strong>Règle Syntec :</strong> 2,5 j de CP par mois travaillé · 30 j max/an · Période : 1er juin → 31 mai. Les RTT ne sont pas reportables.</div></div>`;
+  // Projection card
+  const minMonth=new Date().toISOString().slice(0,7);
+  document.getElementById("solde-projection").innerHTML=`
+    <div class="card">
+      <div class="card-title">🔮 Simuler mon solde</div>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <div style="font-size:.85rem;color:var(--g600)">À quelle date veux-tu partir ?</div>
+        <input type="month" id="proj-month" min="${minMonth}" style="border:1.5px solid var(--g200);border-radius:8px;padding:.4rem .7rem;font-family:inherit;font-size:.88rem;color:var(--g800);background:var(--white);outline:none;cursor:pointer" onchange="renderProjection()">
+      </div>
+      <div id="proj-result"></div>
+    </div>`;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -506,8 +560,9 @@ function renderCalEmployee(){
   document.getElementById("cal-title").textContent=`${MONTHS_FR[calM]} ${calY}`;
   document.getElementById("cal-dhs").innerHTML=DAYS_FR.map(d=>`<div class="cal-dh">${d}</div>`).join("");
   const byDay={};
-  S.absences.filter(a=>a.name===name).forEach(ab=>{const sd=parseD(ab.start),ed=parseD(ab.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=d.toISOString().slice(0,10);if(!byDay[k])byDay[k]=[];byDay[k].push({type:ab.type,pending:false});d.setDate(d.getDate()+1);}});
-  (S.requests||[]).filter(r=>r.name===name&&r.status==='pending').forEach(req=>{const sd=parseD(req.start),ed=parseD(req.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=d.toISOString().slice(0,10);if(!byDay[k])byDay[k]=[];byDay[k].push({type:req.type,pending:true});d.setDate(d.getDate()+1);}});
+  const localISO=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  S.absences.filter(a=>a.name===name).forEach(ab=>{const sd=parseD(ab.start),ed=parseD(ab.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=localISO(d);if(!byDay[k])byDay[k]=[];byDay[k].push({type:ab.type,pending:false});d.setDate(d.getDate()+1);}});
+  (S.requests||[]).filter(r=>r.name===name&&r.status==='pending').forEach(req=>{const sd=parseD(req.start),ed=parseD(req.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=localISO(d);if(!byDay[k])byDay[k]=[];byDay[k].push({type:req.type,pending:true});d.setDate(d.getDate()+1);}});
   const first=new Date(calY,calM,1),last=new Date(calY,calM+1,0),startDow=(first.getDay()+6)%7,now=today();
   let html="";
   for(let i=0;i<startDow;i++)html+=`<div class="cal-day other"></div>`;
@@ -565,6 +620,8 @@ function renderDemandeForm(){
 }
 function onDTypeChange(){document.getElementById("css-note-wrap").style.display=document.getElementById("d-type").value==="Congé sans solde"?"block":"none";}
 
+let _pendingSubmit=null;
+
 async function submitRequest(){
   if(!currentEmployee)return;
   const type=document.getElementById("d-type").value,start=document.getElementById("d-start").value;
@@ -572,7 +629,30 @@ async function submitRequest(){
   const ferier=parseInt(document.getElementById("d-ferier").value)||0,comment=document.getElementById("d-comment").value.trim();
   if(!start||!end||!jours){toast("⚠️ Remplissez les champs obligatoires");return;}
   if(parseD(end)<parseD(start)){toast("⚠️ La date de fin doit être après le début");return;}
-  // Reload before saving to avoid conflicts
+  // Vérification prise en avance (CP et RTT uniquement)
+  if(type==='CP'||type==='RTT'){
+    const emp=currentEmployee;
+    const acq=type==='CP'?(cpAcquis(emp)+(emp.credit||0)):rttAcquis(emp);
+    const used=sumAbs(emp.name,type);
+    const pending=(S.requests||[]).filter(r=>r.name===emp.name&&r.type===type&&r.status==='pending').reduce((s,r)=>s+(+r.jours||0),0);
+    const available=acq-used-pending,deficit=jours-available;
+    if(deficit>5){
+      document.getElementById("avance-summary").innerHTML=`<strong>Type :</strong> ${type}<br><strong>Demandé :</strong> ${jours} j<br><strong>Solde disponible :</strong> ${available.toFixed(1)} j<br><strong>Dépassement :</strong> <span style="color:var(--orange);font-weight:600">+${deficit.toFixed(1)} j au-delà de votre solde</span>`;
+      _pendingSubmit={type,start,end,jours,ferier,comment};
+      openModal('mod-avance');
+      return;
+    }
+  }
+  await doSubmit({type,start,end,jours,ferier,comment});
+}
+
+async function confirmAvanceSubmit(){
+  closeModal('mod-avance');
+  if(_pendingSubmit)await doSubmit(_pendingSubmit);
+  _pendingSubmit=null;
+}
+
+async function doSubmit({type,start,end,jours,ferier,comment}){
   await loadFromCloud();
   if(!S.requests)S.requests=[];
   if(!S.nextReqId)S.nextReqId=1;
