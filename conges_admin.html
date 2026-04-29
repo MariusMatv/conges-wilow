@@ -430,9 +430,11 @@ function setSyncState(state) {
 async function loadFromCloud() {
   try {
     showLoader(true);
+    const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 5000);
     const res = await fetch(`${BIN_URL}/latest`, {
-      headers: { 'X-Master-Key': JSONBIN_API_KEY }
+      headers: { 'X-Master-Key': JSONBIN_API_KEY }, signal: ctrl.signal
     });
+    clearTimeout(t);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     S = json.record;
