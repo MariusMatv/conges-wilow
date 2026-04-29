@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Congés · Admin · Wilow</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:#0f172a; --navy2:#1e293b; --blue:#2563eb; --blue-lt:#eff6ff; --blue-dk:#1d4ed8;
+  --white:#ffffff; --g50:#f8fafc; --g100:#f1f5f9; --g200:#e2e8f0; --g300:#cbd5e1;
+  --g400:#94a3b8; --g600:#475569; --g700:#334155; --g800:#1e293b;
+  --green:#16a34a; --green-lt:#dcfce7; --green-dk:#14532d;
+  --red:#dc2626; --red-lt:#fee2e2; --orange:#ea580c; --orange-lt:#ffedd5;
+  --purple:#7c3aed; --purple-lt:#ede9fe; --teal:#0d9488; --teal-lt:#ccfbf1;
+  --yellow:#ca8a04; --yellow-lt:#fef9c3; --pink:#db2777; --pink-lt:#fce7f3;
+  --r:10px; --sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --sh-md:0 4px 20px rgba(0,0,0,.09); --sh-lg:0 20px 60px rgba(0,0,0,.14);
+}
+html { font-size: 15px; }
+body { font-family:'Instrument Sans',sans-serif; background:var(--g100); color:var(--g800); min-height:100vh; display:flex; flex-direction:column; }
+
+/* LOADER */
+#loader {
+  position:fixed; inset:0; background:rgba(15,23,42,.6); backdrop-filter:blur(4px);
+  z-index:9999; display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:1rem; color:#fff;
+}
+#loader.hidden { display:none; }
+.spinner { width:36px; height:36px; border:3px solid rgba(255,255,255,.2); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loader-text { font-size:.85rem; font-weight:500; opacity:.8; }
+
+/* OFFLINE BANNER */
+#offline-banner {
+  display:none; background:#fef9c3; border-bottom:1px solid #fde68a;
+  color:#78350f; padding:.5rem 1.5rem; font-size:.8rem; font-weight:500;
+  text-align:center;
+}
+#offline-banner.show { display:block; }
+
+/* HEADER */
+header { background:var(--navy); color:var(--white); padding:0 1.5rem; display:flex; align-items:center; justify-content:space-between; height:58px; position:sticky; top:0; z-index:200; box-shadow:0 2px 20px rgba(0,0,0,.3); gap:.5rem; }
+.logo { font-family:'DM Serif Display',serif; font-size:1.15rem; letter-spacing:-.02em; display:flex; align-items:center; gap:.5rem; flex-shrink:0; }
+.logo-badge { background:rgba(37,99,235,.35); border:1px solid rgba(37,99,235,.5); color:#93c5fd; font-family:'Instrument Sans',sans-serif; font-size:.65rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:.15rem .45rem; border-radius:4px; }
+.header-actions { display:flex; gap:.4rem; flex-wrap:wrap; align-items:center; }
+.sync-indicator { font-size:.72rem; color:rgba(255,255,255,.5); display:flex; align-items:center; gap:.3rem; }
+.sync-dot { width:6px; height:6px; border-radius:50%; background:var(--green); }
+.sync-dot.syncing { background:var(--yellow); animation:pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* BUTTONS */
+.btn { display:inline-flex; align-items:center; gap:.35rem; padding:.45rem .9rem; border-radius:8px; border:none; font-family:'Instrument Sans',sans-serif; font-size:.82rem; font-weight:500; cursor:pointer; transition:all .15s; white-space:nowrap; line-height:1; }
+.btn-ghost { background:rgba(255,255,255,.1); color:var(--white); }
+.btn-ghost:hover { background:rgba(255,255,255,.18); }
+.btn-primary { background:var(--blue); color:var(--white); box-shadow:0 1px 3px rgba(37,99,235,.3); }
+.btn-primary:hover { background:var(--blue-dk); transform:translateY(-1px); }
+.btn-success { background:var(--green); color:var(--white); }
+.btn-danger { background:var(--red); color:var(--white); }
+.btn-danger:hover { filter:brightness(1.08); }
+.btn-outline { background:var(--white); color:var(--g700); border:1.5px solid var(--g200); }
+.btn-outline:hover { background:var(--g50); border-color:var(--g300); }
+.btn-sm { padding:.28rem .65rem; font-size:.76rem; border-radius:6px; }
+.btn-approve { background:var(--green-lt); color:var(--green); border:1.5px solid #bbf7d0; }
+.btn-approve:hover { background:#bbf7d0; }
+.btn-reject { background:var(--red-lt); color:var(--red); border:1.5px solid #fecaca; }
+.btn-reject:hover { background:#fecaca; }
+
+/* NAV */
+nav { background:var(--white); border-bottom:1px solid var(--g200); padding:0 1.5rem; display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+nav::-webkit-scrollbar { display:none; }
+nav button { background:none; border:none; cursor:pointer; font-family:'Instrument Sans',sans-serif; font-size:.85rem; font-weight:500; color:var(--g400); padding:.9rem 1.1rem; border-bottom:2px solid transparent; white-space:nowrap; transition:all .15s; display:flex; align-items:center; gap:.35rem; }
+nav button:hover { color:var(--g800); }
+nav button.active { color:var(--blue); border-bottom-color:var(--blue); }
+.nav-badge { background:var(--red); color:#fff; font-size:.6rem; font-weight:700; padding:.1rem .35rem; border-radius:999px; line-height:1.3; min-width:16px; text-align:center; }
+
+/* MAIN */
+main { flex:1; padding:1.4rem 1.5rem; max-width:1400px; width:100%; margin:0 auto; }
+.page { display:none; }
+.page.active { display:block; }
+
+/* CARD */
+.card { background:var(--white); border-radius:var(--r); box-shadow:var(--sh); padding:1.35rem; margin-bottom:1.2rem; border:1px solid var(--g200); }
+.card-title { font-family:'DM Serif Display',serif; font-size:1rem; color:var(--navy); margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
+.page-title { font-family:'DM Serif Display',serif; font-size:1.2rem; color:var(--navy); }
+.page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.1rem; flex-wrap:wrap; gap:.5rem; }
+
+/* KPI */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:1rem; margin-bottom:1.3rem; }
+.kpi { background:var(--white); border-radius:var(--r); padding:1.1rem 1.25rem; box-shadow:var(--sh); border:1px solid var(--g200); border-top:3px solid var(--blue); transition:transform .15s,box-shadow .15s; }
+.kpi:hover { transform:translateY(-2px); box-shadow:var(--sh-md); }
+.kpi.green { border-top-color:var(--green); }
+.kpi.orange { border-top-color:var(--orange); }
+.kpi.purple { border-top-color:var(--purple); }
+.kpi.red { border-top-color:var(--red); }
+.kpi.pink { border-top-color:var(--pink); }
+.kpi.yellow { border-top-color:var(--yellow); }
+.kpi-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--g400); margin-bottom:.3rem; }
+.kpi-value { font-family:'DM Mono',monospace; font-size:1.7rem; font-weight:500; color:var(--navy); line-height:1.1; }
+.kpi-sub { font-size:.72rem; color:var(--g400); margin-top:.18rem; }
+
+/* TABLE */
+.table-wrap { overflow-x:auto; border-radius:8px; }
+table { width:100%; border-collapse:collapse; font-size:.83rem; min-width:500px; }
+thead th { background:var(--g50); color:var(--g600); padding:.7rem 1rem; text-align:left; font-weight:700; font-size:.7rem; letter-spacing:.05em; text-transform:uppercase; white-space:nowrap; border-bottom:2px solid var(--g200); }
+tbody tr { border-bottom:1px solid var(--g100); transition:background .1s; }
+tbody tr:hover { background:var(--g50); }
+tbody td { padding:.65rem 1rem; vertical-align:middle; }
+tbody tr:last-child { border-bottom:none; }
+
+/* BADGE */
+.badge { display:inline-flex; align-items:center; gap:.22rem; padding:.2rem .6rem; border-radius:999px; font-size:.69rem; font-weight:600; white-space:nowrap; }
+.badge-blue { background:var(--blue-lt); color:var(--blue-dk); }
+.badge-green { background:var(--green-lt); color:var(--green-dk); }
+.badge-purple { background:var(--purple-lt); color:var(--purple); }
+.badge-teal { background:var(--teal-lt); color:var(--teal); }
+.badge-orange { background:var(--orange-lt); color:var(--orange); }
+.badge-red { background:var(--red-lt); color:var(--red); }
+.badge-yellow { background:var(--yellow-lt); color:var(--yellow); }
+.badge-pink { background:var(--pink-lt); color:var(--pink); }
+.badge-gray { background:var(--g100); color:var(--g600); }
+
+/* PROGRESS */
+.prog-wrap { background:var(--g100); border-radius:999px; height:5px; overflow:hidden; margin-top:.35rem; }
+.prog-bar { height:100%; border-radius:999px; transition:width .4s; }
+
+/* MONO */
+.mono { font-family:'DM Mono',monospace; }
+.pos { color:var(--green); font-weight:600; font-family:'DM Mono',monospace; }
+.neg { color:var(--red); font-weight:600; font-family:'DM Mono',monospace; }
+.mid { color:var(--blue); font-weight:600; font-family:'DM Mono',monospace; }
+
+/* FORM */
+.form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(185px,1fr)); gap:.9rem; }
+.form-group { display:flex; flex-direction:column; gap:.3rem; }
+.form-group.full { grid-column:1/-1; }
+label { font-size:.73rem; font-weight:600; color:var(--g600); text-transform:uppercase; letter-spacing:.04em; }
+label .opt { font-weight:400; text-transform:none; color:var(--g400); }
+input,select,textarea { border:1.5px solid var(--g200); border-radius:8px; padding:.5rem .75rem; font-family:'Instrument Sans',sans-serif; font-size:.88rem; color:var(--g800); background:var(--white); transition:border-color .15s; outline:none; width:100%; }
+input:focus,select:focus,textarea:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+textarea { resize:vertical; min-height:70px; }
+.hint { font-size:.71rem; color:var(--g400); margin-top:.12rem; font-style:italic; }
+
+/* CALENDAR */
+.cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; flex-wrap:wrap; gap:.5rem; }
+.cal-title { font-family:'DM Serif Display',serif; font-size:1.25rem; color:var(--navy); }
+.cal-filters { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.9rem; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.cal-dh { text-align:center; font-size:.67rem; font-weight:700; color:var(--g400); padding:.4rem 0; text-transform:uppercase; letter-spacing:.05em; }
+.cal-day { min-height:74px; border-radius:8px; padding:.35rem .4rem; background:var(--white); border:1px solid var(--g200); position:relative; transition:border-color .15s; }
+.cal-day:hover { border-color:var(--blue); }
+.cal-day.other { background:var(--g50); opacity:.4; }
+.cal-day.we { background:var(--g50); }
+.cal-day.today { border:2px solid var(--blue); }
+.cal-day.ferie { background:#fff7ed; }
+.cal-dn { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--g400); margin-bottom:.22rem; }
+.cal-day.today .cal-dn-inner { background:var(--blue); color:#fff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.68rem; }
+.cal-evt { border-radius:4px; padding:.07rem .28rem; font-size:.61rem; font-weight:600; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* DEMANDES */
+.req-card { background:var(--white); border-radius:var(--r); border:1px solid var(--g200); box-shadow:var(--sh); padding:1.1rem 1.25rem; margin-bottom:.75rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; transition:box-shadow .15s; }
+.req-card:hover { box-shadow:var(--sh-md); }
+.req-info { flex:1; min-width:200px; }
+.req-name { font-weight:600; font-size:.9rem; color:var(--navy); margin-bottom:.2rem; display:flex; align-items:center; gap:.5rem; }
+.req-detail { font-size:.8rem; color:var(--g600); display:flex; flex-wrap:wrap; gap:.6rem; }
+.req-actions { display:flex; gap:.5rem; flex-shrink:0; }
+.req-comment { font-size:.78rem; font-style:italic; color:var(--g600); background:var(--g50); padding:.35rem .7rem; border-radius:6px; margin-top:.4rem; }
+.empty-state { text-align:center; padding:3rem 1rem; color:var(--g400); }
+.empty-icon { font-size:2.5rem; margin-bottom:.6rem; opacity:.5; }
+.empty-text { font-size:.9rem; }
+
+/* MODAL */
+.overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,.5); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; padding:1rem; }
+.overlay.open { display:flex; }
+.modal { background:var(--white); border-radius:16px; padding:1.75rem; width:100%; max-width:540px; box-shadow:var(--sh-lg); max-height:90vh; overflow-y:auto; animation:up .2s ease; border:1px solid var(--g200); }
+@keyframes up { from{transform:translateY(12px);opacity:0} to{transform:none;opacity:1} }
+.modal-title { font-family:'DM Serif Display',serif; font-size:1.2rem; color:var(--navy); margin-bottom:1.2rem; }
+.modal-footer { display:flex; gap:.65rem; justify-content:flex-end; margin-top:1.4rem; }
+
+/* TOAST */
+#toast { position:fixed; bottom:1.25rem; right:1.25rem; z-index:9999; background:var(--navy); color:var(--white); padding:.75rem 1.2rem; border-radius:10px; font-size:.83rem; font-weight:500; box-shadow:var(--sh-lg); transform:translateY(80px); transition:transform .25s; pointer-events:none; }
+#toast.show { transform:none; }
+
+/* AVATAR */
+.av { width:32px; height:32px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; color:var(--white); flex-shrink:0; }
+
+/* ALERT */
+.alert { border-radius:10px; padding:.9rem 1.1rem; font-size:.8rem; line-height:1.65; display:flex; gap:.6rem; align-items:flex-start; margin-bottom:.75rem; }
+.alert-yellow { background:var(--yellow-lt); border:1px solid #fde68a; color:#78350f; }
+.alert-pink { background:var(--pink-lt); border:1px solid #fbcfe8; color:#831843; }
+.alert-blue { background:var(--blue-lt); border:1px solid #bfdbfe; color:#1e40af; }
+
+/* FILTER BAR */
+.filter-bar { display:flex; gap:.4rem; flex-wrap:wrap; align-items:center; }
+.filter-bar select { font-size:.82rem; padding:.38rem .7rem; border-radius:8px; border:1.5px solid var(--g200); width:auto; }
+
+@media(max-width:640px){
+  header{padding:0 1rem;height:52px;} main{padding:1rem;}
+  .header-actions .btn:not(.btn-primary):not(#btn-add-abs){display:none;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:.65rem;} .kpi-value{font-size:1.35rem;}
+  nav button{padding:.75rem .85rem;font-size:.8rem;}
+}
+#file-import{display:none;}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="spinner"></div>
+  <div class="loader-text">Chargement des données…</div>
+</div>
+
+<!-- OFFLINE BANNER -->
+<div id="offline-banner">⚠️ Mode hors-ligne — les données affichées sont en cache local. Vérifiez votre connexion internet.</div>
+
+<header>
+  <div class="logo">🌿 Wilow<span style="color:var(--g400);margin:0 .15rem">·</span>Congés <span class="logo-badge">Admin</span></div>
+  <div class="header-actions">
+    <span class="sync-indicator"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">Synchronisé</span></span>
+    <button class="btn btn-ghost" onclick="exportJSON()">⬇ Export</button>
+    <button class="btn btn-ghost" onclick="document.getElementById('file-import').click()">⬆ Import</button>
+    <input type="file" id="file-import" accept=".json" onchange="importJSON(this)">
+    <button id="btn-add-abs" class="btn btn-primary" onclick="openAbsModal()">+ Absence</button>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="goPage('dashboard',this)">📊 Tableau de bord</button>
+  <button onclick="goPage('calendar',this)">📅 Calendrier</button>
+  <button onclick="goPage('absences',this)">📋 Absences</button>
+  <button onclick="goPage('demandes',this)" id="nav-demandes">📬 Demandes <span class="nav-badge" id="badge-demandes" style="display:none">0</span></button>
+  <button onclick="goPage('params',this)">⚙️ Paramètres</button>
+</nav>
+
+<main>
+<div id="page-dashboard" class="page active">
+  <div class="kpi-grid" id="kpis"></div>
+  <div class="card">
+    <div class="card-title">👥 Soldes par collaborateur</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Collaborateur</th><th>Contrat</th><th>Entrée</th><th>CP acquis</th><th>Crédit 🎁</th><th>CP posés</th><th>Solde CP</th><th>RTT</th><th>Sans solde</th><th>École</th></tr></thead>
+        <tbody id="tb-dash"></tbody>
+      </table>
+    </div>
+  </div>
+  <div id="note-legal"></div>
+</div>
+
+<div id="page-calendar" class="page">
+  <div class="card">
+    <div class="cal-header">
+      <button class="btn btn-outline" onclick="chgMonth(-1)">← Préc.</button>
+      <div class="cal-title" id="cal-title">—</div>
+      <button class="btn btn-outline" onclick="chgMonth(1)">Suiv. →</button>
+    </div>
+    <div class="cal-filters" id="cal-filters"></div>
+    <div class="cal-grid" id="cal-dhs"></div>
+    <div class="cal-grid" style="margin-top:3px" id="cal-grid"></div>
+    <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap;" id="cal-legend"></div>
+  </div>
+</div>
+
+<div id="page-absences" class="page">
+  <div class="page-header">
+    <div class="page-title">Toutes les absences</div>
+    <div class="filter-bar">
+      <select id="fil-emp" onchange="renderAbs()"><option value="">Tous</option></select>
+      <select id="fil-type" onchange="renderAbs()"><option value="">Tous types</option></select>
+      <button class="btn btn-primary" onclick="openAbsModal()">+ Absence</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table><thead><tr><th>Collaborateur</th><th>Type</th><th>Début</th><th>Fin</th><th>Jours</th><th>Fériés</th><th>Commentaire</th><th></th></tr></thead><tbody id="tb-abs"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div id="page-demandes" class="page">
+  <div class="page-header">
+    <div class="page-title">📬 Demandes de congés</div>
+    <div class="filter-bar">
+      <select id="fil-req-status" onchange="renderDemandes()">
+        <option value="pending">En attente</option>
+        <option value="approved">Approuvées</option>
+        <option value="rejected">Refusées</option>
+        <option value="">Toutes</option>
+      </select>
+      <button class="btn btn-outline btn-sm" onclick="loadFromCloud().then(renderDemandes)">🔄 Actualiser</button>
+    </div>
+  </div>
+  <div id="demandes-list"></div>
+</div>
+
+<div id="page-params" class="page">
+  <div class="page-header">
+    <div class="page-title">Équipe & Configuration</div>
+    <button class="btn btn-primary" onclick="openEmpModal()">+ Collaborateur</button>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table><thead><tr><th>Collaborateur</th><th>Contrat</th><th>Entrée</th><th>h/sem.</th><th>39h depuis</th><th>Crédit CP 🎁</th><th></th></tr></thead><tbody id="tb-params"></tbody></table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Légende des types</div>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;" id="type-legend"></div>
+  </div>
+  <div class="alert alert-yellow"><span>ℹ️</span><div><strong>Syntec – CP :</strong> 2,5 j/mois · 30 j ouvrables/an · Période 1er juin → 31 mai.</div></div>
+  <div class="alert alert-pink"><span>💸</span><div><strong>Congé sans solde :</strong> hors quota CP — retenue salariale à traiter manuellement en paie.</div></div>
+</div>
+</main>
+
+<!-- MODAL ABSENCE -->
+<div class="overlay" id="mod-abs">
+  <div class="modal">
+    <div class="modal-title" id="mod-abs-title">+ Nouvelle absence</div>
+    <input type="hidden" id="abs-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Collaborateur</label><select id="f-name"></select></div>
+      <div class="form-group"><label>Type d'absence</label><select id="f-type" onchange="onTypeChange()"></select></div>
+      <div class="form-group"><label>Date de début</label><input type="date" id="f-start"></div>
+      <div class="form-group"><label>Date de fin</label><input type="date" id="f-end"></div>
+      <div class="form-group"><label>Jours ouvrés posés</label><input type="number" id="f-jours" min="0.5" step="0.5" placeholder="ex: 3"></div>
+      <div class="form-group"><label>Jours fériés inclus <span class="opt">(optionnel)</span></label><input type="number" id="f-ferier" min="0" step="1" value="0"></div>
+      <div class="form-group full" id="css-note-wrap" style="display:none">
+        <div class="alert alert-pink" style="font-size:.78rem;padding:.65rem .85rem"><span>💸</span><div><strong>Sans solde :</strong> non déduit du CP, à traiter en paie.</div></div>
+      </div>
+      <div class="form-group full"><label>Commentaire <span class="opt">(optionnel)</span></label><textarea id="f-comment" placeholder="Notes libres…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mod-abs')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveAbs()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EMPLOYEE -->
+<div class="overlay" id="mod-emp">
+  <div class="modal">
+    <div class="modal-title" id="mod-emp-title">+ Nouveau collaborateur</div>
+    <input type="hidden" id="emp-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Prénom / Nom</label><input type="text" id="e-name" placeholder="ex: Sophie Durand"></div>
+      <div class="form-group"><label>Type de contrat</label>
+        <select id="e-type"><option value="CDI">CDI</option><option value="Alternance">Alternance</option><option value="CDD">CDD</option><option value="Stage">Stage</option><option value="Freelance">Freelance</option></select>
+      </div>
+      <div class="form-group"><label>Date d'entrée</label><input type="date" id="e-arrival"></div>
+      <div class="form-group"><label>Heures / semaine</label><input type="number" id="e-hours" min="1" max="48" step="0.5" value="35"><div class="hint">35 = standard · 39 = RTT Syntec</div></div>
+      <div class="form-group" id="rtt-date-wrap"><label>39h en vigueur depuis <span class="opt">(si ≠ entrée)</span></label><input type="date" id="e-rtt-since"><div class="hint">Laisser vide si 39h dès l'arrivée</div></div>
+      <div class="form-group"><label>Crédit CP offert (jours)</label><input type="number" id="e-credit" min="0" step="0.5" value="0"><div class="hint">Jours accordés en avance</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mod-emp')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveEmp()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REJECT -->
+<div class="overlay" id="mod-reject">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">✖ Refuser la demande</div>
+    <input type="hidden" id="reject-id">
+    <div class="form-group"><label>Motif <span class="opt">(optionnel)</span></label><textarea id="reject-note" placeholder="Ex: Période de forte activité…" style="min-height:90px"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mod-reject')">Annuler</button>
+      <button class="btn btn-danger" onclick="confirmReject()">Confirmer le refus</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════
+// ⚙️  CONFIGURATION — À REMPLIR AVEC VOS CLÉS
+// ══════════════════════════════════════════════════════════════════════════
+const JSONBIN_API_KEY = '$2a$10$UiiW/7Dpnc2rqJOytJsSFO0oEUukHgh0lI4AQQ2..9CoHParU6a1G';
+const JSONBIN_BIN_ID  = '69f1e68d36566621a805c1fa';
+const BIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+// ══════════════════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════════════════
+let S = null;
+let saveTimer = null;
+
+function defaultData() {
+  return {
+    employees: [
+      { id:1, name:"Céline",  arrival:"2025-09-01", type:"CDI",        hours:35, rttSince:null, credit:0 },
+      { id:2, name:"Tom",     arrival:"2025-09-01", type:"Alternance", hours:35, rttSince:null, credit:0 },
+      { id:3, name:"Maxime",  arrival:"2025-09-25", type:"Alternance", hours:35, rttSince:null, credit:0 },
+      { id:4, name:"Fanny",   arrival:"2026-02-02", type:"CDI",        hours:35, rttSince:null, credit:0 },
+      { id:5, name:"Gabriel", arrival:"2026-02-16", type:"CDI",        hours:35, rttSince:null, credit:0 },
+      { id:6, name:"Rita",    arrival:"2026-03-02", type:"CDI",        hours:39, rttSince:"2026-04-01", credit:0 },
+      { id:7, name:"Lea",     arrival:"2026-03-09", type:"CDI",        hours:35, rttSince:null, credit:0 },
+    ],
+    absences: [
+      { id:1, name:"Céline", start:"2025-09-05", end:"2025-09-05", type:"CP", jours:1, ferier:0, comment:"" },
+      { id:2, name:"Céline", start:"2025-12-26", end:"2025-12-26", type:"CP", jours:1, ferier:0, comment:"" },
+      { id:3, name:"Céline", start:"2025-12-29", end:"2025-12-31", type:"CP", jours:3, ferier:0, comment:"" },
+      { id:4, name:"Céline", start:"2026-01-02", end:"2026-01-02", type:"CP", jours:1, ferier:0, comment:"" },
+      { id:5, name:"Céline", start:"2026-05-11", end:"2026-05-15", type:"CP", jours:4, ferier:1, comment:"" },
+      { id:6, name:"Maxime", start:"2025-12-26", end:"2025-12-26", type:"CP", jours:1, ferier:0, comment:"" },
+      { id:7, name:"Maxime", start:"2025-12-29", end:"2025-12-31", type:"CP", jours:3, ferier:0, comment:"" },
+      { id:8, name:"Maxime", start:"2026-01-02", end:"2026-01-02", type:"CP", jours:1, ferier:0, comment:"" },
+      { id:9, name:"Lea",    start:"2026-04-20", end:"2026-04-24", type:"Congé sans solde", jours:5, ferier:0, comment:"Demandés avant le recrutement" },
+    ],
+    requests: [],
+    nextEmpId: 8, nextAbsId: 10, nextReqId: 1,
+  };
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// CLOUD STORAGE (JSONBin.io)
+// ══════════════════════════════════════════════════════════════════════════
+function setSyncState(state) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if (state === 'syncing') { dot.className = 'sync-dot syncing'; lbl.textContent = 'Sauvegarde…'; }
+  else if (state === 'ok') { dot.className = 'sync-dot'; lbl.textContent = 'Synchronisé'; }
+  else { dot.className = 'sync-dot'; dot.style.background = 'var(--red)'; lbl.textContent = 'Hors-ligne'; }
+}
+
+async function loadFromCloud() {
+  try {
+    showLoader(true);
+    const res = await fetch(`${BIN_URL}/latest`, {
+      headers: { 'X-Access-Key': JSONBIN_API_KEY }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    S = json.record;
+    if (!S.requests)  S.requests  = [];
+    if (!S.nextReqId) S.nextReqId = 1;
+    // Cache local
+    try { localStorage.setItem('wilow_conges_cache', JSON.stringify(S)); } catch(e) {}
+    document.getElementById('offline-banner').classList.remove('show');
+    setSyncState('ok');
+    return true;
+  } catch(e) {
+    // Fallback cache local
+    try {
+      const cached = localStorage.getItem('wilow_conges_cache');
+      if (cached) {
+        S = JSON.parse(cached);
+        document.getElementById('offline-banner').classList.add('show');
+        setSyncState('error');
+        return true;
+      }
+    } catch(e2) {}
+    // Premier lancement : données par défaut
+    S = defaultData();
+    return true;
+  } finally {
+    showLoader(false);
+  }
+}
+
+function save() {
+  // Cache immédiat
+  try { localStorage.setItem('wilow_conges_cache', JSON.stringify(S)); } catch(e) {}
+  // Sauvegarde cloud avec debounce (1.2s)
+  clearTimeout(saveTimer);
+  setSyncState('syncing');
+  saveTimer = setTimeout(saveToCloud, 1200);
+}
+
+async function saveToCloud() {
+  try {
+    const res = await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: { 'X-Access-Key': JSONBIN_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(S)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    setSyncState('ok');
+  } catch(e) {
+    setSyncState('error');
+    toast('⚠️ Erreur de sauvegarde — données en cache local');
+  }
+}
+
+function showLoader(v) {
+  document.getElementById('loader').classList.toggle('hidden', !v);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════════════════
+const ABSENCE_TYPES = [
+  { key:"CP",               label:"Congés payés",     badge:"badge-blue",   cal:["#dbeafe","#1d4ed8"] },
+  { key:"RTT",              label:"RTT",              badge:"badge-purple", cal:["#ede9fe","#7c3aed"] },
+  { key:"Congé école",      label:"Congé école",      badge:"badge-teal",   cal:["#ccfbf1","#0d9488"] },
+  { key:"Maladie",          label:"Maladie",          badge:"badge-red",    cal:["#fee2e2","#dc2626"] },
+  { key:"Congé sans solde", label:"Sans solde",       badge:"badge-pink",   cal:["#fce7f3","#db2777"] },
+  { key:"Maternité/Pater.", label:"Maternité/Pater.", badge:"badge-green",  cal:["#dcfce7","#16a34a"] },
+  { key:"Autre",            label:"Autre",            badge:"badge-orange", cal:["#ffedd5","#ea580c"] },
+];
+const TYPE_MAP = Object.fromEntries(ABSENCE_TYPES.map(t => [t.key, t]));
+const CSS_TYPES = new Set(["Congé sans solde","Maladie","Maternité/Pater.","Autre"]);
+const FERIES = new Set(["2025-01-01","2025-04-21","2025-05-01","2025-05-08","2025-05-29","2025-06-09","2025-07-14","2025-08-15","2025-11-01","2025-11-11","2025-12-25","2026-01-01","2026-04-06","2026-05-01","2026-05-08","2026-05-14","2026-05-25","2026-07-14","2026-08-15","2026-11-01","2026-11-11","2026-12-25","2027-01-01","2027-03-29","2027-05-01","2027-05-08","2027-05-17","2027-07-14","2027-08-15","2027-11-01","2027-11-11","2027-12-25"]);
+const MONTHS_FR = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const DAYS_FR   = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+const EMP_COLORS = ["#3b82f6","#0d9488","#7c3aed","#16a34a","#ea580c","#dc2626","#ca8a04","#db2777","#0369a1","#059669"];
+
+// ══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════════════
+const empIdx   = name => S.employees.findIndex(e => e.name === name);
+const empColor = name => EMP_COLORS[((empIdx(name)%EMP_COLORS.length)+EMP_COLORS.length)%EMP_COLORS.length]||"#3b82f6";
+const initials = name => name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+const fmtDate  = d => { if(!d) return "—"; const [y,m,day]=d.split("-"); return `${day}/${m}/${y}`; };
+const parseD   = s => s ? new Date(s+"T00:00:00") : null;
+const todayISO = () => new Date().toISOString().slice(0,10);
+const today    = () => new Date();
+function monthsBetween(fromStr,toDate){ const from=parseD(fromStr); if(!from) return 0; return Math.max(0,(toDate-from)/(1000*60*60*24*30.4375)); }
+function cpAcquis(emp){ return Math.min(25,Math.round(monthsBetween(emp.arrival,today())*2.5*2)/2); }
+function rttAcquis(emp){ if(emp.hours<=35) return 0; const extra=emp.hours-35; const weeks=monthsBetween(emp.rttSince||emp.arrival,today())*4.35; return Math.round(weeks*extra/7*2)/2; }
+function sumAbs(name,type){ if(Array.isArray(type)) return type.reduce((s,t)=>s+sumAbs(name,t),0); return S.absences.filter(a=>a.name===name&&a.type===type).reduce((s,a)=>s+(+a.jours||0),0); }
+function cpDeduit(name){ return sumAbs(name,"CP"); }
+
+// ══════════════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════════════
+function toast(msg,dur=2800){ const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("show"),dur); }
+
+// ══════════════════════════════════════════════════════════════════════════
+// NAV BADGE
+// ══════════════════════════════════════════════════════════════════════════
+function updateBadge(){ const n=(S.requests||[]).filter(r=>r.status==='pending').length; const el=document.getElementById('badge-demandes'); if(n>0){el.textContent=n;el.style.display='inline';}else{el.style.display='none';} }
+
+// ══════════════════════════════════════════════════════════════════════════
+// ROUTING
+// ══════════════════════════════════════════════════════════════════════════
+function goPage(id,btn){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  btn.classList.add("active");
+  const renders={dashboard:renderDash,calendar:renderCal,absences:renderAbs,demandes:renderDemandes,params:renderParams};
+  renders[id]?.();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════════════════════
+function renderDash(){
+  const totAcq=S.employees.reduce((s,e)=>s+cpAcquis(e)+(e.credit||0),0);
+  const totPoses=S.employees.reduce((s,e)=>s+cpDeduit(e.name),0);
+  const totSolde=totAcq-totPoses;
+  const totRTT=S.employees.reduce((s,e)=>s+(e.hours>35?rttAcquis(e)-sumAbs(e.name,"RTT"):0),0);
+  const pendingN=(S.requests||[]).filter(r=>r.status==='pending').length;
+  document.getElementById("kpis").innerHTML=`
+    <div class="kpi"><div class="kpi-label">Équipe</div><div class="kpi-value">${S.employees.length}</div><div class="kpi-sub">collaborateurs</div></div>
+    <div class="kpi green"><div class="kpi-label">CP acquis total</div><div class="kpi-value">${totAcq.toFixed(1)}<span style="font-size:.85rem"> j</span></div><div class="kpi-sub">crédits inclus</div></div>
+    <div class="kpi orange"><div class="kpi-label">CP posés total</div><div class="kpi-value">${totPoses.toFixed(1)}<span style="font-size:.85rem"> j</span></div><div class="kpi-sub">sur la période</div></div>
+    <div class="kpi ${totSolde<0?"red":"green"}"><div class="kpi-label">Solde global CP</div><div class="kpi-value" style="color:${totSolde<0?"var(--red)":"var(--green)"}">${totSolde.toFixed(1)}<span style="font-size:.85rem"> j</span></div><div class="kpi-sub">${totSolde<0?"⚠️ Dépassement":"restants"}</div></div>
+    <div class="kpi purple"><div class="kpi-label">Solde RTT (39h)</div><div class="kpi-value">${totRTT.toFixed(1)}<span style="font-size:.85rem"> j</span></div><div class="kpi-sub">≈ 26j/an théorique</div></div>
+    <div class="kpi ${pendingN>0?"yellow":""}"><div class="kpi-label">Demandes en attente</div><div class="kpi-value" style="color:${pendingN>0?"var(--yellow)":"var(--g400)"}">${pendingN}</div><div class="kpi-sub">${pendingN>0?"à traiter":"aucune"}</div></div>`;
+  const tbody=document.getElementById("tb-dash"); tbody.innerHTML="";
+  S.employees.forEach(emp=>{
+    const acq=cpAcquis(emp),cred=emp.credit||0,total=acq+cred,poses=cpDeduit(emp.name),solde=total-poses;
+    const rtt=emp.hours>35?rttAcquis(emp)-sumAbs(emp.name,"RTT"):null;
+    const css=sumAbs(emp.name,"Congé sans solde"),ecole=emp.type==="Alternance"?sumAbs(emp.name,"Congé école"):null;
+    const pct=total>0?Math.min(100,poses/total*100):0;
+    const isAlt=emp.type==="Alternance",hasRTT=emp.hours>35;
+    const tb=hasRTT?"badge-purple":isAlt?"badge-teal":"badge-blue";
+    const tl=hasRTT?`CDI ${emp.hours}h`:isAlt?"Alternant":emp.type;
+    const sc=solde<0?"neg":solde>5?"pos":"mid";
+    tbody.innerHTML+=`<tr>
+      <td><div style="display:flex;align-items:center;gap:.55rem"><div class="av" style="background:${empColor(emp.name)}">${initials(emp.name)}</div><strong>${emp.name}</strong></div></td>
+      <td><span class="badge ${tb}">${tl}</span></td>
+      <td class="mono" style="color:var(--g600);font-size:.78rem">${fmtDate(emp.arrival)}</td>
+      <td class="mono">${acq.toFixed(1)} j</td>
+      <td class="mono" style="color:${cred>0?"var(--orange)":"var(--g300)"}">${cred>0?`+${cred.toFixed(1)} j`:"—"}</td>
+      <td><div class="mono">${poses.toFixed(1)} j</div><div class="prog-wrap" style="width:72px"><div class="prog-bar" style="width:${pct}%;background:${poses>total?"var(--red)":"var(--blue)"}"></div></div></td>
+      <td><span class="${sc}">${solde.toFixed(1)} j</span></td>
+      <td class="mono" style="color:var(--purple)">${rtt!==null?rtt.toFixed(1)+" j":"<span style='color:var(--g300)'>—</span>"}</td>
+      <td class="mono" style="color:var(--pink)">${css>0?css.toFixed(1)+" j":"<span style='color:var(--g300)'>—</span>"}</td>
+      <td class="mono" style="color:var(--teal)">${ecole!==null?ecole.toFixed(1)+" j":"<span style='color:var(--g300)'>—</span>"}</td>
+    </tr>`;
+  });
+  const rttEmp=S.employees.find(e=>e.hours>35);
+  const rttNote=rttEmp?`<strong>🟣 RTT ${rttEmp.name} (${rttEmp.hours}h) :</strong> depuis ${fmtDate(rttEmp.rttSince||rttEmp.arrival)} · ${rttAcquis(rttEmp).toFixed(1)} j acquis · solde <strong>${(rttAcquis(rttEmp)-sumAbs(rttEmp.name,"RTT")).toFixed(1)} j</strong>. `:"";
+  document.getElementById("note-legal").innerHTML=`<div class="alert alert-yellow"><span>ℹ️</span><div>${rttNote}<strong>Syntec CP :</strong> 2,5 j/mois · 30 j/an · Période 1er juin → 31 mai.</div></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════════════════════════════════════
+let calY=today().getFullYear(),calM=today().getMonth(),calFilter=null;
+function chgMonth(d){calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}renderCal();}
+function renderCal(){
+  document.getElementById("cal-title").textContent=`${MONTHS_FR[calM]} ${calY}`;
+  document.getElementById("cal-dhs").innerHTML=DAYS_FR.map(d=>`<div class="cal-dh">${d}</div>`).join("");
+  document.getElementById("cal-filters").innerHTML=
+    `<button class="btn btn-sm ${!calFilter?"btn-primary":"btn-outline"}" onclick="calFilter=null;renderCal()">Tous</button>`+
+    S.employees.map(e=>`<button class="btn btn-sm" style="background:${calFilter===e.name?empColor(e.name):"var(--g100)"};color:${calFilter===e.name?"#fff":"var(--g600)"};border:none" onclick="calFilter='${e.name}';renderCal()">${e.name}</button>`).join("");
+  const byDay={};
+  const src=calFilter?S.absences.filter(a=>a.name===calFilter):S.absences;
+  src.forEach(ab=>{const sd=parseD(ab.start),ed=parseD(ab.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=d.toISOString().slice(0,10);if(!byDay[k])byDay[k]=[];byDay[k].push({name:ab.name,type:ab.type});d.setDate(d.getDate()+1);}});
+  const first=new Date(calY,calM,1),last=new Date(calY,calM+1,0),startDow=(first.getDay()+6)%7,now=today();
+  let html="";
+  for(let i=0;i<startDow;i++) html+=`<div class="cal-day other"></div>`;
+  for(let day=1;day<=last.getDate();day++){
+    const ds=`${calY}-${String(calM+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const dow=(new Date(calY,calM,day).getDay()+6)%7,we=dow>=5,fh=FERIES.has(ds);
+    const isTd=calY===now.getFullYear()&&calM===now.getMonth()&&day===now.getDate();
+    const evs=byDay[ds]||[];
+    let cls="cal-day";if(we)cls+=" we";if(isTd)cls+=" today";if(fh)cls+=" ferie";
+    const numInner=isTd?`<div class="cal-dn"><div class="cal-dn-inner">${day}</div></div>`:`<div class="cal-dn">${day}${fh?" 🔴":""}</div>`;
+    const evHtml=evs.map(ev=>{const t=TYPE_MAP[ev.type];const[bg,fg]=t?t.cal:["#e2e8f0","#475569"];const dot=`<span style="width:5px;height:5px;border-radius:50%;background:${empColor(ev.name)};display:inline-block;margin-right:2px;vertical-align:middle"></span>`;return `<div class="cal-evt" style="background:${bg};color:${fg}" title="${ev.name} – ${ev.type}">${dot}${ev.name}</div>`;}).join("");
+    html+=`<div class="${cls}">${numInner}${evHtml}</div>`;
+  }
+  const rem=(7-(startDow+last.getDate())%7)%7;for(let i=0;i<rem;i++)html+=`<div class="cal-day other"></div>`;
+  document.getElementById("cal-grid").innerHTML=html;
+  document.getElementById("cal-legend").innerHTML=ABSENCE_TYPES.map(t=>`<span class="badge ${t.badge}">${t.label}</span>`).join("")+`<span class="badge badge-orange">🔴 Jour férié</span>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ABSENCES
+// ══════════════════════════════════════════════════════════════════════════
+function renderAbs(){
+  const empSel=document.getElementById("fil-emp"),cur=empSel.value;
+  empSel.innerHTML=`<option value="">Tous</option>`+S.employees.map(e=>`<option value="${e.name}" ${e.name===cur?"selected":""}>${e.name}</option>`).join("");
+  empSel.value=cur;
+  const typeSel=document.getElementById("fil-type"),curT=typeSel.value;
+  typeSel.innerHTML=`<option value="">Tous types</option>`+ABSENCE_TYPES.map(t=>`<option value="${t.key}" ${t.key===curT?"selected":""}>${t.label}</option>`).join("");
+  typeSel.value=curT;
+  const ef=empSel.value,tf=typeSel.value;
+  let rows=[...S.absences].sort((a,b)=>b.start.localeCompare(a.start));
+  if(ef) rows=rows.filter(a=>a.name===ef);
+  if(tf) rows=rows.filter(a=>a.type===tf);
+  const tbody=document.getElementById("tb-abs");
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--g400)">Aucune absence trouvée</td></tr>`;return;}
+  tbody.innerHTML=rows.map(ab=>{const t=TYPE_MAP[ab.type];return `<tr>
+    <td><div style="display:flex;align-items:center;gap:.45rem"><div class="av" style="background:${empColor(ab.name)};width:26px;height:26px;font-size:.65rem">${initials(ab.name)}</div>${ab.name}</div></td>
+    <td><span class="badge ${t?.badge||"badge-orange"}">${ab.type}</span></td>
+    <td class="mono" style="font-size:.8rem">${fmtDate(ab.start)}</td>
+    <td class="mono" style="font-size:.8rem">${fmtDate(ab.end)}</td>
+    <td class="mono" style="font-weight:600">${ab.jours} j</td>
+    <td class="mono" style="color:${ab.ferier>0?"var(--orange)":"var(--g300)"}">${ab.ferier>0?ab.ferier+" j":"—"}</td>
+    <td style="font-size:.8rem;color:var(--g600);font-style:italic">${ab.comment||"—"}</td>
+    <td><div style="display:flex;gap:.25rem"><button class="btn btn-sm btn-outline" onclick="editAbs(${ab.id})">✏️</button><button class="btn btn-sm btn-danger" onclick="delAbs(${ab.id})">🗑</button></div></td>
+  </tr>`;}).join("");
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// DEMANDES
+// ══════════════════════════════════════════════════════════════════════════
+function renderDemandes(){
+  updateBadge();
+  const statusFilter=document.getElementById("fil-req-status").value;
+  let reqs=[...(S.requests||[])].sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));
+  if(statusFilter) reqs=reqs.filter(r=>r.status===statusFilter);
+  const container=document.getElementById("demandes-list");
+  if(!reqs.length){container.innerHTML=`<div class="empty-state"><div class="empty-icon">📬</div><div class="empty-text">Aucune demande ${statusFilter==='pending'?"en attente":statusFilter==='approved'?"approuvée":statusFilter==='rejected'?"refusée":""}</div></div>`;return;}
+  const statusMap={pending:{label:"En attente",badge:"badge-yellow",icon:"⏳"},approved:{label:"Approuvée",badge:"badge-green",icon:"✅"},rejected:{label:"Refusée",badge:"badge-red",icon:"✖"}};
+  container.innerHTML=reqs.map(req=>{
+    const t=TYPE_MAP[req.type],st=statusMap[req.status]||statusMap.pending;
+    const actions=req.status==='pending'?`<button class="btn btn-sm btn-approve" onclick="approveRequest(${req.id})">✅ Approuver</button><button class="btn btn-sm btn-reject" onclick="openRejectModal(${req.id})">✖ Refuser</button>`:`<button class="btn btn-sm btn-outline" onclick="deleteRequest(${req.id})">🗑</button>`;
+    return `<div class="req-card">
+      <div class="av" style="background:${empColor(req.name)}">${initials(req.name)}</div>
+      <div class="req-info">
+        <div class="req-name"><strong>${req.name}</strong><span class="badge ${t?.badge||'badge-gray'}">${req.type}</span><span class="badge ${st.badge}">${st.icon} ${st.label}</span></div>
+        <div class="req-detail"><span>📅 ${fmtDate(req.start)} → ${fmtDate(req.end)}</span><span class="mono">${req.jours} j${req.ferier>0?` (${req.ferier} j fériés)`:""}</span><span style="color:var(--g400);font-size:.75rem">Soumis le ${fmtDate(req.submittedAt)}</span>${req.reviewedAt?`<span style="color:var(--g400);font-size:.75rem">Traité le ${fmtDate(req.reviewedAt)}</span>`:""}</div>
+        ${req.comment?`<div class="req-comment">💬 ${req.comment}</div>`:""}
+        ${req.reviewNote?`<div class="req-comment" style="background:#fee2e2;color:#991b1b">✖ Motif : ${req.reviewNote}</div>`:""}
+      </div>
+      <div class="req-actions">${actions}</div>
+    </div>`;
+  }).join("");
+}
+
+function approveRequest(id){
+  const req=(S.requests||[]).find(r=>r.id===id);if(!req)return;
+  req.status='approved';req.reviewedAt=todayISO();
+  S.absences.push({id:S.nextAbsId++,name:req.name,type:req.type,start:req.start,end:req.end,jours:req.jours,ferier:req.ferier,comment:(req.comment?req.comment+" ":"")+"[demande approuvée]"});
+  save();renderDemandes();renderDash();updateBadge();
+  toast(`✅ Demande de ${req.name} approuvée`);
+}
+
+function openRejectModal(id){document.getElementById("reject-id").value=id;document.getElementById("reject-note").value="";openModal("mod-reject");}
+
+function confirmReject(){
+  const id=+document.getElementById("reject-id").value,note=document.getElementById("reject-note").value.trim();
+  const req=(S.requests||[]).find(r=>r.id===id);if(!req)return;
+  req.status='rejected';req.reviewedAt=todayISO();req.reviewNote=note;
+  save();closeModal("mod-reject");renderDemandes();updateBadge();
+  toast(`✖ Demande de ${req.name} refusée`);
+}
+
+function deleteRequest(id){if(!confirm("Supprimer cette demande ?"))return;S.requests=(S.requests||[]).filter(r=>r.id!==id);save();renderDemandes();updateBadge();toast("🗑 Demande supprimée");}
+
+// ══════════════════════════════════════════════════════════════════════════
+// PARAMS
+// ══════════════════════════════════════════════════════════════════════════
+function renderParams(){
+  document.getElementById("tb-params").innerHTML=S.employees.map(emp=>{
+    const isAlt=emp.type==="Alternance",hasRTT=emp.hours>35;
+    const tb=hasRTT?"badge-purple":isAlt?"badge-teal":"badge-blue";
+    const tl=hasRTT?`CDI ${emp.hours}h`:isAlt?"Alternant":emp.type;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:.55rem"><div class="av" style="background:${empColor(emp.name)}">${initials(emp.name)}</div><strong>${emp.name}</strong></div></td>
+      <td><span class="badge ${tb}">${tl}</span></td>
+      <td class="mono" style="font-size:.8rem">${fmtDate(emp.arrival)}</td>
+      <td class="mono">${emp.hours}h</td>
+      <td class="mono" style="color:${hasRTT?"var(--purple)":"var(--g400)"}">${hasRTT?fmtDate(emp.rttSince||emp.arrival):"—"}</td>
+      <td><div style="display:flex;align-items:center;gap:.45rem"><input type="number" min="0" step="0.5" value="${emp.credit||0}" style="width:65px;padding:.28rem .45rem;border-radius:6px;border:1.5px solid var(--g200);font-family:'DM Mono',monospace;font-size:.85rem" onchange="setCredit(${emp.id},this.value)"><span style="font-size:.76rem;color:var(--g400)">j</span>${emp.credit>0?`<span class="badge badge-orange">🎁</span>`:""}</div></td>
+      <td><div style="display:flex;gap:.25rem"><button class="btn btn-sm btn-outline" onclick="editEmp(${emp.id})">✏️</button><button class="btn btn-sm btn-danger" onclick="delEmp(${emp.id})">🗑</button></div></td>
+    </tr>`;
+  }).join("");
+  document.getElementById("type-legend").innerHTML=ABSENCE_TYPES.map(t=>`<span class="badge ${t.badge}">${t.label}</span>`).join("");
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add("open");}
+function closeModal(id){document.getElementById(id).classList.remove("open");}
+document.querySelectorAll(".overlay").forEach(el=>el.addEventListener("click",e=>{if(e.target===el)closeModal(el.id);}));
+
+function openAbsModal(ab){
+  document.getElementById("f-name").innerHTML=S.employees.map(e=>`<option value="${e.name}">${e.name}</option>`).join("");
+  document.getElementById("f-type").innerHTML=ABSENCE_TYPES.map(t=>`<option value="${t.key}">${t.label}</option>`).join("");
+  if(ab){
+    document.getElementById("mod-abs-title").textContent="✏️ Modifier l'absence";
+    document.getElementById("abs-id").value=ab.id;
+    ["f-name","f-type","f-start","f-end","f-jours","f-ferier","f-comment"].forEach(x=>{document.getElementById(x).value=ab[x.slice(2)]||"";});
+    document.getElementById("f-name").value=ab.name;document.getElementById("f-type").value=ab.type;
+    document.getElementById("f-start").value=ab.start;document.getElementById("f-end").value=ab.end;
+    document.getElementById("f-jours").value=ab.jours;document.getElementById("f-ferier").value=ab.ferier;
+    document.getElementById("f-comment").value=ab.comment;
+  }else{
+    document.getElementById("mod-abs-title").textContent="+ Nouvelle absence";
+    document.getElementById("abs-id").value="";
+    ["f-start","f-end","f-jours","f-comment"].forEach(x=>document.getElementById(x).value="");
+    document.getElementById("f-ferier").value="0";
+    document.getElementById("f-name").selectedIndex=0;document.getElementById("f-type").selectedIndex=0;
+  }
+  onTypeChange();openModal("mod-abs");
+}
+function onTypeChange(){document.getElementById("css-note-wrap").style.display=document.getElementById("f-type").value==="Congé sans solde"?"block":"none";}
+function editAbs(id){openAbsModal(S.absences.find(a=>a.id===id));}
+function saveAbs(){
+  const id=document.getElementById("abs-id").value,name=document.getElementById("f-name").value,type=document.getElementById("f-type").value;
+  const start=document.getElementById("f-start").value,end=document.getElementById("f-end").value;
+  const jours=parseFloat(document.getElementById("f-jours").value)||0,ferier=parseInt(document.getElementById("f-ferier").value)||0;
+  const comment=document.getElementById("f-comment").value.trim();
+  if(!name||!start||!end||!jours){toast("⚠️ Remplissez les champs obligatoires");return;}
+  if(id){const i=S.absences.findIndex(a=>a.id==id);if(i>=0)S.absences[i]={id:+id,name,type,start,end,jours,ferier,comment};toast("✅ Absence modifiée");}
+  else{S.absences.push({id:S.nextAbsId++,name,type,start,end,jours,ferier,comment});toast("✅ Absence enregistrée");}
+  save();closeModal("mod-abs");renderDash();renderAbs();
+}
+function delAbs(id){if(!confirm("Supprimer cette absence ?"))return;S.absences=S.absences.filter(a=>a.id!==id);save();renderAbs();renderDash();toast("🗑 Supprimée");}
+
+function openEmpModal(emp){
+  if(emp){document.getElementById("mod-emp-title").textContent="✏️ Modifier";document.getElementById("emp-id").value=emp.id;document.getElementById("e-name").value=emp.name;document.getElementById("e-type").value=emp.type;document.getElementById("e-arrival").value=emp.arrival;document.getElementById("e-hours").value=emp.hours;document.getElementById("e-rtt-since").value=emp.rttSince||"";document.getElementById("e-credit").value=emp.credit||0;}
+  else{document.getElementById("mod-emp-title").textContent="+ Nouveau collaborateur";document.getElementById("emp-id").value="";document.getElementById("e-name").value="";document.getElementById("e-type").value="CDI";document.getElementById("e-arrival").value="";document.getElementById("e-hours").value="35";document.getElementById("e-rtt-since").value="";document.getElementById("e-credit").value="0";}
+  toggleRttField();openModal("mod-emp");
+}
+function toggleRttField(){document.getElementById("rtt-date-wrap").style.display=(parseFloat(document.getElementById("e-hours").value)||35)>35?"block":"none";}
+document.getElementById("e-hours").addEventListener("input",toggleRttField);
+function editEmp(id){openEmpModal(S.employees.find(e=>e.id===id));}
+function saveEmp(){
+  const id=document.getElementById("emp-id").value,name=document.getElementById("e-name").value.trim();
+  const type=document.getElementById("e-type").value,arrival=document.getElementById("e-arrival").value;
+  const hours=parseFloat(document.getElementById("e-hours").value)||35,rttSince=document.getElementById("e-rtt-since").value||null;
+  const credit=parseFloat(document.getElementById("e-credit").value)||0;
+  if(!name||!arrival){toast("⚠️ Nom et date d'entrée requis");return;}
+  if(id){const i=S.employees.findIndex(e=>e.id==id);if(i>=0)S.employees[i]={...S.employees[i],name,type,arrival,hours,rttSince,credit};toast("✅ Modifié");}
+  else{S.employees.push({id:S.nextEmpId++,name,type,arrival,hours,rttSince,credit});toast("✅ Ajouté");}
+  save();closeModal("mod-emp");renderParams();renderDash();
+}
+function delEmp(id){if(!confirm("Supprimer ce collaborateur ?"))return;const emp=S.employees.find(e=>e.id===id);S.employees=S.employees.filter(e=>e.id!==id);if(emp)S.absences=S.absences.filter(a=>a.name!==emp.name);save();renderParams();renderDash();toast("🗑 Supprimé");}
+function setCredit(id,val){const e=S.employees.find(e=>e.id===id);if(e){e.credit=parseFloat(val)||0;save();renderDash();}}
+
+// ══════════════════════════════════════════════════════════════════════════
+// IMPORT / EXPORT
+// ══════════════════════════════════════════════════════════════════════════
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const a=Object.assign(document.createElement("a"),{href:URL.createObjectURL(blob),download:`conges_wilow_${new Date().toISOString().slice(0,10)}.json`});
+  a.click();URL.revokeObjectURL(a.href);toast("⬇️ Export téléchargé");
+}
+function importJSON(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{const data=JSON.parse(e.target.result);if(!data.employees||!data.absences)throw new Error();S={...defaultData(),...data};if(!S.requests)S.requests=[];if(!S.nextReqId)S.nextReqId=1;save();renderDash();updateBadge();toast("✅ Données importées !");}
+    catch{toast("❌ Fichier JSON invalide");}
+  };
+  reader.readAsText(file);input.value="";
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════════
+(async()=>{
+  await loadFromCloud();
+  renderDash();
+  renderCal();
+  updateBadge();
+})();
+</script>
+</body>
+</html>

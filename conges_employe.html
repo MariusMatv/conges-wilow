@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes Congés · Wilow</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --primary:#16a34a; --primary-lt:#dcfce7; --primary-dk:#14532d;
+  --navy:#0f172a; --blue:#2563eb; --blue-lt:#eff6ff;
+  --white:#ffffff; --g50:#f8fafc; --g100:#f1f5f9; --g200:#e2e8f0; --g300:#cbd5e1;
+  --g400:#94a3b8; --g600:#475569; --g700:#334155; --g800:#1e293b;
+  --green:#16a34a; --green-lt:#dcfce7; --green-dk:#14532d;
+  --red:#dc2626; --red-lt:#fee2e2; --orange:#ea580c; --orange-lt:#ffedd5;
+  --purple:#7c3aed; --purple-lt:#ede9fe; --teal:#0d9488; --teal-lt:#ccfbf1;
+  --yellow:#ca8a04; --yellow-lt:#fef9c3; --pink:#db2777; --pink-lt:#fce7f3;
+  --r:10px; --sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --sh-md:0 4px 20px rgba(0,0,0,.09); --sh-lg:0 20px 60px rgba(0,0,0,.15);
+}
+html{font-size:15px;}
+body{font-family:'Instrument Sans',sans-serif;background:var(--g100);color:var(--g800);min-height:100vh;display:flex;flex-direction:column;}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1a2e1a 100%);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;color:#fff;}
+#loader.hidden{display:none;}
+.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loader-text{font-size:.85rem;font-weight:500;opacity:.8;}
+.loader-logo{font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:.5rem;}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f2d1a 100%);display:flex;align-items:center;justify-content:center;z-index:9000;padding:1.5rem;}
+#login-screen.hidden{display:none;}
+.login-box{background:var(--white);border-radius:20px;padding:2.5rem 2.25rem;width:100%;max-width:420px;box-shadow:var(--sh-lg);animation:loginUp .3s ease;}
+@keyframes loginUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+.login-logo{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--navy);text-align:center;margin-bottom:.4rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+.login-logo span{color:var(--primary);}
+.login-subtitle{text-align:center;color:var(--g600);font-size:.88rem;margin-bottom:2rem;}
+.login-label{font-size:.73rem;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.55rem;display:block;}
+.name-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.55rem;margin-bottom:1.5rem;}
+.name-btn{display:flex;align-items:center;gap:.55rem;padding:.65rem .85rem;border-radius:10px;border:1.5px solid var(--g200);background:var(--g50);cursor:pointer;font-family:'Instrument Sans',sans-serif;font-size:.85rem;font-weight:500;color:var(--g700);transition:all .15s;text-align:left;}
+.name-btn:hover{border-color:var(--primary);background:var(--green-lt);color:var(--primary-dk);transform:translateY(-1px);}
+.name-btn .av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff;flex-shrink:0;}
+.login-note{font-size:.75rem;color:var(--g400);text-align:center;line-height:1.5;}
+
+/* OFFLINE BANNER */
+#offline-banner{display:none;background:#fef9c3;border-bottom:1px solid #fde68a;color:#78350f;padding:.5rem 1.5rem;font-size:.8rem;font-weight:500;text-align:center;}
+#offline-banner.show{display:block;}
+
+/* HEADER */
+header{background:linear-gradient(135deg,#0f172a 0%,#1a2e1a 100%);color:var(--white);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.3);gap:.5rem;}
+.logo{font-family:'DM Serif Display',serif;font-size:1.15rem;letter-spacing:-.02em;display:flex;align-items:center;gap:.5rem;flex-shrink:0;}
+.user-chip{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.1);border-radius:999px;padding:.3rem .7rem .3rem .35rem;font-size:.82rem;font-weight:500;}
+.user-chip .av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#fff;}
+.header-right{display:flex;align-items:center;gap:.5rem;}
+.sync-indicator{font-size:.72rem;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:.3rem;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+.sync-dot.syncing{background:var(--yellow);animation:pulse 1s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border-radius:8px;border:none;font-family:'Instrument Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;line-height:1;}
+.btn-ghost{background:rgba(255,255,255,.1);color:var(--white);}
+.btn-ghost:hover{background:rgba(255,255,255,.18);}
+.btn-primary{background:var(--primary);color:var(--white);box-shadow:0 1px 3px rgba(22,163,74,.3);}
+.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px);}
+.btn-outline{background:var(--white);color:var(--g700);border:1.5px solid var(--g200);}
+.btn-outline:hover{background:var(--g50);border-color:var(--g300);}
+.btn-sm{padding:.28rem .65rem;font-size:.76rem;border-radius:6px;}
+
+/* NAV */
+nav{background:var(--white);border-bottom:1px solid var(--g200);padding:0 1.5rem;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+nav::-webkit-scrollbar{display:none;}
+nav button{background:none;border:none;cursor:pointer;font-family:'Instrument Sans',sans-serif;font-size:.85rem;font-weight:500;color:var(--g400);padding:.9rem 1.1rem;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;}
+nav button:hover{color:var(--g800);}
+nav button.active{color:var(--primary);border-bottom-color:var(--primary);}
+
+/* MAIN */
+main{flex:1;padding:1.4rem 1.5rem;max-width:1100px;width:100%;margin:0 auto;}
+.page{display:none;}
+.page.active{display:block;}
+
+/* CARD */
+.card{background:var(--white);border-radius:var(--r);box-shadow:var(--sh);padding:1.35rem;margin-bottom:1.2rem;border:1px solid var(--g200);}
+.card-title{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--navy);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+.page-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--navy);}
+
+/* SOLDE GRID */
+.solde-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.3rem;}
+.solde-card{background:var(--white);border-radius:var(--r);padding:1.25rem;box-shadow:var(--sh);border:1px solid var(--g200);border-top:3px solid var(--primary);transition:transform .15s,box-shadow .15s;}
+.solde-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);}
+.solde-card.blue{border-top-color:var(--blue);}
+.solde-card.purple{border-top-color:var(--purple);}
+.solde-card.orange{border-top-color:var(--orange);}
+.solde-card.red{border-top-color:var(--red);}
+.solde-card.pink{border-top-color:var(--pink);}
+.solde-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g400);margin-bottom:.3rem;}
+.solde-value{font-family:'DM Mono',monospace;font-size:1.75rem;font-weight:500;color:var(--navy);line-height:1.1;}
+.solde-value.big-pos{color:var(--green);}
+.solde-value.big-neg{color:var(--red);}
+.solde-sub{font-size:.72rem;color:var(--g400);margin-top:.18rem;}
+
+/* PROGRESS */
+.prog-wrap{background:var(--g100);border-radius:999px;height:6px;overflow:hidden;margin-top:.4rem;}
+.prog-bar{height:100%;border-radius:999px;transition:width .5s ease;}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:8px;}
+table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:400px;}
+thead th{background:var(--g50);color:var(--g600);padding:.65rem 1rem;text-align:left;font-weight:700;font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;border-bottom:2px solid var(--g200);}
+tbody tr{border-bottom:1px solid var(--g100);transition:background .1s;}
+tbody tr:hover{background:var(--g50);}
+tbody td{padding:.65rem 1rem;vertical-align:middle;}
+tbody tr:last-child{border-bottom:none;}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:.22rem;padding:.2rem .6rem;border-radius:999px;font-size:.69rem;font-weight:600;white-space:nowrap;}
+.badge-blue{background:var(--blue-lt);color:#1d4ed8;}
+.badge-green{background:var(--green-lt);color:var(--primary-dk);}
+.badge-purple{background:var(--purple-lt);color:var(--purple);}
+.badge-teal{background:var(--teal-lt);color:var(--teal);}
+.badge-orange{background:var(--orange-lt);color:var(--orange);}
+.badge-red{background:var(--red-lt);color:var(--red);}
+.badge-yellow{background:var(--yellow-lt);color:var(--yellow);}
+.badge-pink{background:var(--pink-lt);color:var(--pink);}
+.badge-gray{background:var(--g100);color:var(--g600);}
+
+/* MONO */
+.mono{font-family:'DM Mono',monospace;}
+.pos{color:var(--green);font-weight:600;font-family:'DM Mono',monospace;}
+.neg{color:var(--red);font-weight:600;font-family:'DM Mono',monospace;}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:.9rem;}
+.form-group{display:flex;flex-direction:column;gap:.3rem;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:.73rem;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.04em;}
+label .opt{font-weight:400;text-transform:none;color:var(--g400);}
+input,select,textarea{border:1.5px solid var(--g200);border-radius:8px;padding:.5rem .75rem;font-family:'Instrument Sans',sans-serif;font-size:.88rem;color:var(--g800);background:var(--white);transition:border-color .15s;outline:none;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(22,163,74,.12);}
+textarea{resize:vertical;min-height:80px;}
+.hint{font-size:.71rem;color:var(--g400);margin-top:.12rem;font-style:italic;}
+
+/* CALENDAR */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;}
+.cal-title{font-family:'DM Serif Display',serif;font-size:1.25rem;color:var(--navy);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-dh{text-align:center;font-size:.67rem;font-weight:700;color:var(--g400);padding:.4rem 0;text-transform:uppercase;letter-spacing:.05em;}
+.cal-day{min-height:68px;border-radius:8px;padding:.35rem .4rem;background:var(--white);border:1px solid var(--g200);position:relative;}
+.cal-day.other{background:var(--g50);opacity:.4;}
+.cal-day.we{background:var(--g50);}
+.cal-day.today{border:2px solid var(--primary);}
+.cal-day.ferie{background:#fff7ed;}
+.cal-dn{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--g400);margin-bottom:.22rem;}
+.cal-day.today .cal-dn-inner{background:var(--primary);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;}
+.cal-evt{border-radius:4px;padding:.08rem .28rem;font-size:.62rem;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* REQUEST CARD */
+.my-req{background:var(--white);border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);padding:1rem 1.2rem;margin-bottom:.65rem;display:flex;align-items:flex-start;gap:.9rem;}
+.req-info{flex:1;}
+.req-name{font-weight:600;font-size:.88rem;color:var(--navy);margin-bottom:.25rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.req-detail{font-size:.8rem;color:var(--g600);display:flex;flex-wrap:wrap;gap:.6rem;}
+.req-note{font-size:.78rem;font-style:italic;color:var(--g600);background:var(--g50);padding:.3rem .65rem;border-radius:6px;margin-top:.35rem;}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem;}
+.overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:16px;padding:1.75rem;width:100%;max-width:520px;box-shadow:var(--sh-lg);max-height:90vh;overflow-y:auto;animation:up .2s ease;border:1px solid var(--g200);}
+@keyframes up{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.modal-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--navy);margin-bottom:1.2rem;}
+.modal-footer{display:flex;gap:.65rem;justify-content:flex-end;margin-top:1.4rem;}
+
+/* TOAST */
+#toast{position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;background:var(--navy);color:var(--white);padding:.75rem 1.2rem;border-radius:10px;font-size:.83rem;font-weight:500;box-shadow:var(--sh-lg);transform:translateY(80px);transition:transform .25s;pointer-events:none;}
+#toast.show{transform:none;}
+
+/* AVATAR */
+.av{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--white);flex-shrink:0;}
+
+/* ALERT */
+.alert{border-radius:10px;padding:.9rem 1.1rem;font-size:.8rem;line-height:1.65;display:flex;gap:.6rem;align-items:flex-start;margin-bottom:.75rem;}
+.alert-green{background:var(--green-lt);border:1px solid #86efac;color:#14532d;}
+.alert-yellow{background:var(--yellow-lt);border:1px solid #fde68a;color:#78350f;}
+.alert-pink{background:var(--pink-lt);border:1px solid #fbcfe8;color:#831843;}
+.alert-blue{background:var(--blue-lt);border:1px solid #bfdbfe;color:#1e40af;}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--g400);}
+.empty-icon{font-size:2.5rem;margin-bottom:.6rem;opacity:.5;}
+.empty-text{font-size:.9rem;}
+
+@media(max-width:640px){
+  header{padding:0 1rem;height:52px;} main{padding:1rem;}
+  .solde-grid{grid-template-columns:repeat(2,1fr);gap:.65rem;} .solde-value{font-size:1.4rem;}
+  nav button{padding:.75rem .85rem;font-size:.8rem;} .login-box{padding:1.75rem 1.25rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">🌿 Wilow</div>
+  <div class="spinner"></div>
+  <div class="loader-text">Chargement de vos congés…</div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen" class="hidden">
+  <div class="login-box">
+    <div class="login-logo">🌿 Wilow<span>·</span>Congés</div>
+    <div class="login-subtitle">Sélectionnez votre nom pour accéder à votre espace</div>
+    <span class="login-label">Qui êtes-vous ?</span>
+    <div class="name-grid" id="name-grid"></div>
+    <div class="login-note">💡 Si votre nom n'apparaît pas, contactez l'administration.</div>
+  </div>
+</div>
+
+<!-- OFFLINE BANNER -->
+<div id="offline-banner">⚠️ Mode hors-ligne — données en cache. Vérifiez votre connexion.</div>
+
+<!-- APP -->
+<div id="app" style="display:none;flex-direction:column;min-height:100vh">
+<header>
+  <div class="logo">🌿 Congés</div>
+  <div class="header-right">
+    <span class="sync-indicator"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">Synchronisé</span></span>
+    <div class="user-chip"><div class="av" id="header-av" style="background:#16a34a">?</div><span id="header-name">—</span></div>
+    <button class="btn btn-ghost btn-sm" onclick="logout()">⬅ Quitter</button>
+  </div>
+</header>
+<nav>
+  <button class="active" onclick="goPage('solde',this)">💚 Mon solde</button>
+  <button onclick="goPage('calendar',this)">📅 Mon calendrier</button>
+  <button onclick="goPage('absences',this)">📋 Mes absences</button>
+  <button onclick="goPage('demande',this)">✉️ Nouvelle demande</button>
+</nav>
+<main>
+  <div id="page-solde" class="page active">
+    <div class="solde-grid" id="solde-kpis"></div>
+    <div id="solde-detail"></div>
+  </div>
+  <div id="page-calendar" class="page">
+    <div class="card">
+      <div class="cal-header">
+        <button class="btn btn-outline" onclick="chgMonth(-1)">← Préc.</button>
+        <div class="cal-title" id="cal-title">—</div>
+        <button class="btn btn-outline" onclick="chgMonth(1)">Suiv. →</button>
+      </div>
+      <div class="cal-grid" id="cal-dhs"></div>
+      <div class="cal-grid" style="margin-top:3px" id="cal-grid"></div>
+      <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap;" id="cal-legend"></div>
+    </div>
+  </div>
+  <div id="page-absences" class="page">
+    <div style="margin-bottom:1.1rem">
+      <div class="page-title" style="margin-bottom:.25rem">Mes absences</div>
+      <div style="font-size:.83rem;color:var(--g600)">Historique validé + statut de vos demandes</div>
+    </div>
+    <div class="card">
+      <div class="card-title">✅ Absences validées</div>
+      <div class="table-wrap"><table><thead><tr><th>Type</th><th>Début</th><th>Fin</th><th>Jours</th><th>Commentaire</th></tr></thead><tbody id="tb-my-abs"></tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>📬 Mes demandes</span>
+        <button class="btn btn-outline btn-sm" onclick="refreshAndRender('absences')">🔄 Actualiser</button>
+      </div>
+      <div id="my-requests-list"></div>
+    </div>
+  </div>
+  <div id="page-demande" class="page">
+    <div style="margin-bottom:1.2rem">
+      <div class="page-title" style="margin-bottom:.25rem">Nouvelle demande de congé</div>
+      <div style="font-size:.83rem;color:var(--g600)">Votre demande sera visible immédiatement par l'administration</div>
+    </div>
+    <div class="card">
+      <div class="form-grid">
+        <div class="form-group"><label>Type de congé</label><select id="d-type" onchange="onDTypeChange()"></select></div>
+        <div class="form-group"><label>Date de début</label><input type="date" id="d-start"></div>
+        <div class="form-group"><label>Date de fin</label><input type="date" id="d-end"></div>
+        <div class="form-group"><label>Jours ouvrés</label><input type="number" id="d-jours" min="0.5" step="0.5" placeholder="ex: 5"><div class="hint">Sans week-ends ni fériés</div></div>
+        <div class="form-group"><label>Jours fériés inclus <span class="opt">(si besoin)</span></label><input type="number" id="d-ferier" min="0" step="1" value="0"></div>
+        <div class="form-group full" id="css-note-wrap" style="display:none"><div class="alert alert-pink"><span>💸</span><div><strong>Sans solde :</strong> non déduit du CP — traitement en paie.</div></div></div>
+        <div class="form-group full"><label>Commentaire <span class="opt">(optionnel)</span></label><textarea id="d-comment" placeholder="Ex: Vacances en famille…"></textarea></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:1.2rem">
+        <button class="btn btn-primary" onclick="submitRequest()" style="padding:.55rem 1.4rem">✉️ Envoyer la demande</button>
+      </div>
+    </div>
+    <div class="alert alert-blue"><span>ℹ️</span><div>Votre demande sera visible par l'administration. Suivez son statut dans <strong>Mes absences → Mes demandes</strong>.</div></div>
+  </div>
+</main>
+</div>
+
+<!-- MODAL CONFIRMATION -->
+<div class="overlay" id="mod-confirm">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title">✅ Demande envoyée !</div>
+    <div id="confirm-summary" style="font-size:.88rem;color:var(--g600);line-height:1.7"></div>
+    <div class="alert alert-green" style="margin-top:1rem"><span>🎉</span><div>Votre demande a été transmise. Suivez son statut dans <strong>Mes absences → Mes demandes</strong>.</div></div>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('mod-confirm')">Fermer</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════
+// ⚙️  CONFIGURATION — À REMPLIR AVEC VOS CLÉS
+// ══════════════════════════════════════════════════════════════════════════
+const JSONBIN_API_KEY = '$2a$10$UiiW/7Dpnc2rqJOytJsSFO0oEUukHgh0lI4AQQ2..9CoHParU6a1G';
+const JSONBIN_BIN_ID  = '69f1e68d36566621a805c1fa';
+const BIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+// ══════════════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════════════
+let S = null;
+let currentEmployee = null;
+let saveTimer = null;
+
+// ══════════════════════════════════════════════════════════════════════════
+// CLOUD STORAGE
+// ══════════════════════════════════════════════════════════════════════════
+function setSyncState(state){
+  const dot=document.getElementById('sync-dot'),lbl=document.getElementById('sync-label');
+  if(!dot||!lbl)return;
+  if(state==='syncing'){dot.className='sync-dot syncing';lbl.textContent='Synchro…';}
+  else if(state==='ok'){dot.className='sync-dot';dot.style.background='var(--green)';lbl.textContent='Synchronisé';}
+  else{dot.className='sync-dot';dot.style.background='var(--red)';lbl.textContent='Hors-ligne';}
+}
+
+async function loadFromCloud(){
+  try{
+    const res=await fetch(`${BIN_URL}/latest`,{headers:{'X-Access-Key':JSONBIN_API_KEY}});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const json=await res.json();
+    S=json.record;
+    if(!S.requests)S.requests=[];
+    if(!S.nextReqId)S.nextReqId=1;
+    try{localStorage.setItem('wilow_conges_cache',JSON.stringify(S));}catch(e){}
+    document.getElementById('offline-banner').classList.remove('show');
+    setSyncState('ok');
+    return true;
+  }catch(e){
+    try{
+      const cached=localStorage.getItem('wilow_conges_cache');
+      if(cached){S=JSON.parse(cached);document.getElementById('offline-banner').classList.add('show');setSyncState('error');return true;}
+    }catch(e2){}
+    return false;
+  }
+}
+
+function save(){
+  try{localStorage.setItem('wilow_conges_cache',JSON.stringify(S));}catch(e){}
+  clearTimeout(saveTimer);
+  setSyncState('syncing');
+  saveTimer=setTimeout(saveToCloud,1200);
+}
+
+async function saveToCloud(){
+  try{
+    const res=await fetch(BIN_URL,{method:'PUT',headers:{'X-Access-Key':JSONBIN_API_KEY,'Content-Type':'application/json'},body:JSON.stringify(S)});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    setSyncState('ok');
+  }catch(e){setSyncState('error');toast('⚠️ Erreur de sauvegarde');}
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════════════════
+const ABSENCE_TYPES=[
+  {key:"CP",label:"Congés payés",badge:"badge-blue",cal:["#dbeafe","#1d4ed8"]},
+  {key:"RTT",label:"RTT",badge:"badge-purple",cal:["#ede9fe","#7c3aed"]},
+  {key:"Congé école",label:"Congé école",badge:"badge-teal",cal:["#ccfbf1","#0d9488"]},
+  {key:"Maladie",label:"Maladie",badge:"badge-red",cal:["#fee2e2","#dc2626"]},
+  {key:"Congé sans solde",label:"Sans solde",badge:"badge-pink",cal:["#fce7f3","#db2777"]},
+  {key:"Maternité/Pater.",label:"Maternité/Pater.",badge:"badge-green",cal:["#dcfce7","#16a34a"]},
+  {key:"Autre",label:"Autre",badge:"badge-orange",cal:["#ffedd5","#ea580c"]},
+];
+const TYPE_MAP=Object.fromEntries(ABSENCE_TYPES.map(t=>[t.key,t]));
+const FERIES=new Set(["2025-01-01","2025-04-21","2025-05-01","2025-05-08","2025-05-29","2025-06-09","2025-07-14","2025-08-15","2025-11-01","2025-11-11","2025-12-25","2026-01-01","2026-04-06","2026-05-01","2026-05-08","2026-05-14","2026-05-25","2026-07-14","2026-08-15","2026-11-01","2026-11-11","2026-12-25","2027-01-01","2027-03-29","2027-05-01","2027-05-08","2027-05-17","2027-07-14","2027-08-15","2027-11-01","2027-11-11","2027-12-25"]);
+const MONTHS_FR=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const DAYS_FR=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+const EMP_COLORS=["#3b82f6","#0d9488","#7c3aed","#16a34a","#ea580c","#dc2626","#ca8a04","#db2777","#0369a1","#059669"];
+
+// ══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════════════
+const empIdx=name=>S.employees.findIndex(e=>e.name===name);
+const empColor=name=>EMP_COLORS[((empIdx(name)%EMP_COLORS.length)+EMP_COLORS.length)%EMP_COLORS.length]||"#16a34a";
+const initials=name=>name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+const fmtDate=d=>{if(!d)return"—";const[y,m,day]=d.split("-");return`${day}/${m}/${y}`;};
+const parseD=s=>s?new Date(s+"T00:00:00"):null;
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const today=()=>new Date();
+function monthsBetween(fromStr,toDate){const from=parseD(fromStr);if(!from)return 0;return Math.max(0,(toDate-from)/(1000*60*60*24*30.4375));}
+function cpAcquis(emp){return Math.min(25,Math.round(monthsBetween(emp.arrival,today())*2.5*2)/2);}
+function rttAcquis(emp){if(emp.hours<=35)return 0;const extra=emp.hours-35;const weeks=monthsBetween(emp.rttSince||emp.arrival,today())*4.35;return Math.round(weeks*extra/7*2)/2;}
+function sumAbs(name,type){return S.absences.filter(a=>a.name===name&&a.type===type).reduce((s,a)=>s+(+a.jours||0),0);}
+
+// ══════════════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════════════
+function toast(msg,dur=2800){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur);}
+
+// ══════════════════════════════════════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════════════════════════════════════
+function showLogin(){
+  document.getElementById('loader').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  const grid=document.getElementById("name-grid");
+  if(!S||!S.employees||!S.employees.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:1rem;font-size:.88rem;color:var(--g600)">⚠️ Impossible de charger les données.<br>Vérifiez votre connexion internet.</div>`;
+    return;
+  }
+  grid.innerHTML=S.employees.map(emp=>`<button class="name-btn" onclick="login('${emp.name}')"><div class="av" style="background:${empColor(emp.name)}">${initials(emp.name)}</div>${emp.name}</button>`).join("");
+}
+
+function login(name){
+  currentEmployee=S.employees.find(e=>e.name===name);
+  if(!currentEmployee)return;
+  document.getElementById('login-screen').classList.add('hidden');
+  const app=document.getElementById("app");app.style.display="flex";app.style.flexDirection="column";app.style.minHeight="100vh";
+  document.getElementById("header-name").textContent=name;
+  document.getElementById("header-av").textContent=initials(name);
+  document.getElementById("header-av").style.background=empColor(name);
+  renderSolde();renderCalEmployee();renderMyAbs();renderDemandeForm();
+}
+
+function logout(){
+  currentEmployee=null;
+  document.getElementById("app").style.display="none";
+  loadFromCloud().then(showLogin);
+}
+
+async function refreshAndRender(page){
+  await loadFromCloud();
+  if(currentEmployee)currentEmployee=S.employees.find(e=>e.name===currentEmployee.name)||currentEmployee;
+  const renders={solde:renderSolde,calendar:renderCalEmployee,absences:renderMyAbs,demande:renderDemandeForm};
+  renders[page]?.();
+  toast("🔄 Données actualisées");
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ROUTING
+// ══════════════════════════════════════════════════════════════════════════
+function goPage(id,btn){
+  // Refresh data silently on page switch
+  loadFromCloud().then(()=>{
+    if(currentEmployee)currentEmployee=S.employees.find(e=>e.name===currentEmployee.name)||currentEmployee;
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+    document.getElementById("page-"+id).classList.add("active");
+    btn.classList.add("active");
+    const renders={solde:renderSolde,calendar:renderCalEmployee,absences:renderMyAbs,demande:renderDemandeForm};
+    renders[id]?.();
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// SOLDE
+// ══════════════════════════════════════════════════════════════════════════
+function renderSolde(){
+  if(!currentEmployee)return;
+  const emp=currentEmployee,acq=cpAcquis(emp),cred=emp.credit||0,total=acq+cred;
+  const poses=sumAbs(emp.name,"CP"),solde=total-poses,pct=total>0?Math.min(100,poses/total*100):0;
+  const rttAcq=rttAcquis(emp),rttPos=sumAbs(emp.name,"RTT"),rttSolde=rttAcq-rttPos;
+  const css=sumAbs(emp.name,"Congé sans solde");
+  const pendingReqs=(S.requests||[]).filter(r=>r.name===emp.name&&r.status==='pending');
+  const isAlt=emp.type==="Alternance",hasRTT=emp.hours>35;
+  const tb=hasRTT?"badge-purple":isAlt?"badge-teal":"badge-blue";
+  const tl=hasRTT?`CDI ${emp.hours}h`:isAlt?"Alternant":emp.type;
+  document.getElementById("solde-kpis").innerHTML=`
+    <div class="solde-card"><div class="solde-label">CP acquis</div><div class="solde-value">${acq.toFixed(1)}<span style="font-size:.9rem"> j</span></div><div class="solde-sub">${cred>0?`+${cred} j crédit offert`:"depuis votre entrée"}</div></div>
+    <div class="solde-card ${solde<0?"red":""}"><div class="solde-label">Solde CP restant</div><div class="solde-value ${solde<0?"big-neg":"big-pos"}">${solde.toFixed(1)}<span style="font-size:.9rem"> j</span></div><div class="solde-sub"><div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:${poses>total?"var(--red)":"var(--primary)"}"></div></div>${poses.toFixed(1)} j posés / ${total.toFixed(1)} j total</div></div>
+    ${hasRTT?`<div class="solde-card purple"><div class="solde-label">Solde RTT</div><div class="solde-value">${rttSolde.toFixed(1)}<span style="font-size:.9rem"> j</span></div><div class="solde-sub">${rttAcq.toFixed(1)} acquis · ${rttPos.toFixed(1)} posés</div></div>`:""}
+    ${css>0?`<div class="solde-card pink"><div class="solde-label">Sans solde posés</div><div class="solde-value">${css.toFixed(1)}<span style="font-size:.9rem"> j</span></div><div class="solde-sub">traitement en paie</div></div>`:""}
+    ${pendingReqs.length>0?`<div class="solde-card orange"><div class="solde-label">Demandes en attente</div><div class="solde-value">${pendingReqs.length}</div><div class="solde-sub">${pendingReqs.reduce((s,r)=>s+(+r.jours||0),0).toFixed(1)} j demandés</div></div>`:""}`;
+  document.getElementById("solde-detail").innerHTML=`
+    <div class="card"><div class="card-title">👤 Mon profil</div>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+        <div class="av" style="background:${empColor(emp.name)};width:48px;height:48px;font-size:1rem">${initials(emp.name)}</div>
+        <div><div style="font-size:1.05rem;font-weight:600;color:var(--navy)">${emp.name}</div>
+          <div style="display:flex;gap:.4rem;margin-top:.35rem;flex-wrap:wrap"><span class="badge ${tb}">${tl}</span><span class="badge badge-gray">Entrée ${fmtDate(emp.arrival)}</span><span class="badge badge-gray">${emp.hours}h/sem.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-yellow"><span>ℹ️</span><div><strong>Règle Syntec :</strong> 2,5 j de CP par mois travaillé · 30 j max/an · Période : 1er juin → 31 mai. Les RTT ne sont pas reportables.</div></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════════════════════════════════════
+let calY=today().getFullYear(),calM=today().getMonth();
+function chgMonth(d){calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}renderCalEmployee();}
+function renderCalEmployee(){
+  if(!currentEmployee)return;
+  const name=currentEmployee.name;
+  document.getElementById("cal-title").textContent=`${MONTHS_FR[calM]} ${calY}`;
+  document.getElementById("cal-dhs").innerHTML=DAYS_FR.map(d=>`<div class="cal-dh">${d}</div>`).join("");
+  const byDay={};
+  S.absences.filter(a=>a.name===name).forEach(ab=>{const sd=parseD(ab.start),ed=parseD(ab.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=d.toISOString().slice(0,10);if(!byDay[k])byDay[k]=[];byDay[k].push({type:ab.type,pending:false});d.setDate(d.getDate()+1);}});
+  (S.requests||[]).filter(r=>r.name===name&&r.status==='pending').forEach(req=>{const sd=parseD(req.start),ed=parseD(req.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=d.toISOString().slice(0,10);if(!byDay[k])byDay[k]=[];byDay[k].push({type:req.type,pending:true});d.setDate(d.getDate()+1);}});
+  const first=new Date(calY,calM,1),last=new Date(calY,calM+1,0),startDow=(first.getDay()+6)%7,now=today();
+  let html="";
+  for(let i=0;i<startDow;i++)html+=`<div class="cal-day other"></div>`;
+  for(let day=1;day<=last.getDate();day++){
+    const ds=`${calY}-${String(calM+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const dow=(new Date(calY,calM,day).getDay()+6)%7,we=dow>=5,fh=FERIES.has(ds);
+    const isTd=calY===now.getFullYear()&&calM===now.getMonth()&&day===now.getDate();
+    const evs=byDay[ds]||[];
+    let cls="cal-day";if(we)cls+=" we";if(isTd)cls+=" today";if(fh)cls+=" ferie";
+    const numInner=isTd?`<div class="cal-dn"><div class="cal-dn-inner">${day}</div></div>`:`<div class="cal-dn">${day}${fh?" 🔴":""}</div>`;
+    const evHtml=evs.map(ev=>{const t=TYPE_MAP[ev.type];const[bg,fg]=t?t.cal:["#e2e8f0","#475569"];const op=ev.pending?"opacity:.6;border:1.5px dashed "+fg+";":"";return`<div class="cal-evt" style="background:${bg};color:${fg};${op}" title="${ev.type}${ev.pending?" (en attente)":""}">${ev.type.split(" ")[0]}${ev.pending?" ⏳":""}</div>`;}).join("");
+    html+=`<div class="${cls}">${numInner}${evHtml}</div>`;
+  }
+  const rem=(7-(startDow+last.getDate())%7)%7;for(let i=0;i<rem;i++)html+=`<div class="cal-day other"></div>`;
+  document.getElementById("cal-grid").innerHTML=html;
+  document.getElementById("cal-legend").innerHTML=ABSENCE_TYPES.map(t=>`<span class="badge ${t.badge}">${t.label}</span>`).join("")+`<span class="badge badge-gray">⏳ En attente</span>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// MY ABSENCES + REQUESTS
+// ══════════════════════════════════════════════════════════════════════════
+function renderMyAbs(){
+  if(!currentEmployee)return;
+  const name=currentEmployee.name;
+  const myAbs=[...S.absences.filter(a=>a.name===name)].sort((a,b)=>b.start.localeCompare(a.start));
+  const tbody=document.getElementById("tb-my-abs");
+  tbody.innerHTML=myAbs.length?myAbs.map(ab=>{const t=TYPE_MAP[ab.type];return`<tr><td><span class="badge ${t?.badge||"badge-orange"}">${ab.type}</span></td><td class="mono" style="font-size:.8rem">${fmtDate(ab.start)}</td><td class="mono" style="font-size:.8rem">${fmtDate(ab.end)}</td><td class="mono" style="font-weight:600">${ab.jours} j</td><td style="font-size:.8rem;color:var(--g600);font-style:italic">${ab.comment||"—"}</td></tr>`;}).join(""):`<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--g400)">Aucune absence enregistrée</td></tr>`;
+  const myReqs=[...(S.requests||[]).filter(r=>r.name===name)].sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));
+  const container=document.getElementById("my-requests-list");
+  if(!myReqs.length){container.innerHTML=`<div class="empty-state"><div class="empty-icon">📬</div><div class="empty-text">Aucune demande envoyée</div></div>`;return;}
+  const statusMap={pending:{label:"En attente",badge:"badge-yellow",icon:"⏳"},approved:{label:"Approuvée",badge:"badge-green",icon:"✅"},rejected:{label:"Refusée",badge:"badge-red",icon:"✖"}};
+  container.innerHTML=myReqs.map(req=>{
+    const t=TYPE_MAP[req.type],st=statusMap[req.status]||statusMap.pending;
+    return`<div class="my-req">
+      <div style="width:38px;height:38px;border-radius:10px;background:${(t?.cal||["#e2e8f0"])[0]};display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">${st.icon}</div>
+      <div class="req-info">
+        <div class="req-name"><span class="badge ${t?.badge||"badge-gray"}">${req.type}</span><span class="badge ${st.badge}">${st.label}</span></div>
+        <div class="req-detail"><span>📅 ${fmtDate(req.start)} → ${fmtDate(req.end)}</span><span class="mono">${req.jours} j</span><span style="color:var(--g400);font-size:.75rem">Soumis le ${fmtDate(req.submittedAt)}</span>${req.reviewedAt?`<span style="color:var(--g400);font-size:.75rem">Traité le ${fmtDate(req.reviewedAt)}</span>`:""}</div>
+        ${req.comment?`<div class="req-note">💬 ${req.comment}</div>`:""}
+        ${req.reviewNote?`<div class="req-note" style="background:#fee2e2;color:#991b1b">✖ Motif : ${req.reviewNote}</div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// DEMANDE FORM
+// ══════════════════════════════════════════════════════════════════════════
+function renderDemandeForm(){
+  const sel=document.getElementById("d-type");
+  sel.innerHTML=ABSENCE_TYPES.map(t=>`<option value="${t.key}">${t.label}</option>`).join("");
+  ["d-start","d-end","d-jours","d-comment"].forEach(x=>document.getElementById(x).value="");
+  document.getElementById("d-ferier").value="0";
+  onDTypeChange();
+}
+function onDTypeChange(){document.getElementById("css-note-wrap").style.display=document.getElementById("d-type").value==="Congé sans solde"?"block":"none";}
+
+async function submitRequest(){
+  if(!currentEmployee)return;
+  const type=document.getElementById("d-type").value,start=document.getElementById("d-start").value;
+  const end=document.getElementById("d-end").value,jours=parseFloat(document.getElementById("d-jours").value)||0;
+  const ferier=parseInt(document.getElementById("d-ferier").value)||0,comment=document.getElementById("d-comment").value.trim();
+  if(!start||!end||!jours){toast("⚠️ Remplissez les champs obligatoires");return;}
+  if(parseD(end)<parseD(start)){toast("⚠️ La date de fin doit être après le début");return;}
+  // Reload before saving to avoid conflicts
+  await loadFromCloud();
+  if(!S.requests)S.requests=[];
+  if(!S.nextReqId)S.nextReqId=1;
+  const newReq={id:S.nextReqId++,name:currentEmployee.name,type,start,end,jours,ferier,comment,status:'pending',submittedAt:todayISO(),reviewedAt:null,reviewNote:""};
+  S.requests.push(newReq);
+  save();
+  const t=TYPE_MAP[type];
+  document.getElementById("confirm-summary").innerHTML=`<strong>Type :</strong> <span class="badge ${t?.badge||'badge-gray'}">${type}</span><br><strong>Période :</strong> ${fmtDate(start)} → ${fmtDate(end)}<br><strong>Durée :</strong> ${jours} jour${jours>1?"s":""} ouvrés${ferier>0?` (dont ${ferier} j fériés)`:""}<br>${comment?`<strong>Commentaire :</strong> ${comment}`:""}`;
+  openModal("mod-confirm");
+  renderDemandeForm();
+  toast("✅ Demande envoyée !");
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add("open");}
+function closeModal(id){document.getElementById(id).classList.remove("open");}
+document.querySelectorAll(".overlay").forEach(el=>el.addEventListener("click",e=>{if(e.target===el)closeModal(el.id);}));
+
+// ══════════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════════
+(async()=>{
+  const ok=await loadFromCloud();
+  if(!ok){
+    document.getElementById('loader').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('name-grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:1.5rem;font-size:.88rem;color:var(--g600)">⚠️ Impossible de charger les données. Vérifiez votre connexion internet et que le fichier Admin a bien été configuré.</div>`;
+    return;
+  }
+  showLogin();
+})();
+</script>
+</body>
+</html>
