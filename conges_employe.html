@@ -4,197 +4,281 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mes Congés · Wilow</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --primary:#16a34a; --primary-lt:#dcfce7; --primary-dk:#14532d;
-  --navy:#0f172a; --blue:#2563eb; --blue-lt:#eff6ff;
-  --white:#ffffff; --g50:#f8fafc; --g100:#f1f5f9; --g200:#e2e8f0; --g300:#cbd5e1;
-  --g400:#94a3b8; --g600:#475569; --g700:#334155; --g800:#1e293b;
-  --green:#16a34a; --green-lt:#dcfce7; --green-dk:#14532d;
-  --red:#dc2626; --red-lt:#fee2e2; --orange:#ea580c; --orange-lt:#ffedd5;
-  --purple:#7c3aed; --purple-lt:#ede9fe; --teal:#0d9488; --teal-lt:#ccfbf1;
-  --yellow:#ca8a04; --yellow-lt:#fef9c3; --pink:#db2777; --pink-lt:#fce7f3;
-  --r:10px; --sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
-  --sh-md:0 4px 20px rgba(0,0,0,.09); --sh-lg:0 20px 60px rgba(0,0,0,.15);
+  --bg:#F7F6FF;
+  --surface:#FFFFFF;
+  --border:#ECEAF5;
+  --border-strong:#D8D4EC;
+  --accent:#6C5CE7;
+  --accent-lt:#F0EEFF;
+  --accent-dk:#4A3BB5;
+  --text:#1A1433;
+  --text-2:#6B6484;
+  --text-3:#A59EC0;
+  --green:#00B37E;
+  --green-lt:#E6FFF6;
+  --green-dk:#00724D;
+  --red:#E53E3E;
+  --red-lt:#FFF5F5;
+  --orange:#DD6B20;
+  --orange-lt:#FFFAF0;
+  --blue:#3182CE;
+  --blue-lt:#EBF8FF;
+  --purple:#805AD5;
+  --purple-lt:#FAF5FF;
+  --yellow:#B7791F;
+  --yellow-lt:#FFFFF0;
+  --pink:#D53F8C;
+  --pink-lt:#FFF5F7;
+  --teal:#2C7A7B;
+  --teal-lt:#E6FFFA;
+  --r:14px;
+  --sh:0 1px 2px rgba(108,92,231,.04),0 4px 16px rgba(108,92,231,.06);
+  --sh-md:0 4px 24px rgba(108,92,231,.10);
+  --sh-lg:0 20px 60px rgba(26,20,51,.14);
 }
 html{font-size:15px;}
-body{font-family:'Instrument Sans',sans-serif;background:var(--g100);color:var(--g800);min-height:100vh;display:flex;flex-direction:column;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;}
 
-/* LOADER */
-#loader{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1a2e1a 100%);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;color:#fff;}
+/* ── LOADER ── */
+#loader{position:fixed;inset:0;background:var(--accent);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.1rem;}
 #loader.hidden{display:none;}
-.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+.loader-wordmark{font-size:1.5rem;font-weight:700;color:#fff;letter-spacing:-.03em;}
+.loader-wordmark span{opacity:.6;}
+.spinner{width:32px;height:32px;border:2.5px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.loader-text{font-size:.85rem;font-weight:500;opacity:.8;}
-.loader-logo{font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:.5rem;}
+.loader-text{font-size:.8rem;font-weight:500;color:rgba(255,255,255,.6);}
 
-/* LOGIN */
-#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f2d1a 100%);display:flex;align-items:center;justify-content:center;z-index:9000;padding:1.5rem;}
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9000;padding:1.5rem;}
 #login-screen.hidden{display:none;}
-.login-box{background:var(--white);border-radius:20px;padding:2.5rem 2.25rem;width:100%;max-width:420px;box-shadow:var(--sh-lg);animation:loginUp .3s ease;}
-@keyframes loginUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
-.login-logo{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--navy);text-align:center;margin-bottom:.4rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
-.login-logo span{color:var(--primary);}
-.login-subtitle{text-align:center;color:var(--g600);font-size:.88rem;margin-bottom:2rem;}
-.login-label{font-size:.73rem;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.55rem;display:block;}
-.name-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.55rem;margin-bottom:1.5rem;}
-.name-btn{display:flex;align-items:center;gap:.55rem;padding:.65rem .85rem;border-radius:10px;border:1.5px solid var(--g200);background:var(--g50);cursor:pointer;font-family:'Instrument Sans',sans-serif;font-size:.85rem;font-weight:500;color:var(--g700);transition:all .15s;text-align:left;}
-.name-btn:hover{border-color:var(--primary);background:var(--green-lt);color:var(--primary-dk);transform:translateY(-1px);}
-.name-btn .av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff;flex-shrink:0;}
-.login-note{font-size:.75rem;color:var(--g400);text-align:center;line-height:1.5;}
+.login-wrap{width:100%;max-width:460px;}
+.login-logo{display:flex;align-items:center;gap:.6rem;margin-bottom:2.5rem;}
+.login-logo-mark{width:40px;height:40px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.login-logo-text{font-size:1.15rem;font-weight:700;color:var(--text);letter-spacing:-.03em;}
+.login-logo-text span{color:var(--text-3);font-weight:400;}
+.login-card{background:var(--surface);border-radius:20px;padding:2rem;box-shadow:var(--sh-md);border:1px solid var(--border);}
+.login-heading{font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:.4rem;letter-spacing:-.03em;}
+.login-sub{font-size:.83rem;color:var(--text-2);margin-bottom:1.5rem;}
+.login-section-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:.75rem;}
+.name-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem;margin-bottom:1.25rem;}
+.name-btn{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.85rem .5rem;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;color:var(--text-2);transition:all .15s;}
+.name-btn:hover{border-color:var(--accent);background:var(--accent-lt);color:var(--accent);transform:translateY(-2px);box-shadow:var(--sh);}
+.name-btn .av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;}
+.login-note{font-size:.75rem;color:var(--text-3);text-align:center;}
 
-/* OFFLINE BANNER */
-#offline-banner{display:none;background:#fef9c3;border-bottom:1px solid #fde68a;color:#78350f;padding:.5rem 1.5rem;font-size:.8rem;font-weight:500;text-align:center;}
+/* ── OFFLINE BANNER ── */
+#offline-banner{display:none;background:#FFFFF0;border-bottom:1px solid #F6E05E;color:#744210;padding:.5rem 1.5rem;font-size:.78rem;font-weight:500;text-align:center;}
 #offline-banner.show{display:block;}
 
-/* HEADER */
-header{background:linear-gradient(135deg,#0f172a 0%,#1a2e1a 100%);color:var(--white);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.3);gap:.5rem;}
-.logo{font-family:'DM Serif Display',serif;font-size:1.15rem;letter-spacing:-.02em;display:flex;align-items:center;gap:.5rem;flex-shrink:0;}
-.user-chip{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.1);border-radius:999px;padding:.3rem .7rem .3rem .35rem;font-size:.82rem;font-weight:500;}
-.user-chip .av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#fff;}
-.header-right{display:flex;align-items:center;gap:.5rem;}
-.sync-indicator{font-size:.72rem;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:.3rem;}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
-.sync-dot.syncing{background:var(--yellow);animation:pulse 1s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* ── HEADER ── */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.75rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:200;gap:.5rem;}
+.logo{display:flex;align-items:center;gap:.55rem;flex-shrink:0;}
+.logo-mark{width:30px;height:30px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;}
+.logo-text{font-size:.95rem;font-weight:700;color:var(--text);letter-spacing:-.03em;}
+.logo-text span{color:var(--text-3);font-weight:400;}
+.header-right{display:flex;align-items:center;gap:.75rem;}
+.sync-pill{display:flex;align-items:center;gap:.35rem;background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:.3rem .7rem;font-size:.72rem;font-weight:500;color:var(--text-2);}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.sync-dot.syncing{background:var(--yellow);animation:pulse .9s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.user-pill{display:flex;align-items:center;gap:.5rem;padding:.3rem .6rem .3rem .35rem;border-radius:999px;background:var(--bg);border:1px solid var(--border);font-size:.82rem;font-weight:600;color:var(--text);}
+.user-pill .av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#fff;}
+.btn-logout{background:none;border:none;font-family:'Inter',sans-serif;font-size:.78rem;font-weight:500;color:var(--text-3);cursor:pointer;padding:.3rem .5rem;border-radius:8px;transition:all .15s;}
+.btn-logout:hover{background:var(--bg);color:var(--text-2);}
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border-radius:8px;border:none;font-family:'Instrument Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;line-height:1;}
-.btn-ghost{background:rgba(255,255,255,.1);color:var(--white);}
-.btn-ghost:hover{background:rgba(255,255,255,.18);}
-.btn-primary{background:var(--primary);color:var(--white);box-shadow:0 1px 3px rgba(22,163,74,.3);}
-.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px);}
-.btn-outline{background:var(--white);color:var(--g700);border:1.5px solid var(--g200);}
-.btn-outline:hover{background:var(--g50);border-color:var(--g300);}
-.btn-sm{padding:.28rem .65rem;font-size:.76rem;border-radius:6px;}
-
-/* NAV */
-nav{background:var(--white);border-bottom:1px solid var(--g200);padding:0 1.5rem;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+/* ── NAV ── */
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.75rem;display:flex;gap:.25rem;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 nav::-webkit-scrollbar{display:none;}
-nav button{background:none;border:none;cursor:pointer;font-family:'Instrument Sans',sans-serif;font-size:.85rem;font-weight:500;color:var(--g400);padding:.9rem 1.1rem;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;}
-nav button:hover{color:var(--g800);}
-nav button.active{color:var(--primary);border-bottom-color:var(--primary);}
+nav button{background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:500;color:var(--text-2);padding:.75rem .9rem;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-1px;}
+nav button:hover{color:var(--text);}
+nav button.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
 
-/* MAIN */
-main{flex:1;padding:1.4rem 1.5rem;max-width:1100px;width:100%;margin:0 auto;}
+/* ── MAIN ── */
+main{flex:1;padding:1.75rem;max-width:1100px;width:100%;margin:0 auto;}
 .page{display:none;}
 .page.active{display:block;}
 
-/* CARD */
-.card{background:var(--white);border-radius:var(--r);box-shadow:var(--sh);padding:1.35rem;margin-bottom:1.2rem;border:1px solid var(--g200);}
-.card-title{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--navy);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
-.page-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--navy);}
+/* ── CARD ── */
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);padding:1.5rem;margin-bottom:1.1rem;border:1px solid var(--border);}
+.card-title{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:1.1rem;display:flex;align-items:center;gap:.45rem;letter-spacing:-.01em;}
+.page-header{margin-bottom:1.4rem;}
+.page-heading{font-size:1.2rem;font-weight:700;color:var(--text);letter-spacing:-.03em;margin-bottom:.3rem;}
+.page-sub{font-size:.82rem;color:var(--text-2);}
 
-/* SOLDE GRID */
-.solde-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.3rem;}
-.solde-card{background:var(--white);border-radius:var(--r);padding:1.25rem;box-shadow:var(--sh);border:1px solid var(--g200);border-top:3px solid var(--primary);transition:transform .15s,box-shadow .15s;}
-.solde-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);}
-.solde-card.blue{border-top-color:var(--blue);}
-.solde-card.purple{border-top-color:var(--purple);}
-.solde-card.orange{border-top-color:var(--orange);}
-.solde-card.red{border-top-color:var(--red);}
-.solde-card.pink{border-top-color:var(--pink);}
-.solde-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g400);margin-bottom:.3rem;}
-.solde-value{font-family:'DM Mono',monospace;font-size:1.75rem;font-weight:500;color:var(--navy);line-height:1.1;}
-.solde-value.big-pos{color:var(--green);}
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.9rem;margin-bottom:1.1rem;}
+.kpi-tile{background:var(--surface);border-radius:var(--r);padding:1.25rem 1.35rem;box-shadow:var(--sh);border:1px solid var(--border);transition:box-shadow .15s;}
+.kpi-tile:hover{box-shadow:var(--sh-md);}
+.kpi-tile.accent{background:var(--accent);border-color:var(--accent-dk);}
+.kpi-tile.green{background:var(--green-lt);border-color:#9AE6B4;}
+.kpi-tile.red{background:var(--red-lt);border-color:#FEB2B2;}
+.kpi-tile.purple{background:var(--purple-lt);border-color:#D6BCFA;}
+.kpi-tile.orange{background:var(--orange-lt);border-color:#FBD38D;}
+.kpi-tile.pink{background:var(--pink-lt);border-color:#FBB6CE;}
+.kpi-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:.45rem;}
+.kpi-tile.accent .kpi-label{color:rgba(255,255,255,.7);}
+.kpi-tile.green .kpi-label{color:var(--green-dk);}
+.kpi-tile.red .kpi-label{color:var(--red);}
+.kpi-tile.purple .kpi-label{color:var(--purple);}
+.kpi-tile.orange .kpi-label{color:var(--orange);}
+.kpi-tile.pink .kpi-label{color:var(--pink);}
+.kpi-val{font-size:2rem;font-weight:700;color:var(--text);line-height:1;letter-spacing:-.04em;}
+.kpi-tile.accent .kpi-val{color:#fff;}
+.kpi-tile.green .kpi-val{color:var(--green-dk);}
+.kpi-tile.red .kpi-val{color:var(--red);}
+.kpi-tile.purple .kpi-val{color:var(--purple);}
+.kpi-tile.orange .kpi-val{color:var(--orange);}
+.kpi-tile.pink .kpi-val{color:var(--pink);}
+.kpi-val span{font-size:1rem;font-weight:500;opacity:.65;}
+.kpi-sub{font-size:.72rem;color:var(--text-3);margin-top:.35rem;}
+.kpi-tile.accent .kpi-sub{color:rgba(255,255,255,.6);}
+.kpi-tile.green .kpi-sub{color:var(--green-dk);opacity:.7;}
+.kpi-tile.red .kpi-sub{color:var(--red);opacity:.7;}
+.prog-track{background:rgba(0,0,0,.08);border-radius:999px;height:4px;margin-top:.5rem;overflow:hidden;}
+.prog-fill{height:100%;border-radius:999px;transition:width .5s ease;}
+
+/* ── SOLDE CARDS (rendered by JS) ── */
+.solde-card{background:var(--surface);border-radius:var(--r);padding:1.25rem 1.35rem;box-shadow:var(--sh);border:1px solid var(--border);transition:box-shadow .15s;}
+.solde-card:hover{box-shadow:var(--sh-md);}
+.solde-card.red{background:var(--red-lt);border-color:#FEB2B2;}
+.solde-card.purple{background:var(--purple-lt);border-color:#D6BCFA;}
+.solde-card.pink{background:var(--pink-lt);border-color:#FBB6CE;}
+.solde-card.orange{background:var(--orange-lt);border-color:#FBD38D;}
+.solde-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:.45rem;}
+.solde-card.red .solde-label{color:var(--red);}
+.solde-card.purple .solde-label{color:var(--purple);}
+.solde-card.pink .solde-label{color:var(--pink);}
+.solde-card.orange .solde-label{color:var(--orange);}
+.solde-value{font-size:2rem;font-weight:700;color:var(--text);line-height:1;letter-spacing:-.04em;}
+.solde-value span{font-size:1rem;font-weight:500;opacity:.65;}
+.solde-value.big-pos{color:var(--green-dk);}
 .solde-value.big-neg{color:var(--red);}
-.solde-sub{font-size:.72rem;color:var(--g400);margin-top:.18rem;}
-
-/* PROGRESS */
-.prog-wrap{background:var(--g100);border-radius:999px;height:6px;overflow:hidden;margin-top:.4rem;}
+.solde-card.red .solde-value{color:var(--red);}
+.solde-card.purple .solde-value{color:var(--purple);}
+.solde-card.pink .solde-value{color:var(--pink);}
+.solde-card.orange .solde-value{color:var(--orange);}
+.solde-sub{font-size:.72rem;color:var(--text-3);margin-top:.35rem;}
+.solde-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.9rem;margin-bottom:1.1rem;}
+.prog-wrap{background:rgba(0,0,0,.07);border-radius:999px;height:4px;margin-top:.5rem;overflow:hidden;}
 .prog-bar{height:100%;border-radius:999px;transition:width .5s ease;}
 
-/* TABLE */
-.table-wrap{overflow-x:auto;border-radius:8px;}
-table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:400px;}
-thead th{background:var(--g50);color:var(--g600);padding:.65rem 1rem;text-align:left;font-weight:700;font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;border-bottom:2px solid var(--g200);}
-tbody tr{border-bottom:1px solid var(--g100);transition:background .1s;}
-tbody tr:hover{background:var(--g50);}
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:400px;}
+thead th{background:var(--bg);color:var(--text-3);padding:.65rem 1rem;text-align:left;font-weight:600;font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--border);}
+tbody tr{border-bottom:1px solid var(--bg);transition:background .1s;}
+tbody tr:hover{background:var(--bg);}
 tbody td{padding:.65rem 1rem;vertical-align:middle;}
 tbody tr:last-child{border-bottom:none;}
 
-/* BADGE */
-.badge{display:inline-flex;align-items:center;gap:.22rem;padding:.2rem .6rem;border-radius:999px;font-size:.69rem;font-weight:600;white-space:nowrap;}
-.badge-blue{background:var(--blue-lt);color:#1d4ed8;}
-.badge-green{background:var(--green-lt);color:var(--primary-dk);}
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:.22rem;padding:.2rem .55rem;border-radius:6px;font-size:.69rem;font-weight:600;white-space:nowrap;}
+.badge-blue{background:#EBF8FF;color:#2B6CB0;}
+.badge-green{background:var(--green-lt);color:var(--green-dk);}
 .badge-purple{background:var(--purple-lt);color:var(--purple);}
 .badge-teal{background:var(--teal-lt);color:var(--teal);}
 .badge-orange{background:var(--orange-lt);color:var(--orange);}
 .badge-red{background:var(--red-lt);color:var(--red);}
 .badge-yellow{background:var(--yellow-lt);color:var(--yellow);}
 .badge-pink{background:var(--pink-lt);color:var(--pink);}
-.badge-gray{background:var(--g100);color:var(--g600);}
+.badge-gray{background:var(--bg);color:var(--text-2);}
 
-/* MONO */
-.mono{font-family:'DM Mono',monospace;}
-.pos{color:var(--green);font-weight:600;font-family:'DM Mono',monospace;}
-.neg{color:var(--red);font-weight:600;font-family:'DM Mono',monospace;}
+/* ── MONO ── */
+.mono{font-family:'SF Mono',ui-monospace,monospace;}
+.pos{color:var(--green-dk);font-weight:600;}
+.neg{color:var(--red);font-weight:600;}
 
-/* FORM */
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:.9rem;}
-.form-group{display:flex;flex-direction:column;gap:.3rem;}
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:1rem;}
+.form-group{display:flex;flex-direction:column;gap:.35rem;}
 .form-group.full{grid-column:1/-1;}
-label{font-size:.73rem;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.04em;}
-label .opt{font-weight:400;text-transform:none;color:var(--g400);}
-input,select,textarea{border:1.5px solid var(--g200);border-radius:8px;padding:.5rem .75rem;font-family:'Instrument Sans',sans-serif;font-size:.88rem;color:var(--g800);background:var(--white);transition:border-color .15s;outline:none;width:100%;}
-input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(22,163,74,.12);}
+label{font-size:.72rem;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;}
+label .opt{font-weight:400;text-transform:none;color:var(--text-3);}
+input,select,textarea{border:1.5px solid var(--border);border-radius:10px;padding:.55rem .8rem;font-family:'Inter',sans-serif;font-size:.88rem;color:var(--text);background:var(--surface);transition:border-color .15s,box-shadow .15s;outline:none;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,92,231,.12);}
 textarea{resize:vertical;min-height:80px;}
-.hint{font-size:.71rem;color:var(--g400);margin-top:.12rem;font-style:italic;}
+.hint{font-size:.7rem;color:var(--text-3);font-style:italic;}
 
-/* CALENDAR */
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;}
-.cal-title{font-family:'DM Serif Display',serif;font-size:1.25rem;color:var(--navy);}
+/* ── CALENDAR ── */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:.5rem;}
+.cal-title{font-size:1.05rem;font-weight:700;color:var(--text);letter-spacing:-.03em;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-dh{text-align:center;font-size:.67rem;font-weight:700;color:var(--g400);padding:.4rem 0;text-transform:uppercase;letter-spacing:.05em;}
-.cal-day{min-height:68px;border-radius:8px;padding:.35rem .4rem;background:var(--white);border:1px solid var(--g200);position:relative;}
-.cal-day.other{background:var(--g50);opacity:.4;}
-.cal-day.we{background:var(--g50);}
-.cal-day.today{border:2px solid var(--primary);}
-.cal-day.ferie{background:#fff7ed;}
-.cal-dn{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--g400);margin-bottom:.22rem;}
-.cal-day.today .cal-dn-inner{background:var(--primary);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;}
-.cal-evt{border-radius:4px;padding:.08rem .28rem;font-size:.62rem;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-dh{text-align:center;font-size:.65rem;font-weight:600;color:var(--text-3);padding:.4rem 0;text-transform:uppercase;letter-spacing:.05em;}
+.cal-day{min-height:72px;border-radius:10px;padding:.38rem .42rem;background:var(--surface);border:1px solid var(--border);position:relative;transition:border-color .1s;}
+.cal-day:hover{border-color:var(--border-strong);}
+.cal-day.other{background:transparent;border-color:transparent;opacity:.35;}
+.cal-day.we{background:var(--bg);}
+.cal-day.today{border:2px solid var(--accent);background:var(--accent-lt);}
+.cal-day.ferie{background:#FFFFF0;}
+.cal-dn{font-size:.68rem;font-weight:500;color:var(--text-3);margin-bottom:.2rem;}
+.cal-day.today .cal-dn-inner{background:var(--accent);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.67rem;font-weight:700;}
+.cal-evt{border-radius:4px;padding:.08rem .25rem;font-size:.6rem;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-/* REQUEST CARD */
-.my-req{background:var(--white);border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);padding:1rem 1.2rem;margin-bottom:.65rem;display:flex;align-items:flex-start;gap:.9rem;}
+/* ── REQUEST CARD ── */
+.my-req{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);padding:1rem 1.25rem;margin-bottom:.65rem;display:flex;align-items:flex-start;gap:.9rem;transition:box-shadow .15s;}
+.my-req:hover{box-shadow:var(--sh-md);}
+.req-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0;}
 .req-info{flex:1;}
-.req-name{font-weight:600;font-size:.88rem;color:var(--navy);margin-bottom:.25rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
-.req-detail{font-size:.8rem;color:var(--g600);display:flex;flex-wrap:wrap;gap:.6rem;}
-.req-note{font-size:.78rem;font-style:italic;color:var(--g600);background:var(--g50);padding:.3rem .65rem;border-radius:6px;margin-top:.35rem;}
+.req-name{font-weight:600;font-size:.88rem;color:var(--text);margin-bottom:.3rem;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;}
+.req-detail{font-size:.79rem;color:var(--text-2);display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;}
+.req-note{font-size:.77rem;color:var(--text-2);background:var(--bg);padding:.3rem .65rem;border-radius:8px;margin-top:.35rem;border:1px solid var(--border);}
 
-/* MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem;}
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,20,51,.45);backdrop-filter:blur(6px);z-index:1000;align-items:center;justify-content:center;padding:1rem;}
 .overlay.open{display:flex;}
-.modal{background:var(--white);border-radius:16px;padding:1.75rem;width:100%;max-width:520px;box-shadow:var(--sh-lg);max-height:90vh;overflow-y:auto;animation:up .2s ease;border:1px solid var(--g200);}
-@keyframes up{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
-.modal-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--navy);margin-bottom:1.2rem;}
-.modal-footer{display:flex;gap:.65rem;justify-content:flex-end;margin-top:1.4rem;}
+.modal{background:var(--surface);border-radius:20px;padding:1.85rem;width:100%;max-width:500px;box-shadow:var(--sh-lg);max-height:90vh;overflow-y:auto;animation:up .2s ease;border:1px solid var(--border);}
+@keyframes up{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.modal-title{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:1.25rem;letter-spacing:-.03em;}
+.modal-footer{display:flex;gap:.65rem;justify-content:flex-end;margin-top:1.5rem;}
 
-/* TOAST */
-#toast{position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;background:var(--navy);color:var(--white);padding:.75rem 1.2rem;border-radius:10px;font-size:.83rem;font-weight:500;box-shadow:var(--sh-lg);transform:translateY(80px);transition:transform .25s;pointer-events:none;}
-#toast.show{transform:none;}
+/* ── ALERT ── */
+.alert{border-radius:12px;padding:.9rem 1.1rem;font-size:.8rem;line-height:1.65;display:flex;gap:.65rem;align-items:flex-start;margin-bottom:.8rem;}
+.alert-green{background:var(--green-lt);border:1px solid #9AE6B4;color:var(--green-dk);}
+.alert-yellow{background:#FFFFF0;border:1px solid #F6E05E;color:#744210;}
+.alert-pink{background:var(--pink-lt);border:1px solid #FBB6CE;color:#97266D;}
+.alert-blue{background:var(--blue-lt);border:1px solid #BEE3F8;color:#2A4365;}
 
-/* AVATAR */
-.av{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--white);flex-shrink:0;}
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.48rem .95rem;border-radius:10px;border:none;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;line-height:1;}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 4px rgba(108,92,231,.3);}
+.btn-primary:hover{background:var(--accent-dk);transform:translateY(-1px);box-shadow:0 4px 12px rgba(108,92,231,.35);}
+.btn-outline{background:var(--surface);color:var(--text-2);border:1.5px solid var(--border);}
+.btn-outline:hover{background:var(--bg);border-color:var(--border-strong);color:var(--text);}
+.btn-sm{padding:.3rem .65rem;font-size:.76rem;border-radius:8px;}
 
-/* ALERT */
-.alert{border-radius:10px;padding:.9rem 1.1rem;font-size:.8rem;line-height:1.65;display:flex;gap:.6rem;align-items:flex-start;margin-bottom:.75rem;}
-.alert-green{background:var(--green-lt);border:1px solid #86efac;color:#14532d;}
-.alert-yellow{background:var(--yellow-lt);border:1px solid #fde68a;color:#78350f;}
-.alert-pink{background:var(--pink-lt);border:1px solid #fbcfe8;color:#831843;}
-.alert-blue{background:var(--blue-lt);border:1px solid #bfdbfe;color:#1e40af;}
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text-3);}
+.empty-icon{font-size:2.2rem;margin-bottom:.5rem;opacity:.4;}
+.empty-text{font-size:.88rem;}
 
-/* EMPTY */
-.empty-state{text-align:center;padding:3rem 1rem;color:var(--g400);}
-.empty-icon{font-size:2.5rem;margin-bottom:.6rem;opacity:.5;}
-.empty-text{font-size:.9rem;}
+/* ── TOAST ── */
+#toast{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;background:var(--text);color:#fff;padding:.7rem 1.25rem;border-radius:999px;font-size:.82rem;font-weight:500;box-shadow:var(--sh-lg);transition:transform .25s;pointer-events:none;white-space:nowrap;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── AV ── */
+.av{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0;}
+
+/* ── PROFILE BLOCK ── */
+.profile-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.profile-info{flex:1;}
+.profile-name{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.35rem;}
+.profile-tags{display:flex;gap:.35rem;flex-wrap:wrap;}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:1.25rem 0;}
 
 @media(max-width:640px){
-  header{padding:0 1rem;height:52px;} main{padding:1rem;}
-  .solde-grid{grid-template-columns:repeat(2,1fr);gap:.65rem;} .solde-value{font-size:1.4rem;}
-  nav button{padding:.75rem .85rem;font-size:.8rem;} .login-box{padding:1.75rem 1.25rem;}
+  header{padding:0 1rem;height:54px;}
+  main{padding:1rem;}
+  .kpi-strip,.solde-grid{grid-template-columns:repeat(2,1fr);gap:.65rem;}
+  .kpi-val,.solde-value{font-size:1.6rem;}
+  nav{padding:0 1rem;}
+  nav button{padding:.7rem .75rem;font-size:.79rem;}
+  .login-card{padding:1.5rem;}
 }
 </style>
 </head>
@@ -202,97 +286,131 @@ textarea{resize:vertical;min-height:80px;}
 
 <!-- LOADER -->
 <div id="loader">
-  <div class="loader-logo">🌿 Wilow</div>
+  <div class="loader-wordmark">🌿 Wilow <span>· Congés</span></div>
   <div class="spinner"></div>
-  <div class="loader-text">Chargement de vos congés…</div>
+  <div class="loader-text">Chargement de votre espace…</div>
 </div>
 
 <!-- LOGIN -->
 <div id="login-screen" class="hidden">
-  <div class="login-box">
-    <div class="login-logo">🌿 Wilow<span>·</span>Congés</div>
-    <div class="login-subtitle">Sélectionnez votre nom pour accéder à votre espace</div>
-    <span class="login-label">Qui êtes-vous ?</span>
-    <div class="name-grid" id="name-grid"></div>
-    <div class="login-note">💡 Si votre nom n'apparaît pas, contactez l'administration.</div>
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div class="login-logo-mark">🌿</div>
+      <div class="login-logo-text">Wilow <span>· Congés</span></div>
+    </div>
+    <div class="login-card">
+      <div class="login-heading">Bonjour 👋</div>
+      <div class="login-sub">Sélectionnez votre nom pour accéder à votre espace personnel.</div>
+      <div class="login-section-label">Qui êtes-vous ?</div>
+      <div class="name-grid" id="name-grid"></div>
+      <div class="login-note">Votre nom n'apparaît pas ? Contactez l'administration.</div>
+    </div>
   </div>
 </div>
 
 <!-- OFFLINE BANNER -->
-<div id="offline-banner">⚠️ Mode hors-ligne — données en cache. Vérifiez votre connexion.</div>
+<div id="offline-banner">⚠️ Mode hors-ligne — données en cache local. Vérifiez votre connexion.</div>
 
 <!-- APP -->
 <div id="app" style="display:none;flex-direction:column;min-height:100vh">
+
 <header>
-  <div class="logo">🌿 Congés</div>
+  <div class="logo">
+    <div class="logo-mark">🌿</div>
+    <div class="logo-text">Congés <span>Wilow</span></div>
+  </div>
   <div class="header-right">
-    <span class="sync-indicator"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">Synchronisé</span></span>
-    <div class="user-chip"><div class="av" id="header-av" style="background:#16a34a">?</div><span id="header-name">—</span></div>
-    <button class="btn btn-ghost btn-sm" onclick="logout()">⬅ Quitter</button>
+    <div class="sync-pill">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-label">Synchronisé</span>
+    </div>
+    <div class="user-pill">
+      <div class="av" id="header-av" style="width:26px;height:26px;font-size:.62rem;background:var(--accent)">?</div>
+      <span id="header-name">—</span>
+    </div>
+    <button class="btn-logout" onclick="logout()">← Quitter</button>
   </div>
 </header>
+
 <nav>
-  <button class="active" onclick="goPage('solde',this)">💚 Mon solde</button>
-  <button onclick="goPage('calendar',this)">📅 Mon calendrier</button>
-  <button onclick="goPage('absences',this)">📋 Mes absences</button>
-  <button onclick="goPage('demande',this)">✉️ Nouvelle demande</button>
+  <button class="active" onclick="goPage('solde',this)">Mon solde</button>
+  <button onclick="goPage('calendar',this)">Calendrier</button>
+  <button onclick="goPage('absences',this)">Mes absences</button>
+  <button onclick="goPage('demande',this)">Nouvelle demande</button>
 </nav>
+
 <main>
+
+  <!-- SOLDE -->
   <div id="page-solde" class="page active">
     <div class="solde-grid" id="solde-kpis"></div>
     <div id="solde-detail"></div>
     <div id="solde-projection"></div>
   </div>
+
+  <!-- CALENDRIER -->
   <div id="page-calendar" class="page">
     <div class="card">
       <div class="cal-header">
-        <button class="btn btn-outline" onclick="chgMonth(-1)">← Préc.</button>
+        <button class="btn btn-outline btn-sm" onclick="chgMonth(-1)">← Préc.</button>
         <div class="cal-title" id="cal-title">—</div>
-        <button class="btn btn-outline" onclick="chgMonth(1)">Suiv. →</button>
+        <button class="btn btn-outline btn-sm" onclick="chgMonth(1)">Suiv. →</button>
       </div>
       <div class="cal-grid" id="cal-dhs"></div>
       <div class="cal-grid" style="margin-top:3px" id="cal-grid"></div>
-      <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap;" id="cal-legend"></div>
+      <div style="margin-top:1rem;display:flex;gap:.4rem;flex-wrap:wrap;" id="cal-legend"></div>
     </div>
   </div>
+
+  <!-- ABSENCES -->
   <div id="page-absences" class="page">
-    <div style="margin-bottom:1.1rem">
-      <div class="page-title" style="margin-bottom:.25rem">Mes absences</div>
-      <div style="font-size:.83rem;color:var(--g600)">Historique validé + statut de vos demandes</div>
+    <div class="page-header">
+      <div class="page-heading">Mes absences</div>
+      <div class="page-sub">Historique validé et statut de vos demandes</div>
     </div>
     <div class="card">
-      <div class="card-title">✅ Absences validées</div>
-      <div class="table-wrap"><table><thead><tr><th>Type</th><th>Début</th><th>Fin</th><th>Jours</th><th>Commentaire</th></tr></thead><tbody id="tb-my-abs"></tbody></table></div>
+      <div class="card-title">Absences validées</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Début</th><th>Fin</th><th>Jours</th><th>Commentaire</th></tr></thead>
+          <tbody id="tb-my-abs"></tbody>
+        </table>
+      </div>
     </div>
     <div class="card">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
-        <span>📬 Mes demandes</span>
-        <button class="btn btn-outline btn-sm" onclick="refreshAndRender('absences')">🔄 Actualiser</button>
+        <span>Mes demandes</span>
+        <button class="btn btn-outline btn-sm" onclick="refreshAndRender('absences')">↺ Actualiser</button>
       </div>
       <div id="my-requests-list"></div>
     </div>
   </div>
+
+  <!-- DEMANDE -->
   <div id="page-demande" class="page">
-    <div style="margin-bottom:1.2rem">
-      <div class="page-title" style="margin-bottom:.25rem">Nouvelle demande de congé</div>
-      <div style="font-size:.83rem;color:var(--g600)">Votre demande sera visible immédiatement par l'administration</div>
+    <div class="page-header">
+      <div class="page-heading">Nouvelle demande</div>
+      <div class="page-sub">Votre demande sera transmise à l'administration pour validation</div>
     </div>
     <div class="card">
       <div class="form-grid">
         <div class="form-group"><label>Type de congé</label><select id="d-type" onchange="onDTypeChange()"></select></div>
         <div class="form-group"><label>Date de début</label><input type="date" id="d-start"></div>
         <div class="form-group"><label>Date de fin</label><input type="date" id="d-end"></div>
-        <div class="form-group"><label>Jours ouvrés</label><input type="number" id="d-jours" min="0.5" step="0.5" placeholder="ex: 5"><div class="hint">Sans week-ends ni fériés</div></div>
+        <div class="form-group"><label>Jours ouvrés</label><input type="number" id="d-jours" min="0.5" step="0.5" placeholder="ex : 5"><div class="hint">Week-ends et fériés exclus</div></div>
         <div class="form-group"><label>Jours fériés inclus <span class="opt">(si besoin)</span></label><input type="number" id="d-ferier" min="0" step="1" value="0"></div>
-        <div class="form-group full" id="css-note-wrap" style="display:none"><div class="alert alert-pink"><span>💸</span><div><strong>Sans solde :</strong> non déduit du CP — traitement en paie.</div></div></div>
-        <div class="form-group full"><label>Commentaire <span class="opt">(optionnel)</span></label><textarea id="d-comment" placeholder="Ex: Vacances en famille…"></textarea></div>
+        <div class="form-group full" id="css-note-wrap" style="display:none">
+          <div class="alert alert-pink"><span>💸</span><div><strong>Sans solde :</strong> non déduit du CP — traitement en paie.</div></div>
+        </div>
+        <div class="form-group full"><label>Commentaire <span class="opt">(optionnel)</span></label><textarea id="d-comment" placeholder="Ex : Vacances en famille…"></textarea></div>
       </div>
-      <div style="display:flex;justify-content:flex-end;margin-top:1.2rem">
-        <button class="btn btn-primary" onclick="submitRequest()" style="padding:.55rem 1.4rem">✉️ Envoyer la demande</button>
+      <div style="display:flex;justify-content:flex-end;margin-top:1.25rem">
+        <button class="btn btn-primary" onclick="submitRequest()" style="padding:.55rem 1.5rem">Envoyer la demande →</button>
       </div>
     </div>
-    <div class="alert alert-blue"><span>ℹ️</span><div>Votre demande sera visible par l'administration. Suivez son statut dans <strong>Mes absences → Mes demandes</strong>.</div></div>
+    <div class="alert alert-blue"><span>ℹ️</span><div>Suivez le statut de votre demande dans l'onglet <strong>Mes absences</strong>.</div></div>
   </div>
+
 </main>
 </div>
 
@@ -300,7 +418,7 @@ textarea{resize:vertical;min-height:80px;}
 <div class="overlay" id="mod-avance">
   <div class="modal" style="max-width:440px">
     <div class="modal-title">⚠️ Demande en avance sur solde</div>
-    <div id="avance-summary" style="font-size:.88rem;color:var(--g600);line-height:1.85;margin-bottom:.75rem"></div>
+    <div id="avance-summary" style="font-size:.85rem;color:var(--text-2);line-height:1.85;margin-bottom:.8rem;background:var(--bg);border-radius:10px;padding:.9rem 1rem;border:1px solid var(--border)"></div>
     <div class="alert alert-yellow"><span>⚠️</span><div>Vous posez des congés avant de les avoir acquis. L'administration en sera informée lors de la validation. Vous pouvez tout de même envoyer la demande.</div></div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('mod-avance')">Annuler</button>
@@ -313,8 +431,8 @@ textarea{resize:vertical;min-height:80px;}
 <div class="overlay" id="mod-confirm">
   <div class="modal" style="max-width:440px">
     <div class="modal-title">✅ Demande envoyée !</div>
-    <div id="confirm-summary" style="font-size:.88rem;color:var(--g600);line-height:1.7"></div>
-    <div class="alert alert-green" style="margin-top:1rem"><span>🎉</span><div>Votre demande a été transmise. Suivez son statut dans <strong>Mes absences → Mes demandes</strong>.</div></div>
+    <div id="confirm-summary" style="font-size:.85rem;color:var(--text-2);line-height:1.85;background:var(--bg);border-radius:10px;padding:.9rem 1rem;border:1px solid var(--border);margin-bottom:.8rem"></div>
+    <div class="alert alert-green"><span>🎉</span><div>Votre demande a bien été transmise. Suivez son statut dans <strong>Mes absences → Mes demandes</strong>.</div></div>
     <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('mod-confirm')">Fermer</button></div>
   </div>
 </div>
@@ -409,7 +527,7 @@ const EMP_COLORS=["#3b82f6","#0d9488","#7c3aed","#16a34a","#ea580c","#dc2626","#
 // HELPERS
 // ══════════════════════════════════════════════════════════════════════════
 const empIdx=name=>S.employees.findIndex(e=>e.name===name);
-const empColor=name=>EMP_COLORS[((empIdx(name)%EMP_COLORS.length)+EMP_COLORS.length)%EMP_COLORS.length]||"#16a34a";
+const empColor=name=>EMP_COLORS[((empIdx(name)%EMP_COLORS.length)+EMP_COLORS.length)%EMP_COLORS.length]||"#6C5CE7";
 const initials=name=>name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
 const fmtDate=d=>{if(!d)return"—";const[y,m,day]=d.split("-");return`${day}/${m}/${y}`;};
 const parseD=s=>s?new Date(s+"T00:00:00"):null;
@@ -434,39 +552,29 @@ function renderProjection(){
   if(projDate<today()){container.innerHTML=`<div class="alert alert-yellow" style="margin-top:.75rem"><span>⚠️</span><div>Choisissez une date future.</div></div>`;return;}
   const mname=MONTHS_FR[m-1];
   const arrival=parseD(emp.arrival);
-
-  // Période Syntec : 1er juin → 31 mai
   const getPeriodStart=d=>{const dy=d.getFullYear(),dm=d.getMonth();return new Date(dm>=5?dy:dy-1,5,1);};
   const cpInRange=(from,until)=>{const mo=Math.max(0,(until-from)/(1000*60*60*24*30.4375));return Math.min(25,Math.round(mo*2.5*2)/2);};
-
   const todayPeriodStart=getPeriodStart(today());
   const projPeriodStart=getPeriodStart(projDate);
   const isFuturePeriod=projPeriodStart>todayPeriodStart;
-
   let cpAcqPeriod,cpCarry=0,cpUsed,cpPending,rttAcq=0,rttUsed=0,rttPending=0;
-
   if(!isFuturePeriod){
-    // Même période qu'aujourd'hui
     const from=arrival>todayPeriodStart?arrival:todayPeriodStart;
     cpAcqPeriod=cpInRange(from,projDate)+(emp.credit||0);
     cpUsed=sumAbsUntil(emp.name,'CP',projDate);
     cpPending=sumReqsUntil(emp.name,'CP',projDate);
   } else {
-    // Nouvelle période — calcul du report
     const currentPeriodEnd=new Date(todayPeriodStart.getFullYear()+1,4,31,23,59,59);
     const fromCurrent=arrival>todayPeriodStart?arrival:todayPeriodStart;
     const cpCurrentAcq=cpInRange(fromCurrent,currentPeriodEnd);
     const cpCurrentUsed=sumAbsUntil(emp.name,'CP',currentPeriodEnd);
     cpCarry=Math.max(0,cpCurrentAcq-cpCurrentUsed);
-    // CP de la nouvelle période
     const fromNew=arrival>projPeriodStart?arrival:projPeriodStart;
     cpAcqPeriod=cpInRange(fromNew,projDate);
     cpUsed=S.absences.filter(a=>a.name===emp.name&&a.type==='CP'&&parseD(a.start)>=projPeriodStart&&parseD(a.end)<=projDate).reduce((s,a)=>s+(+a.jours||0),0);
     cpPending=(S.requests||[]).filter(r=>r.name===emp.name&&r.type==='CP'&&r.status!=='rejected'&&parseD(r.start)>=projPeriodStart&&parseD(r.end)<=projDate).reduce((s,r)=>s+(+r.jours||0),0);
   }
   const cpDispo=cpCarry+cpAcqPeriod-cpUsed-cpPending;
-
-  // RTT (pas de report sous Syntec)
   const hasRTT=emp.hours>35;
   if(hasRTT){
     const extra=emp.hours-35;
@@ -477,23 +585,22 @@ function renderProjection(){
     rttPending=isFuturePeriod?(S.requests||[]).filter(r=>r.name===emp.name&&r.type==='RTT'&&r.status!=='rejected'&&parseD(r.start)>=projPeriodStart&&parseD(r.end)<=projDate).reduce((s,r)=>s+(+r.jours||0),0):sumReqsUntil(emp.name,'RTT',projDate);
   }
   const rttDispo=rttAcq-rttUsed-rttPending;
-
-  container.innerHTML=`<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--g200)">
-    <div style="font-size:.78rem;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.7rem">📊 Fin ${mname} ${y}</div>
+  container.innerHTML=`<div style="margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid var(--border)">
+    <div style="font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:.75rem">Fin ${mname} ${y}</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:.7rem">
-      <div style="background:var(--green-lt);border:1px solid #86efac;border-radius:10px;padding:.9rem">
-        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary-dk);margin-bottom:.25rem">CP disponibles</div>
-        <div style="font-family:'DM Mono',monospace;font-size:1.55rem;font-weight:500;color:${cpDispo<0?'var(--red)':'var(--primary-dk)'}">${cpDispo.toFixed(1)}<span style="font-size:.8rem"> j</span></div>
-        <div style="font-size:.68rem;color:var(--primary-dk);opacity:.7;margin-top:.15rem">${cpAcqPeriod.toFixed(1)} j acquis${cpCarry>0?` + ${cpCarry.toFixed(1)} j report`:''}${cpUsed>0?` · ${cpUsed.toFixed(1)} posés`:''}${cpPending>0?` · ${cpPending.toFixed(1)} en attente`:''}</div>
+      <div style="background:var(--green-lt);border:1px solid #9AE6B4;border-radius:12px;padding:1rem">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--green-dk);margin-bottom:.3rem">CP disponibles</div>
+        <div style="font-size:1.6rem;font-weight:700;color:${cpDispo<0?'var(--red)':'var(--green-dk)'};letter-spacing:-.04em;line-height:1">${cpDispo.toFixed(1)}<span style="font-size:.85rem;font-weight:500;opacity:.7"> j</span></div>
+        <div style="font-size:.68rem;color:var(--green-dk);opacity:.65;margin-top:.2rem">${cpAcqPeriod.toFixed(1)} acquis${cpCarry>0?` + ${cpCarry.toFixed(1)} report`:''}${cpUsed>0?` · ${cpUsed.toFixed(1)} posés`:''}${cpPending>0?` · ${cpPending.toFixed(1)} en attente`:''}</div>
       </div>
-      ${hasRTT?`<div style="background:var(--purple-lt);border:1px solid #c4b5fd;border-radius:10px;padding:.9rem">
-        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple);margin-bottom:.25rem">RTT disponibles</div>
-        <div style="font-family:'DM Mono',monospace;font-size:1.55rem;font-weight:500;color:${rttDispo<0?'var(--red)':'var(--purple)'}">${rttDispo.toFixed(1)}<span style="font-size:.8rem"> j</span></div>
-        <div style="font-size:.68rem;color:var(--purple);opacity:.7;margin-top:.15rem">${rttAcq.toFixed(1)} acquis${rttUsed>0?` · ${rttUsed.toFixed(1)} posés`:''}</div>
+      ${hasRTT?`<div style="background:var(--purple-lt);border:1px solid #D6BCFA;border-radius:12px;padding:1rem">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--purple);margin-bottom:.3rem">RTT disponibles</div>
+        <div style="font-size:1.6rem;font-weight:700;color:${rttDispo<0?'var(--red)':'var(--purple)'};letter-spacing:-.04em;line-height:1">${rttDispo.toFixed(1)}<span style="font-size:.85rem;font-weight:500;opacity:.7"> j</span></div>
+        <div style="font-size:.68rem;color:var(--purple);opacity:.65;margin-top:.2rem">${rttAcq.toFixed(1)} acquis${rttUsed>0?` · ${rttUsed.toFixed(1)} posés`:''}</div>
       </div>`:''}
     </div>
-    ${isFuturePeriod?`<div class="alert alert-blue" style="margin-top:.7rem"><span>ℹ️</span><div>Nouvelle période Syntec (1er juin ${projPeriodStart.getFullYear()}) · ${cpCarry>0?`<strong>${cpCarry.toFixed(1)} j</strong> reportés de la période précédente`:'Aucun report de la période précédente (tous les CP auront été utilisés)'}.</div></div>`:''}
-    ${cpDispo<0?`<div class="alert alert-yellow" style="margin-top:.7rem"><span>⚠️</span><div>Solde CP négatif de <strong>${Math.abs(cpDispo).toFixed(1)} j</strong> à cette date.</div></div>`:''}
+    ${isFuturePeriod?`<div class="alert alert-blue" style="margin-top:.75rem"><span>ℹ️</span><div>Nouvelle période Syntec · 1er juin ${projPeriodStart.getFullYear()} · ${cpCarry>0?`<strong>${cpCarry.toFixed(1)} j</strong> reportés de la période actuelle`:'0 j de report (tous vos CP auront été utilisés)'}.</div></div>`:''}
+    ${cpDispo<0?`<div class="alert alert-yellow" style="margin-top:.75rem"><span>⚠️</span><div>Solde CP négatif de <strong>${Math.abs(cpDispo).toFixed(1)} j</strong> à cette date.</div></div>`:''}
   </div>`;
 }
 
@@ -510,10 +617,10 @@ function showLogin(){
   document.getElementById('login-screen').classList.remove('hidden');
   const grid=document.getElementById("name-grid");
   if(!S||!S.employees||!S.employees.length){
-    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:1.5rem;font-size:.88rem;color:var(--g600)">👋 Aucun employé configuré pour l'instant.<br><span style="font-size:.8rem;opacity:.7">L'administrateur doit d'abord ouvrir la version Admin pour initialiser les données.</span><br><br><button onclick="loadFromCloud().then(showLogin)" style="margin-top:.5rem;padding:.4rem 1rem;border-radius:7px;border:1.5px solid #cbd5e1;background:#f8fafc;cursor:pointer;font-size:.82rem;">🔄 Réessayer</button></div>`;
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:1.5rem;font-size:.85rem;color:var(--text-2)">👋 Aucun employé configuré.<br><span style="font-size:.78rem;opacity:.6">L'administrateur doit d'abord initialiser la plateforme.</span><br><br><button onclick="loadFromCloud().then(showLogin)" style="margin-top:.5rem;padding:.4rem 1rem;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:.8rem;font-family:inherit;font-weight:500;">↺ Réessayer</button></div>`;
     return;
   }
-  grid.innerHTML=S.employees.map(emp=>`<button class="name-btn" onclick="login('${emp.name}')"><div class="av" style="background:${empColor(emp.name)}">${initials(emp.name)}</div>${emp.name}</button>`).join("");
+  grid.innerHTML=S.employees.map(emp=>`<button class="name-btn" onclick="login('${emp.name}')"><div class="av" style="width:36px;height:36px;font-size:.72rem;background:${empColor(emp.name)}">${initials(emp.name)}</div>${emp.name}</button>`).join("");
 }
 
 function login(name){
@@ -538,7 +645,7 @@ async function refreshAndRender(page){
   if(currentEmployee)currentEmployee=S.employees.find(e=>e.name===currentEmployee.name)||currentEmployee;
   const renders={solde:renderSolde,calendar:renderCalEmployee,absences:renderMyAbs,demande:renderDemandeForm};
   renders[page]?.();
-  toast("🔄 Données actualisées");
+  toast("↺ Données actualisées");
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -567,29 +674,31 @@ function renderSolde(){
   const tb=hasRTT?"badge-purple":isAlt?"badge-teal":"badge-blue";
   const tl=hasRTT?`CDI ${emp.hours}h`:isAlt?"Alternant":emp.type;
   document.getElementById("solde-kpis").innerHTML=`
-    <div class="solde-card"><div class="solde-label">CP acquis</div><div class="solde-value">${acq.toFixed(1)}<span style="font-size:.9rem"> j</span></div><div class="solde-sub">${cred>0?`+${cred} j crédit offert`:"depuis votre entrée"}</div></div>
-    <div class="solde-card ${solde<0?"red":""}"><div class="solde-label">Solde CP restant</div><div class="solde-value ${solde<0?"big-neg":"big-pos"}">${solde.toFixed(1)}<span style="font-size:.9rem"> j</span></div><div class="solde-sub"><div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:${poses>total?"var(--red)":"var(--primary)"}"></div></div>${poses.toFixed(1)} j posés / ${total.toFixed(1)} j total</div></div>
-    ${hasRTT?`<div class="solde-card purple"><div class="solde-label">Solde RTT</div><div class="solde-value">${rttSolde.toFixed(1)}<span style="font-size:.9rem"> j</span></div><div class="solde-sub">${rttAcq.toFixed(1)} acquis · ${rttPos.toFixed(1)} posés</div></div>`:""}
-    ${css>0?`<div class="solde-card pink"><div class="solde-label">Sans solde posés</div><div class="solde-value">${css.toFixed(1)}<span style="font-size:.9rem"> j</span></div><div class="solde-sub">traitement en paie</div></div>`:""}
-    ${pendingReqs.length>0?`<div class="solde-card orange"><div class="solde-label">Demandes en attente</div><div class="solde-value">${pendingReqs.length}</div><div class="solde-sub">${pendingReqs.reduce((s,r)=>s+(+r.jours||0),0).toFixed(1)} j demandés</div></div>`:""}`;
+    <div class="solde-card"><div class="solde-label">CP acquis</div><div class="solde-value">${acq.toFixed(1)}<span> j</span></div><div class="solde-sub">${cred>0?`+${cred} j crédit offert`:"période en cours"}</div></div>
+    <div class="solde-card ${solde<0?"red":"green"}"><div class="solde-label">Solde CP restant</div><div class="solde-value ${solde<0?"big-neg":"big-pos"}">${solde.toFixed(1)}<span> j</span></div><div class="solde-sub"><div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:${poses>total?"var(--red)":"var(--green)"}"></div></div>${poses.toFixed(1)} posés · ${total.toFixed(1)} total</div></div>
+    ${hasRTT?`<div class="solde-card purple"><div class="solde-label">Solde RTT</div><div class="solde-value">${rttSolde.toFixed(1)}<span> j</span></div><div class="solde-sub">${rttAcq.toFixed(1)} acquis · ${rttPos.toFixed(1)} posés</div></div>`:""}
+    ${css>0?`<div class="solde-card pink"><div class="solde-label">Sans solde posés</div><div class="solde-value">${css.toFixed(1)}<span> j</span></div><div class="solde-sub">traitement en paie</div></div>`:""}
+    ${pendingReqs.length>0?`<div class="solde-card orange"><div class="solde-label">En attente</div><div class="solde-value">${pendingReqs.length}</div><div class="solde-sub">${pendingReqs.reduce((s,r)=>s+(+r.jours||0),0).toFixed(1)} j demandés</div></div>`:""}`;
   document.getElementById("solde-detail").innerHTML=`
-    <div class="card"><div class="card-title">👤 Mon profil</div>
-      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
-        <div class="av" style="background:${empColor(emp.name)};width:48px;height:48px;font-size:1rem">${initials(emp.name)}</div>
-        <div><div style="font-size:1.05rem;font-weight:600;color:var(--navy)">${emp.name}</div>
-          <div style="display:flex;gap:.4rem;margin-top:.35rem;flex-wrap:wrap"><span class="badge ${tb}">${tl}</span><span class="badge badge-gray">Entrée ${fmtDate(emp.arrival)}</span><span class="badge badge-gray">${emp.hours}h/sem.</span></div>
+    <div class="card">
+      <div class="card-title">Mon profil</div>
+      <div class="profile-row">
+        <div class="av" style="width:48px;height:48px;font-size:1rem;background:${empColor(emp.name)}">${initials(emp.name)}</div>
+        <div class="profile-info">
+          <div class="profile-name">${emp.name}</div>
+          <div class="profile-tags"><span class="badge ${tb}">${tl}</span><span class="badge badge-gray">Arrivée ${fmtDate(emp.arrival)}</span><span class="badge badge-gray">${emp.hours}h / sem.</span></div>
         </div>
       </div>
-    </div>
-    <div class="alert alert-yellow"><span>ℹ️</span><div><strong>Règle Syntec :</strong> 2,5 j de CP par mois travaillé · 30 j max/an · Période : 1er juin → 31 mai. Les RTT ne sont pas reportables.</div></div>`;
-  // Projection card
+      <div class="divider"></div>
+      <div style="font-size:.78rem;color:var(--text-2);line-height:1.7;background:var(--bg);border-radius:10px;padding:.75rem 1rem;border:1px solid var(--border)"><strong style="color:var(--text)">Règle Syntec</strong> · 2,5 j de CP par mois travaillé · 30 j max/an · Période : 1er juin → 31 mai · Les RTT ne sont pas reportables.</div>
+    </div>`;
   const minMonth=new Date().toISOString().slice(0,7);
   document.getElementById("solde-projection").innerHTML=`
     <div class="card">
       <div class="card-title">🔮 Simuler mon solde</div>
       <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-        <div style="font-size:.85rem;color:var(--g600)">À quelle date veux-tu partir ?</div>
-        <input type="month" id="proj-month" min="${minMonth}" style="border:1.5px solid var(--g200);border-radius:8px;padding:.4rem .7rem;font-family:inherit;font-size:.88rem;color:var(--g800);background:var(--white);outline:none;cursor:pointer" onchange="renderProjection()">
+        <span style="font-size:.85rem;color:var(--text-2)">Je veux partir en</span>
+        <input type="month" id="proj-month" min="${minMonth}" style="border:1.5px solid var(--border);border-radius:10px;padding:.45rem .8rem;font-family:'Inter',sans-serif;font-size:.85rem;color:var(--text);background:var(--surface);outline:none;cursor:pointer;transition:border-color .15s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" onchange="renderProjection()">
       </div>
       <div id="proj-result"></div>
     </div>`;
@@ -635,7 +744,7 @@ function renderMyAbs(){
   const name=currentEmployee.name;
   const myAbs=[...S.absences.filter(a=>a.name===name)].sort((a,b)=>b.start.localeCompare(a.start));
   const tbody=document.getElementById("tb-my-abs");
-  tbody.innerHTML=myAbs.length?myAbs.map(ab=>{const t=TYPE_MAP[ab.type];return`<tr><td><span class="badge ${t?.badge||"badge-orange"}">${ab.type}</span></td><td class="mono" style="font-size:.8rem">${fmtDate(ab.start)}</td><td class="mono" style="font-size:.8rem">${fmtDate(ab.end)}</td><td class="mono" style="font-weight:600">${ab.jours} j</td><td style="font-size:.8rem;color:var(--g600);font-style:italic">${ab.comment||"—"}</td></tr>`;}).join(""):`<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--g400)">Aucune absence enregistrée</td></tr>`;
+  tbody.innerHTML=myAbs.length?myAbs.map(ab=>{const t=TYPE_MAP[ab.type];return`<tr><td><span class="badge ${t?.badge||"badge-orange"}">${ab.type}</span></td><td class="mono" style="font-size:.8rem">${fmtDate(ab.start)}</td><td class="mono" style="font-size:.8rem">${fmtDate(ab.end)}</td><td style="font-weight:600;font-size:.82rem">${ab.jours} j</td><td style="font-size:.78rem;color:var(--text-2);font-style:italic">${ab.comment||"—"}</td></tr>`;}).join(""):`<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-3)">Aucune absence enregistrée</td></tr>`;
   const myReqs=[...(S.requests||[]).filter(r=>r.name===name)].sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));
   const container=document.getElementById("my-requests-list");
   if(!myReqs.length){container.innerHTML=`<div class="empty-state"><div class="empty-icon">📬</div><div class="empty-text">Aucune demande envoyée</div></div>`;return;}
@@ -643,12 +752,12 @@ function renderMyAbs(){
   container.innerHTML=myReqs.map(req=>{
     const t=TYPE_MAP[req.type],st=statusMap[req.status]||statusMap.pending;
     return`<div class="my-req">
-      <div style="width:38px;height:38px;border-radius:10px;background:${(t?.cal||["#e2e8f0"])[0]};display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">${st.icon}</div>
+      <div class="req-icon" style="background:${(t?.cal||["#F7F6FF"])[0]}">${st.icon}</div>
       <div class="req-info">
         <div class="req-name"><span class="badge ${t?.badge||"badge-gray"}">${req.type}</span><span class="badge ${st.badge}">${st.label}</span></div>
-        <div class="req-detail"><span>📅 ${fmtDate(req.start)} → ${fmtDate(req.end)}</span><span class="mono">${req.jours} j</span><span style="color:var(--g400);font-size:.75rem">Soumis le ${fmtDate(req.submittedAt)}</span>${req.reviewedAt?`<span style="color:var(--g400);font-size:.75rem">Traité le ${fmtDate(req.reviewedAt)}</span>`:""}</div>
+        <div class="req-detail"><span>📅 ${fmtDate(req.start)} → ${fmtDate(req.end)}</span><span style="font-weight:600">${req.jours} j</span><span style="color:var(--text-3);font-size:.75rem">Soumis le ${fmtDate(req.submittedAt)}</span>${req.reviewedAt?`<span style="color:var(--text-3);font-size:.75rem">Traité le ${fmtDate(req.reviewedAt)}</span>`:""}</div>
         ${req.comment?`<div class="req-note">💬 ${req.comment}</div>`:""}
-        ${req.reviewNote?`<div class="req-note" style="background:#fee2e2;color:#991b1b">✖ Motif : ${req.reviewNote}</div>`:""}
+        ${req.reviewNote?`<div class="req-note" style="background:var(--red-lt);color:var(--red);border-color:#FEB2B2">✖ Motif : ${req.reviewNote}</div>`:""}
       </div>
     </div>`;
   }).join("");
@@ -675,7 +784,6 @@ async function submitRequest(){
   const ferier=parseInt(document.getElementById("d-ferier").value)||0,comment=document.getElementById("d-comment").value.trim();
   if(!start||!end||!jours){toast("⚠️ Remplissez les champs obligatoires");return;}
   if(parseD(end)<parseD(start)){toast("⚠️ La date de fin doit être après le début");return;}
-  // Vérification prise en avance (CP et RTT uniquement)
   if(type==='CP'||type==='RTT'){
     const emp=currentEmployee;
     const acq=type==='CP'?(cpAcquis(emp)+(emp.credit||0)):rttAcquis(emp);
@@ -727,7 +835,7 @@ document.querySelectorAll(".overlay").forEach(el=>el.addEventListener("click",e=
   if(!ok){
     document.getElementById('loader').classList.add('hidden');
     document.getElementById('login-screen').classList.remove('hidden');
-    document.getElementById('name-grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:1.5rem;font-size:.88rem;color:var(--g600)">⚠️ Impossible de charger les données. Vérifiez votre connexion internet et que le fichier Admin a bien été configuré.</div>`;
+    document.getElementById('name-grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:1.5rem;font-size:.85rem;color:var(--text-2)">⚠️ Impossible de charger les données.<br><span style="font-size:.78rem;opacity:.6">Vérifiez votre connexion internet.</span></div>`;
     return;
   }
   showLogin();
