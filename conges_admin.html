@@ -569,10 +569,16 @@ const todayISO = () => { const n=new Date(); return `${n.getFullYear()}-${String
 const today    = () => new Date();
 const localISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 function monthsBetween(fromStr,toDate){ const from=parseD(fromStr); if(!from) return 0; return Math.max(0,(toDate-from)/(1000*60*60*24*30.4375)); }
-function cpAcquis(emp){ return Math.min(25,Math.round(monthsBetween(emp.arrival,today())*2.5*2)/2); }
-function rttAcquis(emp){ if(emp.hours<=35) return 0; const extra=emp.hours-35; const weeks=monthsBetween(emp.rttSince||emp.arrival,today())*4.35; return Math.round(weeks*extra/7*2)/2; }
+// Syntec : période annuelle 1er juin → 31 mai
+function getPeriodStart(d){return d.getMonth()>=5?new Date(d.getFullYear(),5,1):new Date(d.getFullYear()-1,5,1);}
+// CP : 2,5j/mois depuis le début de la période en cours, plafond 30j/an (Syntec)
+function cpAcquis(emp){const now=today(),ps=getPeriodStart(now),from=parseD(emp.arrival);if(!from)return 0;const ef=from>ps?from:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(30,Math.round(mo*2.5*2)/2);}
+// RTT : 11j/an pour les 39h (Syntec), proratisé depuis le début de la période en cours
+function rttAcquis(emp){if(emp.hours<=35)return 0;const now=today(),ps=getPeriodStart(now),rf=parseD(emp.rttSince||emp.arrival);if(!rf)return 0;const ef=rf>ps?rf:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(11,Math.round(mo/12*11*2)/2);}
 function sumAbs(name,type){ if(Array.isArray(type)) return type.reduce((s,t)=>s+sumAbs(name,t),0); return S.absences.filter(a=>a.name===name&&a.type===type).reduce((s,a)=>s+(+a.jours||0),0); }
-function cpDeduit(name){ return sumAbs(name,"CP"); }
+// Variante filtrée sur la période Syntec en cours (pour CP et RTT)
+function sumAbsPeriod(name,type){const pISO=localISO(getPeriodStart(today()));if(Array.isArray(type))return type.reduce((s,t)=>s+sumAbsPeriod(name,t),0);return S.absences.filter(a=>a.name===name&&a.type===type&&a.start>=pISO).reduce((s,a)=>s+(+a.jours||0),0);}
+function cpDeduit(name){return sumAbsPeriod(name,'CP');}
 
 // ══════════════════════════════════════════════════════════════════════════
 // TOAST
@@ -603,7 +609,7 @@ function renderDash(){
   const totAcq=S.employees.reduce((s,e)=>s+cpAcquis(e)+(e.credit||0),0);
   const totPoses=S.employees.reduce((s,e)=>s+cpDeduit(e.name),0);
   const totSolde=totAcq-totPoses;
-  const totRTT=S.employees.reduce((s,e)=>s+(e.hours>35?rttAcquis(e)-sumAbs(e.name,"RTT"):0),0);
+  const totRTT=S.employees.reduce((s,e)=>s+(e.hours>35?rttAcquis(e)-sumAbsPeriod(e.name,"RTT"):0),0);
   const pendingN=(S.requests||[]).filter(r=>r.status==='pending').length;
   document.getElementById("kpis").innerHTML=`
     <div class="kpi"><div class="kpi-label">Équipe</div><div class="kpi-value">${S.employees.length}</div><div class="kpi-sub">collaborateurs</div></div>
@@ -615,7 +621,7 @@ function renderDash(){
   const tbody=document.getElementById("tb-dash"); tbody.innerHTML="";
   S.employees.forEach(emp=>{
     const acq=cpAcquis(emp),cred=emp.credit||0,total=acq+cred,poses=cpDeduit(emp.name),solde=total-poses;
-    const rtt=emp.hours>35?rttAcquis(emp)-sumAbs(emp.name,"RTT"):null;
+    const rtt=emp.hours>35?rttAcquis(emp)-sumAbsPeriod(emp.name,"RTT"):null;
     const css=sumAbs(emp.name,"Congé sans solde"),ecole=emp.type==="Alternance"?sumAbs(emp.name,"Congé école"):null;
     const pct=total>0?Math.min(100,poses/total*100):0;
     const isAlt=emp.type==="Alternance",hasRTT=emp.hours>35;
@@ -636,7 +642,7 @@ function renderDash(){
     </tr>`;
   });
   const rttEmp=S.employees.find(e=>e.hours>35);
-  const rttNote=rttEmp?`<strong>RTT ${rttEmp.name} (${rttEmp.hours}h) :</strong> depuis ${fmtDate(rttEmp.rttSince||rttEmp.arrival)} · ${rttAcquis(rttEmp).toFixed(1)} j acquis · solde <strong>${(rttAcquis(rttEmp)-sumAbs(rttEmp.name,"RTT")).toFixed(1)} j</strong>. `:"";
+  const rttNote=rttEmp?`<strong>RTT ${rttEmp.name} (${rttEmp.hours}h) :</strong> depuis ${fmtDate(rttEmp.rttSince||rttEmp.arrival)} · ${rttAcquis(rttEmp).toFixed(1)} j acquis · solde <strong>${(rttAcquis(rttEmp)-sumAbsPeriod(rttEmp.name,"RTT")).toFixed(1)} j</strong>. `:"";
   document.getElementById("note-legal").innerHTML=`<div class="alert alert-yellow"><span>ℹ️</span><div>${rttNote}<strong>Syntec CP :</strong> 2,5 j/mois · 30 j/an · Période 1er juin → 31 mai.</div></div>`;
 }
 
