@@ -723,7 +723,7 @@ function renderCalEmployee(){
   document.getElementById("cal-dhs").innerHTML=DAYS_FR.map(d=>`<div class="cal-dh">${d}</div>`).join("");
   const byDay={};
   const localISO=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  S.absences.filter(a=>a.name===name).forEach(ab=>{const sd=parseD(ab.start),ed=parseD(ab.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=localISO(d);if(!byDay[k])byDay[k]=[];byDay[k].push({type:ab.type,pending:false});d.setDate(d.getDate()+1);}});
+  S.absences.filter(a=>a.name===name).forEach(ab=>{const sd=parseD(ab.start),ed=parseD(ab.end);if(!sd||!ed)return;const s2=sd<=ed?sd:ed,e2=sd<=ed?ed:sd;let d=new Date(s2);while(d<=e2){const k=localISO(d);if(!byDay[k])byDay[k]=[];byDay[k].push({type:ab.type,pending:false});d.setDate(d.getDate()+1);}});
   (S.requests||[]).filter(r=>r.name===name&&r.status==='pending').forEach(req=>{const sd=parseD(req.start),ed=parseD(req.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=localISO(d);if(!byDay[k])byDay[k]=[];byDay[k].push({type:req.type,pending:true});d.setDate(d.getDate()+1);}});
   const first=new Date(calY,calM,1),last=new Date(calY,calM+1,0),startDow=(first.getDay()+6)%7,now=today();
   let html="";
