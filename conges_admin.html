@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Congés · Admin · Wilow</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌴</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -660,7 +659,7 @@ function renderCal(){
     S.employees.map(e=>`<button class="btn btn-sm" style="background:${calFilter===e.name?empColor(e.name):"var(--bg)"};color:${calFilter===e.name?"#fff":"var(--text-2)"};border:1.5px solid var(--border)" onclick="calFilter='${e.name}';renderCal()">${e.name}</button>`).join("");
   const byDay={};
   const src=calFilter?S.absences.filter(a=>a.name===calFilter):S.absences;
-  src.forEach(ab=>{const sd=parseD(ab.start),ed=parseD(ab.end);if(!sd||!ed)return;let d=new Date(sd);while(d<=ed){const k=localISO(d);if(!byDay[k])byDay[k]=[];byDay[k].push({name:ab.name,type:ab.type});d.setDate(d.getDate()+1);}});
+  src.forEach(ab=>{const sd=parseD(ab.start),ed=parseD(ab.end);if(!sd||!ed)return;const s2=sd<=ed?sd:ed,e2=sd<=ed?ed:sd;let d=new Date(s2);while(d<=e2){const k=localISO(d);if(!byDay[k])byDay[k]=[];byDay[k].push({name:ab.name,type:ab.type});d.setDate(d.getDate()+1);}});
   const first=new Date(calY,calM,1),last=new Date(calY,calM+1,0),startDow=(first.getDay()+6)%7,now=today();
   let html="";
   for(let i=0;i<startDow;i++) html+=`<div class="cal-day other"></div>`;
