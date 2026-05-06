@@ -446,7 +446,7 @@ textarea{resize:vertical;min-height:80px;}
 const JSONBIN_API_KEY = '$2a$10$UiiW/7Dpnc2rqJOytJsSFO0oEUukHgh0lI4AQQ2..9CoHParU6a1G';
 const JSONBIN_BIN_ID  = '69f1e68d36566621a805c1fa';
 const BIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-const SLACK_WEBHOOK   = 'https://hooks.slack.com/services/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';
+const SLACK_WEBHOOK   = 'https://hooks.slack.com/services/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';
 
 // ══════════════════════════════════════════════════════════════════════════
 // STATE
@@ -814,12 +814,17 @@ async function confirmAvanceSubmit(){
   _pendingSubmit=null;
 }
 
-async function sendSlackNotif(req){
+function sendSlackNotif(req){
   try{
     const emoji={CP:"🏖️",RTT:"💤","Congé école":"📚","Maladie":"🤒","Congé sans solde":"💸","Maternité/Pater.":"👶","Autre":"📅"};
     const ic=emoji[req.type]||"📅";
     const text=`${ic} *Nouvelle demande — ${req.name}*\n*Type :* ${req.type}\n*Période :* ${fmtDate(req.start)} → ${fmtDate(req.end)}\n*Durée :* ${req.jours} jour${req.jours>1?"s":""} ouvrés${req.ferier>0?` (dont ${req.ferier} j fériés)`:""}${req.comment?`\n*Commentaire :* ${req.comment}`:""}`;
-    await fetch(SLACK_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'payload='+encodeURIComponent(JSON.stringify({text})),mode:'no-cors'});
+    // La requête EST envoyée à Slack ; l'erreur CORS sur la réponse est ignorée
+    fetch(SLACK_WEBHOOK,{
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'payload='+encodeURIComponent(JSON.stringify({text}))
+    }).catch(()=>{});
   }catch(e){}
 }
 
