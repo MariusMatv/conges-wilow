@@ -577,7 +577,7 @@ function cpAcquis(emp){const now=today(),ps=getPeriodStart(now),from=parseD(emp.
 function rttAcquis(emp){if(emp.hours<=35)return 0;const now=today(),ps=getPeriodStart(now),rf=parseD(emp.rttSince||emp.arrival);if(!rf)return 0;const ef=rf>ps?rf:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(11,Math.round(mo/12*11*2)/2);}
 function sumAbs(name,type){ if(Array.isArray(type)) return type.reduce((s,t)=>s+sumAbs(name,t),0); return S.absences.filter(a=>a.name===name&&a.type===type).reduce((s,a)=>s+(+a.jours||0),0); }
 // Variante filtrée sur la période Syntec en cours (pour CP et RTT)
-function sumAbsPeriod(name,type){const pISO=localISO(getPeriodStart(today()));if(Array.isArray(type))return type.reduce((s,t)=>s+sumAbsPeriod(name,t),0);return S.absences.filter(a=>a.name===name&&a.type===type&&a.start>=pISO).reduce((s,a)=>s+(+a.jours||0),0);}
+function sumAbsPeriod(name,type){const ps=getPeriodStart(today());const pStart=localISO(ps);const pEnd=localISO(new Date(ps.getFullYear()+1,4,31));if(Array.isArray(type))return type.reduce((s,t)=>s+sumAbsPeriod(name,t),0);return S.absences.filter(a=>a.name===name&&a.type===type&&a.start>=pStart&&a.start<=pEnd).reduce((s,a)=>s+(+a.jours||0),0);}
 function cpDeduit(name){return sumAbsPeriod(name,'CP');}
 
 // ══════════════════════════════════════════════════════════════════════════
