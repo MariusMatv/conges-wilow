@@ -819,12 +819,10 @@ function sendSlackNotif(req){
     const emoji={CP:"🏖️",RTT:"💤","Congé école":"📚","Maladie":"🤒","Congé sans solde":"💸","Maternité/Pater.":"👶","Autre":"📅"};
     const ic=emoji[req.type]||"📅";
     const text=`${ic} *Nouvelle demande — ${req.name}*\n*Type :* ${req.type}\n*Période :* ${fmtDate(req.start)} → ${fmtDate(req.end)}\n*Durée :* ${req.jours} jour${req.jours>1?"s":""} ouvrés${req.ferier>0?` (dont ${req.ferier} j fériés)`:""}${req.comment?`\n*Commentaire :* ${req.comment}`:""}`;
-    // La requête EST envoyée à Slack ; l'erreur CORS sur la réponse est ignorée
-    fetch(SLACK_WEBHOOK,{
-      method:'POST',
-      headers:{'Content-Type':'application/x-www-form-urlencoded'},
-      body:'payload='+encodeURIComponent(JSON.stringify({text}))
-    }).catch(()=>{});
+    // sendBeacon = requête POST fire-and-forget, pas de problème CORS
+    const data=new URLSearchParams();
+    data.append('payload',JSON.stringify({text}));
+    navigator.sendBeacon(SLACK_WEBHOOK, data);
   }catch(e){}
 }
 
