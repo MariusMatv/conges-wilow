@@ -531,15 +531,22 @@ const empColor=name=>EMP_COLORS[((empIdx(name)%EMP_COLORS.length)+EMP_COLORS.len
 const initials=name=>name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
 const fmtDate=d=>{if(!d)return"—";const[y,m,day]=d.split("-");return`${day}/${m}/${y}`;};
 const parseD=s=>s?new Date(s+"T00:00:00"):null;
-const todayISO=()=>new Date().toISOString().slice(0,10);
+const todayISO=()=>{const n=new Date();return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;};
 const today=()=>new Date();
+const localISO=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+// Syntec : période annuelle 1er juin → 31 mai
+function getPeriodStart(d){return d.getMonth()>=5?new Date(d.getFullYear(),5,1):new Date(d.getFullYear()-1,5,1);}
 function monthsBetween(fromStr,toDate){const from=parseD(fromStr);if(!from)return 0;return Math.max(0,(toDate-from)/(1000*60*60*24*30.4375));}
-function cpAcquis(emp){return Math.min(25,Math.round(monthsBetween(emp.arrival,today())*2.5*2)/2);}
-function rttAcquis(emp){if(emp.hours<=35)return 0;const extra=emp.hours-35;const weeks=monthsBetween(emp.rttSince||emp.arrival,today())*4.35;return Math.round(weeks*extra/7*2)/2;}
+// CP : 2,5j/mois depuis le début de la période en cours, plafond 30j/an (Syntec)
+function cpAcquis(emp){const now=today(),ps=getPeriodStart(now),from=parseD(emp.arrival);if(!from)return 0;const ef=from>ps?from:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(30,Math.round(mo*2.5*2)/2);}
+// RTT : 11j/an pour les 39h (Syntec), proratisé depuis le début de la période en cours
+function rttAcquis(emp){if(emp.hours<=35)return 0;const now=today(),ps=getPeriodStart(now),rf=parseD(emp.rttSince||emp.arrival);if(!rf)return 0;const ef=rf>ps?rf:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(11,Math.round(mo/12*11*2)/2);}
 function sumAbs(name,type){return S.absences.filter(a=>a.name===name&&a.type===type).reduce((s,a)=>s+(+a.jours||0),0);}
+// Variante filtrée sur la période Syntec en cours (pour CP et RTT)
+function sumAbsPeriod(name,type){const pISO=localISO(getPeriodStart(today()));if(Array.isArray(type))return type.reduce((s,t)=>s+sumAbsPeriod(name,t),0);return S.absences.filter(a=>a.name===name&&a.type===type&&a.start>=pISO).reduce((s,a)=>s+(+a.jours||0),0);}
 // Projection helpers
-function cpAcquisAt(emp,date){return Math.min(25,Math.round(monthsBetween(emp.arrival,date)*2.5*2)/2)+(emp.credit||0);}
-function rttAcquisAt(emp,date){if(emp.hours<=35)return 0;const extra=emp.hours-35;const weeks=monthsBetween(emp.rttSince||emp.arrival,date)*4.35;return Math.round(weeks*extra/7*2)/2;}
+function cpAcquisAt(emp,date){const ps=getPeriodStart(date),from=parseD(emp.arrival);if(!from)return 0;const ef=from>ps?from:ps;const mo=Math.max(0,(date-ef)/(1000*60*60*24*30.4375));return Math.min(30,Math.round(mo*2.5*2)/2)+(emp.credit||0);}
+function rttAcquisAt(emp,date){if(emp.hours<=35)return 0;const ps=getPeriodStart(date),rf=parseD(emp.rttSince||emp.arrival);if(!rf)return 0;const ef=rf>ps?rf:ps;const mo=Math.max(0,(date-ef)/(1000*60*60*24*30.4375));return Math.min(11,Math.round(mo/12*11*2)/2);}
 function sumAbsUntil(name,type,date){return S.absences.filter(a=>a.name===name&&a.type===type&&parseD(a.end)<=date).reduce((s,a)=>s+(+a.jours||0),0);}
 function sumReqsUntil(name,type,date){return(S.requests||[]).filter(r=>r.name===name&&r.status!=='rejected'&&r.type===type&&parseD(r.end)<=date).reduce((s,r)=>s+(+r.jours||0),0);}
 function renderProjection(){
@@ -553,7 +560,7 @@ function renderProjection(){
   const mname=MONTHS_FR[m-1];
   const arrival=parseD(emp.arrival);
   const getPeriodStart=d=>{const dy=d.getFullYear(),dm=d.getMonth();return new Date(dm>=5?dy:dy-1,5,1);};
-  const cpInRange=(from,until)=>{const mo=Math.max(0,(until-from)/(1000*60*60*24*30.4375));return Math.min(25,Math.round(mo*2.5*2)/2);};
+  const cpInRange=(from,until)=>{const mo=Math.max(0,(until-from)/(1000*60*60*24*30.4375));return Math.min(30,Math.round(mo*2.5*2)/2);};
   const todayPeriodStart=getPeriodStart(today());
   const projPeriodStart=getPeriodStart(projDate);
   const isFuturePeriod=projPeriodStart>todayPeriodStart;
@@ -579,8 +586,8 @@ function renderProjection(){
   if(hasRTT){
     const extra=emp.hours-35;
     const rttFrom=emp.rttSince?(parseD(emp.rttSince)>projPeriodStart?parseD(emp.rttSince):projPeriodStart):(arrival>projPeriodStart?arrival:projPeriodStart);
-    const weeks=Math.max(0,(projDate-rttFrom)/(1000*60*60*24*7));
-    rttAcq=Math.round(weeks*extra/7*2)/2;
+    const rttMo=Math.max(0,(projDate-rttFrom)/(1000*60*60*24*30.4375));
+    rttAcq=Math.min(11,Math.round(rttMo/12*11*2)/2);
     rttUsed=isFuturePeriod?S.absences.filter(a=>a.name===emp.name&&a.type==='RTT'&&parseD(a.start)>=projPeriodStart&&parseD(a.end)<=projDate).reduce((s,a)=>s+(+a.jours||0),0):sumAbsUntil(emp.name,'RTT',projDate);
     rttPending=isFuturePeriod?(S.requests||[]).filter(r=>r.name===emp.name&&r.type==='RTT'&&r.status!=='rejected'&&parseD(r.start)>=projPeriodStart&&parseD(r.end)<=projDate).reduce((s,r)=>s+(+r.jours||0),0):sumReqsUntil(emp.name,'RTT',projDate);
   }
@@ -666,8 +673,8 @@ function goPage(id,btn){
 function renderSolde(){
   if(!currentEmployee)return;
   const emp=currentEmployee,acq=cpAcquis(emp),cred=emp.credit||0,total=acq+cred;
-  const poses=sumAbs(emp.name,"CP"),solde=total-poses,pct=total>0?Math.min(100,poses/total*100):0;
-  const rttAcq=rttAcquis(emp),rttPos=sumAbs(emp.name,"RTT"),rttSolde=rttAcq-rttPos;
+  const poses=sumAbsPeriod(emp.name,"CP"),solde=total-poses,pct=total>0?Math.min(100,poses/total*100):0;
+  const rttAcq=rttAcquis(emp),rttPos=sumAbsPeriod(emp.name,"RTT"),rttSolde=rttAcq-rttPos;
   const css=sumAbs(emp.name,"Congé sans solde");
   const pendingReqs=(S.requests||[]).filter(r=>r.name===emp.name&&r.status==='pending');
   const isAlt=emp.type==="Alternance",hasRTT=emp.hours>35;
