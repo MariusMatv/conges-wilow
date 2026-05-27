@@ -509,6 +509,7 @@ async function saveToCloud(){
 // ══════════════════════════════════════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════════════════════════════════════
+function rttLabel(emp){return emp&&emp.forfait?'Jours de repos':'RTT';}
 const ABSENCE_TYPES=[
   {key:"CP",label:"Congés payés",badge:"badge-blue",cal:["#dbeafe","#1d4ed8"]},
   {key:"RTT",label:"RTT",badge:"badge-purple",cal:["#ede9fe","#7c3aed"]},
@@ -602,7 +603,7 @@ function renderProjection(){
         <div style="font-size:.68rem;color:var(--green-dk);opacity:.65;margin-top:.2rem">${cpAcqPeriod.toFixed(1)} acquis${cpCarry>0?` + ${cpCarry.toFixed(1)} report`:''}${cpUsed>0?` · ${cpUsed.toFixed(1)} posés`:''}${cpPending>0?` · ${cpPending.toFixed(1)} en attente`:''}</div>
       </div>
       ${hasRTT?`<div style="background:var(--purple-lt);border:1px solid #D6BCFA;border-radius:12px;padding:1rem">
-        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--purple);margin-bottom:.3rem">RTT disponibles</div>
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--purple);margin-bottom:.3rem">${rttLabel(emp)} disponibles</div>
         <div style="font-size:1.6rem;font-weight:700;color:${rttDispo<0?'var(--red)':'var(--purple)'};letter-spacing:-.04em;line-height:1">${rttDispo.toFixed(1)}<span style="font-size:.85rem;font-weight:500;opacity:.7"> j</span></div>
         <div style="font-size:.68rem;color:var(--purple);opacity:.65;margin-top:.2rem">${rttAcq.toFixed(1)} acquis${rttUsed>0?` · ${rttUsed.toFixed(1)} posés`:''}</div>
       </div>`:''}
@@ -776,7 +777,7 @@ function renderMyAbs(){
 // ══════════════════════════════════════════════════════════════════════════
 function renderDemandeForm(){
   const sel=document.getElementById("d-type");
-  sel.innerHTML=ABSENCE_TYPES.map(t=>`<option value="${t.key}">${t.label}</option>`).join("");
+  sel.innerHTML=ABSENCE_TYPES.map(t=>`<option value="${t.key}">${t.key==='RTT'?rttLabel(currentEmployee):t.label}</option>`).join("");
   ["d-start","d-end","d-jours","d-comment"].forEach(x=>document.getElementById(x).value="");
   document.getElementById("d-ferier").value="0";
   onDTypeChange();
