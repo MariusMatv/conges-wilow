@@ -394,7 +394,15 @@ textarea{resize:vertical;min-height:70px;}
       </div>
       <div class="form-group"><label>Date d'entrée</label><input type="date" id="e-arrival"></div>
       <div class="form-group"><label>Heures / semaine</label><input type="number" id="e-hours" min="1" max="48" step="0.5" value="35"><div class="hint">35 = standard · 39 = RTT Syntec</div></div>
-      <div class="form-group" id="rtt-date-wrap"><label>39h en vigueur depuis <span class="opt">(si ≠ entrée)</span></label><input type="date" id="e-rtt-since"><div class="hint">Laisser vide si 39h dès l'arrivée</div></div>
+      <div class="form-group" id="rtt-date-wrap">
+        <label>39h en vigueur depuis <span class="opt">(si ≠ entrée)</span></label>
+        <input type="date" id="e-rtt-since">
+        <div class="hint">Laisser vide si 39h dès l'arrivée</div>
+        <label style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;font-size:.82rem;font-weight:500;cursor:pointer">
+          <input type="checkbox" id="e-forfait" style="width:15px;height:15px;accent-color:var(--accent)">
+          Forfait jours (Syntec) — jours de repos à la place des RTT
+        </label>
+      </div>
       <div class="form-group"><label>Crédit CP offert (jours)</label><input type="number" id="e-credit" min="0" step="0.5" value="0"><div class="hint">Jours accordés en avance</div></div>
     </div>
     <div class="modal-footer">
@@ -575,6 +583,7 @@ function getPeriodStart(d){return d.getMonth()>=5?new Date(d.getFullYear(),5,1):
 // CP : 2,5j/mois depuis le début de la période en cours, plafond 30j/an (Syntec)
 function cpAcquis(emp){const now=today(),ps=getPeriodStart(now),from=parseD(emp.arrival);if(!from)return 0;const ef=from>ps?from:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(30,Math.round(mo*2.5*2)/2);}
 // RTT : 11j/an pour les 39h (Syntec), proratisé depuis le début de la période en cours
+function rttLabel(emp){return emp&&emp.forfait?'Jours de repos':'RTT';}
 function rttAcquis(emp){if(emp.hours<=35)return 0;const now=today(),ps=getPeriodStart(now),rf=parseD(emp.rttSince||emp.arrival);if(!rf)return 0;const ef=rf>ps?rf:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(11,Math.round(mo/12*11*2)/2);}
 function sumAbs(name,type){ if(Array.isArray(type)) return type.reduce((s,t)=>s+sumAbs(name,t),0); return S.absences.filter(a=>a.name===name&&a.type===type).reduce((s,a)=>s+(+a.jours||0),0); }
 // Variante filtrée sur la période Syntec en cours (pour CP et RTT)
@@ -617,7 +626,7 @@ function renderDash(){
     <div class="kpi"><div class="kpi-label">CP acquis total</div><div class="kpi-value green">${totAcq.toFixed(1)}<span style="font-size:1rem;font-weight:500"> j</span></div><div class="kpi-sub">crédits inclus</div></div>
     <div class="kpi"><div class="kpi-label">CP posés total</div><div class="kpi-value orange">${totPoses.toFixed(1)}<span style="font-size:1rem;font-weight:500"> j</span></div><div class="kpi-sub">sur la période</div></div>
     <div class="kpi"><div class="kpi-label">Solde global CP</div><div class="kpi-value ${totSolde<0?"red":"green"}">${totSolde.toFixed(1)}<span style="font-size:1rem;font-weight:500"> j</span></div><div class="kpi-sub">${totSolde<0?"⚠️ Dépassement":"restants"}</div></div>
-    <div class="kpi"><div class="kpi-label">Solde RTT (39h)</div><div class="kpi-value purple">${totRTT.toFixed(1)}<span style="font-size:1rem;font-weight:500"> j</span></div><div class="kpi-sub">≈ 26j/an théorique</div></div>
+    <div class="kpi"><div class="kpi-label">Solde RTT / Jours de repos</div><div class="kpi-value purple">${totRTT.toFixed(1)}<span style="font-size:1rem;font-weight:500"> j</span></div><div class="kpi-sub">39h + forfait jours</div></div>
     <div class="kpi"><div class="kpi-label">En attente</div><div class="kpi-value ${pendingN>0?"orange":"gray"}">${pendingN}</div><div class="kpi-sub">${pendingN>0?"à traiter":"aucune demande"}</div></div>`;
   const tbody=document.getElementById("tb-dash"); tbody.innerHTML="";
   S.employees.forEach(emp=>{
@@ -627,7 +636,7 @@ function renderDash(){
     const pct=total>0?Math.min(100,poses/total*100):0;
     const isAlt=emp.type==="Alternance",hasRTT=emp.hours>35;
     const tb=hasRTT?"badge-accent":isAlt?"badge-teal":"badge-blue";
-    const tl=hasRTT?`CDI ${emp.hours}h`:isAlt?"Alternant":emp.type;
+    const tl=hasRTT?(emp.forfait?'CDI Forfait':`CDI ${emp.hours}h`):isAlt?"Alternant":emp.type;
     const sc=solde<0?"neg":solde>5?"pos":"mid";
     tbody.innerHTML+=`<tr>
       <td><div style="display:flex;align-items:center;gap:.55rem"><div class="av" style="background:${empColor(emp.name)}">${initials(emp.name)}</div><strong>${emp.name}</strong></div></td>
@@ -643,7 +652,7 @@ function renderDash(){
     </tr>`;
   });
   const rttEmp=S.employees.find(e=>e.hours>35);
-  const rttNote=rttEmp?`<strong>RTT ${rttEmp.name} (${rttEmp.hours}h) :</strong> depuis ${fmtDate(rttEmp.rttSince||rttEmp.arrival)} · ${rttAcquis(rttEmp).toFixed(1)} j acquis · solde <strong>${(rttAcquis(rttEmp)-sumAbsPeriod(rttEmp.name,"RTT")).toFixed(1)} j</strong>. `:"";
+  const rttNote=rttEmp?`<strong>${rttLabel(rttEmp)} ${rttEmp.name} (${rttEmp.forfait?'Forfait jours':rttEmp.hours+'h'}) :</strong> depuis ${fmtDate(rttEmp.rttSince||rttEmp.arrival)} · ${rttAcquis(rttEmp).toFixed(1)} j acquis · solde <strong>${(rttAcquis(rttEmp)-sumAbsPeriod(rttEmp.name,"RTT")).toFixed(1)} j</strong>. `:"";
   document.getElementById("note-legal").innerHTML=`<div class="alert alert-yellow"><span>ℹ️</span><div>${rttNote}<strong>Syntec CP :</strong> 2,5 j/mois · 30 j/an · Période 1er juin → 31 mai.</div></div>`;
 }
 
@@ -775,7 +784,7 @@ function renderParams(){
   document.getElementById("tb-params").innerHTML=S.employees.map(emp=>{
     const isAlt=emp.type==="Alternance",hasRTT=emp.hours>35;
     const tb=hasRTT?"badge-accent":isAlt?"badge-teal":"badge-blue";
-    const tl=hasRTT?`CDI ${emp.hours}h`:isAlt?"Alternant":emp.type;
+    const tl=hasRTT?(emp.forfait?'CDI Forfait':`CDI ${emp.hours}h`):isAlt?"Alternant":emp.type;
     return `<tr>
       <td><div style="display:flex;align-items:center;gap:.55rem"><div class="av" style="background:${empColor(emp.name)}">${initials(emp.name)}</div><strong>${emp.name}</strong></div></td>
       <td><span class="badge ${tb}">${tl}</span></td>
@@ -849,6 +858,7 @@ function openEmpModal(emp){
     document.getElementById("e-arrival").value=emp.arrival;
     document.getElementById("e-hours").value=emp.hours;
     document.getElementById("e-rtt-since").value=emp.rttSince||"";
+    if(document.getElementById("e-forfait"))document.getElementById("e-forfait").checked=!!emp.forfait;
     document.getElementById("e-credit").value=emp.credit||0;
   }else{
     document.getElementById("mod-emp-title").textContent="+ Nouveau collaborateur";
@@ -858,6 +868,7 @@ function openEmpModal(emp){
     document.getElementById("e-arrival").value="";
     document.getElementById("e-hours").value="35";
     document.getElementById("e-rtt-since").value="";
+    if(document.getElementById("e-forfait"))document.getElementById("e-forfait").checked=false;
     document.getElementById("e-credit").value="0";
   }
   toggleRttField();openModal("mod-emp");
@@ -870,9 +881,10 @@ function saveEmp(){
   const type=document.getElementById("e-type").value,arrival=document.getElementById("e-arrival").value;
   const hours=parseFloat(document.getElementById("e-hours").value)||35,rttSince=document.getElementById("e-rtt-since").value||null;
   const credit=parseFloat(document.getElementById("e-credit").value)||0;
+  const forfait=document.getElementById("e-forfait")?.checked||false;
   if(!name||!arrival){toast("⚠️ Nom et date d'entrée requis");return;}
-  if(id){const i=S.employees.findIndex(e=>e.id==id);if(i>=0)S.employees[i]={...S.employees[i],name,type,arrival,hours,rttSince,credit};toast("✅ Modifié");}
-  else{S.employees.push({id:S.nextEmpId++,name,type,arrival,hours,rttSince,credit});toast("✅ Ajouté");}
+  if(id){const i=S.employees.findIndex(e=>e.id==id);if(i>=0)S.employees[i]={...S.employees[i],name,type,arrival,hours,rttSince,credit,forfait};toast("✅ Modifié");}
+  else{S.employees.push({id:S.nextEmpId++,name,type,arrival,hours,rttSince,credit,forfait});toast("✅ Ajouté");}
   save();closeModal("mod-emp");renderParams();renderDash();
 }
 function delEmp(id){if(!confirm("Supprimer ce collaborateur ?"))return;const emp=S.employees.find(e=>e.id===id);S.employees=S.employees.filter(e=>e.id!==id);if(emp)S.absences=S.absences.filter(a=>a.name!==emp.name);save();renderParams();renderDash();toast("🗑 Supprimé");}
