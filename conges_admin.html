@@ -330,7 +330,7 @@ const BIN_URL=`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 let S=null,saveTimer=null;
 function defaultData(){return{
   employees:[
-    {id:1,name:"Céline",  arrival:"2025-09-01",type:"CDI",        hours:35,rttSince:null,      credit:0,recup:0,forfait:false},
+    {id:1,name:"Céline",  arrival:"2025-09-01",type:"CDI",        hours:35,rttSince:null,      credit:0,recup:1.5,forfait:false},
     {id:2,name:"Tom",     arrival:"2025-09-01",type:"Alternance", hours:35,rttSince:null,      credit:0,recup:0,forfait:false},
     {id:3,name:"Maxime",  arrival:"2025-09-25",type:"Alternance", hours:35,rttSince:null,      credit:0,recup:0,forfait:false},
     {id:4,name:"Fanny",   arrival:"2026-02-02",type:"CDI",        hours:35,rttSince:null,      credit:0,recup:0,forfait:false},
@@ -343,13 +343,28 @@ function defaultData(){return{
     {id:2,name:"Céline",start:"2025-12-26",end:"2025-12-26",type:"CP",jours:1,ferier:0,comment:""},
     {id:3,name:"Céline",start:"2025-12-29",end:"2025-12-31",type:"CP",jours:3,ferier:0,comment:""},
     {id:4,name:"Céline",start:"2026-01-02",end:"2026-01-02",type:"CP",jours:1,ferier:0,comment:""},
-    {id:5,name:"Céline",start:"2026-05-11",end:"2026-05-15",type:"CP",jours:4,ferier:1,comment:""},
+    {id:5,name:"Céline",start:"2026-05-11",end:"2026-05-15",type:"CP",jours:3,ferier:1,comment:""},
+    {id:10,name:"Céline",start:"2026-05-12",end:"2026-05-12",type:"Récupération",jours:1,ferier:0,comment:""},
     {id:6,name:"Maxime",start:"2025-12-26",end:"2025-12-26",type:"CP",jours:1,ferier:0,comment:""},
     {id:7,name:"Maxime",start:"2025-12-29",end:"2025-12-31",type:"CP",jours:3,ferier:0,comment:""},
     {id:8,name:"Maxime",start:"2026-01-02",end:"2026-01-02",type:"CP",jours:1,ferier:0,comment:""},
     {id:9,name:"Lea",   start:"2026-04-20",end:"2026-04-24",type:"Congé sans solde",jours:5,ferier:0,comment:"Demandés avant le recrutement"},
+    // Vacances été 2026
+    {id:11,name:"Maxime",start:"2026-07-03",end:"2026-07-03",type:"CP",jours:1,ferier:0,comment:""},
+    {id:12,name:"Maxime",start:"2026-07-06",end:"2026-07-06",type:"CP",jours:1,ferier:0,comment:""},
+    {id:13,name:"Maxime",start:"2026-07-13",end:"2026-07-15",type:"CP",jours:2,ferier:1,comment:"14 juillet"},
+    {id:14,name:"Maxime",start:"2026-08-17",end:"2026-08-21",type:"CP",jours:5,ferier:0,comment:""},
+    {id:15,name:"Fanny", start:"2026-07-13",end:"2026-07-20",type:"CP",jours:5,ferier:1,comment:"14 juillet"},
+    {id:16,name:"Lea",   start:"2026-07-30",end:"2026-08-18",type:"CP",jours:14,ferier:0,comment:""},
+    // Fermeture collective 3-14 août
+    {id:17,name:"Céline", start:"2026-08-03",end:"2026-08-14",type:"CP",jours:10,ferier:0,comment:"Fermeture annuelle"},
+    {id:18,name:"Tom",    start:"2026-08-03",end:"2026-08-14",type:"CP",jours:10,ferier:0,comment:"Fermeture annuelle"},
+    {id:19,name:"Maxime", start:"2026-08-03",end:"2026-08-14",type:"CP",jours:10,ferier:0,comment:"Fermeture annuelle"},
+    {id:20,name:"Fanny",  start:"2026-08-03",end:"2026-08-14",type:"CP",jours:10,ferier:0,comment:"Fermeture annuelle"},
+    {id:21,name:"Gabriel",start:"2026-08-03",end:"2026-08-14",type:"CP",jours:10,ferier:0,comment:"Fermeture annuelle"},
+    {id:22,name:"Camille",start:"2026-08-03",end:"2026-08-14",type:"CP",jours:10,ferier:0,comment:"Fermeture annuelle"},
   ],
-  requests:[],nextEmpId:8,nextAbsId:10,nextReqId:1,
+  requests:[],nextEmpId:8,nextAbsId:23,nextReqId:1,
 };}
 function setSyncState(st){const dot=document.getElementById('sync-dot'),lbl=document.getElementById('sync-label');if(st==='syncing'){dot.className='sync-dot syncing';lbl.textContent='Sauvegarde…';}else if(st==='ok'){dot.className='sync-dot';lbl.textContent='Synchronisé';}else{dot.className='sync-dot';dot.style.background='var(--red)';lbl.textContent='Hors-ligne';}}
 async function loadFromCloud(){
@@ -396,8 +411,11 @@ function sumAbs(name,type){if(Array.isArray(type))return type.reduce((s,t)=>s+su
 function sumAbsPeriod(name,type){const ps=getPeriodStart(today());const p0=localISO(ps),p1=localISO(new Date(ps.getFullYear()+1,4,31));if(Array.isArray(type))return type.reduce((s,t)=>s+sumAbsPeriod(name,t),0);return S.absences.filter(a=>a.name===name&&a.type===type&&a.start>=p0&&a.start<=p1).reduce((s,a)=>s+(+a.jours||0),0);}
 function cpDeduit(name){return sumAbsPeriod(name,'CP');}
 function getMonthlyAccount(emp){
-  const now=today(),ps=getPeriodStart(now),pe=new Date(ps.getFullYear()+1,4,31,23,59,59);
-  const arrival=parseD(emp.arrival);let balance=(emp.credit||0)+(emp.recup||0);const rows=[];
+  const now=today(),currentPS=getPeriodStart(now),pe=new Date(currentPS.getFullYear()+1,4,31,23,59,59);
+  const arrival=parseD(emp.arrival);
+  const arrivalPS=arrival?getPeriodStart(arrival):currentPS;
+  const ps=arrivalPS<currentPS?arrivalPS:currentPS;
+  let balance=(emp.credit||0)+(emp.recup||0);const rows=[];
   let cur=new Date(ps.getFullYear(),ps.getMonth(),1);
   while(cur<=pe){
     const y=cur.getFullYear(),m=cur.getMonth(),mEnd=new Date(y,m+1,0,23,59,59);
@@ -408,7 +426,7 @@ function getMonthlyAccount(emp){
     const debit=S.absences.filter(a=>a.name===emp.name&&a.type==='CP'&&a.start.slice(0,7)===mKey).reduce((s,a)=>s+(+a.jours||0),0);
     const pending=(S.requests||[]).filter(r=>r.name===emp.name&&r.type==='CP'&&r.status==='pending'&&r.start.slice(0,7)===mKey).reduce((s,r)=>s+(+r.jours||0),0);
     balance+=credit-debit-pending;
-    rows.push({label:MONTHS_FR[m].slice(0,4)+' '+y,mKey,credit,debit,pending,balance,isFuture,isCurrent});
+    const isPeriodStart=m===5;rows.push({label:MONTHS_FR[m].slice(0,4)+' '+y,mKey,credit,debit,pending,balance,isFuture,isCurrent,isPeriodStart});
     cur.setMonth(cur.getMonth()+1);
   }
   return rows;
@@ -482,7 +500,8 @@ function renderComptes(){
     const tableRows=rows.map(row=>{
       const bc=row.balance<0?'mbal-neg':row.balance<2.5?'mbal-warn':'mbal-pos';
       const icon=row.balance<0?'⚠️':row.balance<2.5?'🟡':'✅';
-      return`<tr class="${row.isFuture?'mrow-fut':''} ${row.isCurrent?'mrow-cur':''}">
+      const periodHdr=row.isPeriodStart?`<tr><td colspan="5" style="background:var(--navy);color:rgba(255,255,255,.7);font-size:.66rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.4rem 1rem">Période Syntec ${row.label.split(' ')[1]} → Mai ${parseInt(row.label.split(' ')[1])+1}</td></tr>`:'';
+      return periodHdr+`<tr class="${row.isFuture?'mrow-fut':''} ${row.isCurrent?'mrow-cur':''}">
         <td style="font-weight:${row.isCurrent?'600':'400'};white-space:nowrap">${row.isCurrent?'<span style="color:var(--accent);font-size:.7rem">▶ </span>':''}${row.label}</td>
         <td class="mono" style="text-align:right;color:${row.credit>0?'var(--green-dk)':'var(--text-3)'}">${row.credit>0?'+'+row.credit.toFixed(1)+' j':'—'}</td>
         <td class="mono" style="text-align:right;color:${row.debit>0?'var(--red)':'var(--text-3)'}">${row.debit>0?'−'+row.debit.toFixed(1)+' j':'—'}</td>
