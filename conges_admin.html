@@ -496,6 +496,8 @@ function renderComptes(){
     const isAlt=emp.type==='Alternance',hasRTT=emp.hours>35;
     const tb=hasRTT?"badge-accent":isAlt?"badge-teal":"badge-blue";
     const tl=hasRTT?(emp.forfait?'Forfait jours':`CDI ${emp.hours}h`):isAlt?'Alternant':emp.type;
+    const rttBalance=hasRTT?rttAcquis(emp)-sumAbsPeriod(emp.name,'RTT'):0;
+    const totalDispo=currentBalance+rttBalance;
     const tableRows=rows.map(row=>{
       const bc=row.balance<0?'mbal-neg':row.balance<2.5?'mbal-warn':'mbal-pos';
       const icon=row.balance<0?'⚠️':row.balance<2.5?'🟡':'✅';
@@ -523,10 +525,12 @@ function renderComptes(){
           </div>
         </div>
         <div class="comp-stats">
-          <div class="comp-stat"><div class="comp-stat-val" style="color:var(--red)">${debitTotal.toFixed(1)} j</div><div class="comp-stat-lbl">Posés</div></div>
+          <div class="comp-stat"><div class="comp-stat-val" style="color:var(--red)">${debitTotal.toFixed(1)} j</div><div class="comp-stat-lbl">CP posés</div></div>
           ${pendingTotal>0?`<div class="comp-stat"><div class="comp-stat-val" style="color:var(--orange)">${pendingTotal.toFixed(1)} j</div><div class="comp-stat-lbl">En attente</div></div>`:''}
-          <div class="comp-stat"><div class="comp-stat-val" style="color:${currentBalance<0?'var(--red)':currentBalance<2.5?'var(--orange)':'var(--accent)'}">${currentBalance.toFixed(1)} j</div><div class="comp-stat-lbl">Solde actuel</div></div>
-          <div class="comp-stat"><div class="comp-stat-val" style="color:${projBalance<0?'var(--red)':projBalance<5?'var(--orange)':'var(--green-dk)'}">${projBalance.toFixed(1)} j</div><div class="comp-stat-lbl">Fin période</div></div>
+          <div class="comp-stat"><div class="comp-stat-val" style="color:${currentBalance<0?'var(--red)':currentBalance<2.5?'var(--orange)':'var(--accent)'}">${currentBalance.toFixed(1)} j</div><div class="comp-stat-lbl">Solde CP</div></div>
+          ${hasRTT?`<div class="comp-stat"><div class="comp-stat-val" style="color:var(--purple)">${rttBalance.toFixed(1)} j</div><div class="comp-stat-lbl">Solde RTT</div></div>`:''}
+          <div class="comp-stat" style="${hasRTT?'border-left:2px solid var(--accent);padding-left:.75rem':''}"><div class="comp-stat-val" style="color:${totalDispo<0?'var(--red)':totalDispo<2.5?'var(--orange)':'var(--green-dk)'}">${totalDispo.toFixed(1)} j</div><div class="comp-stat-lbl">Total dispo</div></div>
+          <div class="comp-stat"><div class="comp-stat-val" style="color:${projBalance<0?'var(--red)':projBalance<5?'var(--orange)':'var(--green-dk)'}">${projBalance.toFixed(1)} j</div><div class="comp-stat-lbl">Fin période CP</div></div>
         </div>
       </div>
       <div class="table-wrap"><table>

@@ -569,6 +569,9 @@ function renderComptes(){
   const curRow=rows.find(r=>r.isCurrent)||rows.filter(r=>!r.isFuture).at(-1);
   const currentBalance=curRow?.balance??0;
   const projBalance=rows.at(-1)?.balance??0;
+  const hasRTT=ME.hours>35;
+  const rttBalance=hasRTT?rttAcquis(ME)-sumAbsPeriod(ME.name,'RTT'):0;
+  const totalDispo=currentBalance+rttBalance;
   const tableRows=rows.map(row=>{
     const bc=row.balance<0?'mbal-neg':row.balance<2.5?'mbal-warn':'mbal-pos';
     const icon=row.balance<0?'⚠️':row.balance<2.5?'🟡':'✅';
@@ -585,8 +588,10 @@ function renderComptes(){
     <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.2rem;">
       <div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--red)">${debitTotal.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">Posés</div></div>
       ${pendingTotal>0?`<div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--orange)">${pendingTotal.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">En attente</div></div>`:''}
-      <div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:${currentBalance<0?'var(--red)':currentBalance<2.5?'var(--orange)':'var(--accent)'}">${currentBalance.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">Solde actuel</div></div>
-      <div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:${projBalance<0?'var(--red)':projBalance<5?'var(--orange)':'var(--green-dk)'}">${projBalance.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">Fin période</div></div>
+      <div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:${currentBalance<0?'var(--red)':currentBalance<2.5?'var(--orange)':'var(--accent)'}">${currentBalance.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">Solde CP</div></div>
+      ${hasRTT?`<div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--purple)">${rttBalance.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">Solde RTT</div></div>`:''}
+      <div style="background:var(--accent-lt);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--accent);text-align:center"><div style="font-size:1rem;font-weight:700;color:${totalDispo<0?'var(--red)':totalDispo<2.5?'var(--orange)':'var(--green-dk)'}">${totalDispo.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">Total dispo</div></div>
+      <div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:${projBalance<0?'var(--red)':projBalance<5?'var(--orange)':'var(--green-dk)'}">${projBalance.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">Fin période CP</div></div>
     </div>
     <div class="table-wrap"><table>
       <thead><tr><th>Mois</th><th style="text-align:right">CP acquis</th><th style="text-align:right">CP posés</th><th style="text-align:right">En attente</th><th style="text-align:right">Solde fin de mois</th></tr></thead>
