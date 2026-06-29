@@ -438,7 +438,7 @@ function save(){clearTimeout(saveTimer);setSyncState('syncing');saveTimer=setTim
 
 /* ── Calculations ── */
 function getPeriodStart(d){return d.getMonth()>=5?new Date(d.getFullYear(),5,1):new Date(d.getFullYear()-1,5,1);}
-function cpAcquis(emp,asOf){const now=asOf||today(),ps=getPeriodStart(now),from=parseD(emp.arrival);if(!from)return 0;const ef=from>ps?from:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(30,Math.round(mo*2.5*2)/2);}
+function cpAcquis(emp,asOf){const now=asOf||today(),ps=getPeriodStart(now),from=parseD(emp.arrival);if(!from)return 0;const ef=from>ps?from:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(25,Math.round(mo*25/12*100)/100);}
 function rttAcquis(emp,asOf){if(emp.hours<=35)return 0;const now=asOf||today(),ps=getPeriodStart(now),rf=parseD(emp.rttSince||emp.arrival);if(!rf)return 0;const ef=rf>ps?rf:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(11,Math.round(mo/12*11*2)/2);}
 function sumAbsPeriod(name,type,asOf){const ps=getPeriodStart(asOf||today());const p0=localISO(ps),p1=localISO(new Date(ps.getFullYear()+1,4,31));return S.absences.filter(a=>a.name===name&&a.type===type&&a.start>=p0&&a.start<=p1).reduce((s,a)=>s+(+a.jours||0),0);}
 function sumAbsPeriodUpTo(name,type,upToISO){const ps=getPeriodStart(parseD(upToISO)||today());const p0=localISO(ps);return S.absences.filter(a=>a.name===name&&a.type===type&&a.start>=p0&&a.start<=upToISO).reduce((s,a)=>s+(+a.jours||0),0);}
@@ -457,7 +457,7 @@ function getMonthlyAccount(emp){
     const mKey=`${y}-${String(m+1).padStart(2,'0')}`;
     const isFuture=cur>now,isCurrent=y===now.getFullYear()&&m===now.getMonth();
     let credit=0;
-    if(arrival&&arrival<=mEnd){if(arrival<=cur){credit=2.5;}else{const di=mEnd.getDate();const days=Math.round((mEnd-arrival)/864e5)+1;credit=Math.round(Math.min(2.5,2.5*days/di)*2)/2;}}
+    if(arrival&&arrival<=mEnd){if(arrival<=cur){credit=Math.round(25/12*100)/100;}else{const di=mEnd.getDate();const days=Math.round((mEnd-arrival)/864e5)+1;credit=Math.round(Math.min(25/12,25/12*days/di)*100)/100;}}
     const debit=S.absences.filter(a=>a.name===emp.name&&a.type==='CP'&&a.start.slice(0,7)===mKey).reduce((s,a)=>s+(+a.jours||0),0);
     const pending=(S.requests||[]).filter(r=>r.name===emp.name&&r.type==='CP'&&r.status==='pending'&&r.start.slice(0,7)===mKey).reduce((s,r)=>s+(+r.jours||0),0);
     balance+=credit-debit-pending;

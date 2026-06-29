@@ -266,7 +266,7 @@ textarea{resize:vertical;min-height:70px;}
     <div class="table-wrap"><table><thead><tr><th>Collaborateur</th><th>Contrat</th><th>Entrée</th><th>h/sem.</th><th>39h depuis</th><th>Crédit CP 🎁</th><th>Récupération 🔄</th><th></th></tr></thead><tbody id="tb-params"></tbody></table></div>
   </div>
   <div class="card"><div class="card-hd"><span class="card-title">Types d'absence</span></div><div class="card-body" style="display:flex;gap:.4rem;flex-wrap:wrap;" id="type-legend"></div></div>
-  <div class="alert alert-yellow"><span>ℹ️</span><div><strong>Syntec – CP :</strong> 2,5 j/mois · 30 j ouvrables/an · Période 1er juin → 31 mai.</div></div>
+  <div class="alert alert-yellow"><span>ℹ️</span><div><strong>Syntec – CP :</strong> 2,5 j/mois · 25 j ouvrés/an · Période 1er juin → 31 mai.</div></div>
   <div class="alert alert-pink"><span>💸</span><div><strong>Congé sans solde :</strong> hors quota CP — retenue salariale à traiter manuellement en paie.</div></div>
 </div>
 </main>
@@ -404,7 +404,7 @@ const today=()=>new Date();
 const localISO=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const rttLabel=emp=>emp&&emp.forfait?'Repos':'RTT';
 function getPeriodStart(d){return d.getMonth()>=5?new Date(d.getFullYear(),5,1):new Date(d.getFullYear()-1,5,1);}
-function cpAcquis(emp){const now=today(),ps=getPeriodStart(now),from=parseD(emp.arrival);if(!from)return 0;const ef=from>ps?from:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(30,Math.round(mo*2.5*2)/2);}
+function cpAcquis(emp){const now=today(),ps=getPeriodStart(now),from=parseD(emp.arrival);if(!from)return 0;const ef=from>ps?from:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(25,Math.round(mo*25/12*100)/100);}
 function rttAcquis(emp){if(emp.hours<=35)return 0;const now=today(),ps=getPeriodStart(now),rf=parseD(emp.rttSince||emp.arrival);if(!rf)return 0;const ef=rf>ps?rf:ps;const mo=Math.max(0,(now-ef)/(1000*60*60*24*30.4375));return Math.min(11,Math.round(mo/12*11*2)/2);}
 function sumAbs(name,type){if(Array.isArray(type))return type.reduce((s,t)=>s+sumAbs(name,t),0);return S.absences.filter(a=>a.name===name&&a.type===type).reduce((s,a)=>s+(+a.jours||0),0);}
 function sumAbsPeriod(name,type){const ps=getPeriodStart(today());const p0=localISO(ps),p1=localISO(new Date(ps.getFullYear()+1,4,31));if(Array.isArray(type))return type.reduce((s,t)=>s+sumAbsPeriod(name,t),0);return S.absences.filter(a=>a.name===name&&a.type===type&&a.start>=p0&&a.start<=p1).reduce((s,a)=>s+(+a.jours||0),0);}
@@ -421,7 +421,7 @@ function getMonthlyAccount(emp){
     const mKey=`${y}-${String(m+1).padStart(2,'0')}`;
     const isFuture=cur>now,isCurrent=y===now.getFullYear()&&m===now.getMonth();
     let credit=0;
-    if(arrival&&arrival<=mEnd){if(arrival<=cur){credit=2.5;}else{const di=mEnd.getDate();const days=Math.round((mEnd-arrival)/864e5)+1;credit=Math.round(Math.min(2.5,2.5*days/di)*2)/2;}}
+    if(arrival&&arrival<=mEnd){if(arrival<=cur){credit=Math.round(25/12*100)/100;}else{const di=mEnd.getDate();const days=Math.round((mEnd-arrival)/864e5)+1;credit=Math.round(Math.min(25/12,25/12*days/di)*100)/100;}}
     const debit=S.absences.filter(a=>a.name===emp.name&&a.type==='CP'&&a.start.slice(0,7)===mKey).reduce((s,a)=>s+(+a.jours||0),0);
     const pending=(S.requests||[]).filter(r=>r.name===emp.name&&r.type==='CP'&&r.status==='pending'&&r.start.slice(0,7)===mKey).reduce((s,r)=>s+(+r.jours||0),0);
     balance+=credit-debit-pending;
