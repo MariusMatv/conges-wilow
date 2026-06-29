@@ -414,7 +414,7 @@ function getMonthlyAccount(emp){
   const arrival=parseD(emp.arrival);
   const arrivalPS=arrival?getPeriodStart(arrival):currentPS;
   const ps=arrivalPS<currentPS?arrivalPS:currentPS;
-  let balance=(emp.credit||0)+(emp.recup||0);const rows=[];
+  let balance=(emp.credit||0)+(emp.recup||0);let rttRunning=0;let prevRttTotal=0;const rows=[];
   let cur=new Date(ps.getFullYear(),ps.getMonth(),1);
   while(cur<=pe){
     const y=cur.getFullYear(),m=cur.getMonth(),mEnd=new Date(y,m+1,0,23,59,59);
@@ -425,7 +425,15 @@ function getMonthlyAccount(emp){
     const debit=S.absences.filter(a=>a.name===emp.name&&a.type==='CP'&&a.start.slice(0,7)===mKey).reduce((s,a)=>s+(+a.jours||0),0);
     const pending=(S.requests||[]).filter(r=>r.name===emp.name&&r.type==='CP'&&r.status==='pending'&&r.start.slice(0,7)===mKey).reduce((s,r)=>s+(+r.jours||0),0);
     balance+=credit-debit-pending;
-    const isPeriodStart=m===5;rows.push({label:MONTHS_FR[m].slice(0,4)+' '+y,mKey,credit,debit,pending,balance,isFuture,isCurrent,isPeriodStart});
+    if(m===5)prevRttTotal=0;
+    const asOfRtt=isFuture?mEnd:(now>mEnd?mEnd:now);
+    const currRttTotal=rttAcquis(emp,asOfRtt);
+    const rttCredit=emp.hours>35?Math.max(0,currRttTotal-prevRttTotal):0;
+    const rttDebit=S.absences.filter(a=>a.name===emp.name&&a.type==='RTT'&&a.start.slice(0,7)===mKey).reduce((s,a)=>s+(+a.jours||0),0);
+    rttRunning+=rttCredit-rttDebit;
+    prevRttTotal=currRttTotal;
+    const totalBalance=balance+rttRunning;
+    const isPeriodStart=m===5;rows.push({label:MONTHS_FR[m].slice(0,4)+' '+y,mKey,credit,debit,pending,balance,rttCredit,rttDebit,rttRunning,totalBalance,isFuture,isCurrent,isPeriodStart});
     cur.setMonth(cur.getMonth()+1);
   }
   return rows;
@@ -496,18 +504,20 @@ function renderComptes(){
     const isAlt=emp.type==='Alternance',hasRTT=emp.hours>35;
     const tb=hasRTT?"badge-accent":isAlt?"badge-teal":"badge-blue";
     const tl=hasRTT?(emp.forfait?'Forfait jours':`CDI ${emp.hours}h`):isAlt?'Alternant':emp.type;
-    const rttBalance=hasRTT?rttAcquis(emp)-sumAbsPeriod(emp.name,'RTT'):0;
-    const totalDispo=currentBalance+rttBalance;
+    const rttBalance=hasRTT?(curRow?.rttRunning??0):0;
+    const totalDispo=currentBalance;
     const tableRows=rows.map(row=>{
-      const bc=row.balance<0?'mbal-neg':row.balance<2.5?'mbal-warn':'mbal-pos';
-      const icon=row.balance<0?'⚠️':row.balance<2.5?'🟡':'✅';
-      const periodHdr=row.isPeriodStart?`<tr><td colspan="5" style="background:var(--navy);color:rgba(255,255,255,.7);font-size:.66rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.4rem 1rem">Période Syntec ${row.label.split(' ')[1]} → Mai ${parseInt(row.label.split(' ')[1])+1}</td></tr>`:'';
+      const bc=row.totalBalance<0?'mbal-neg':row.totalBalance<2.5?'mbal-warn':'mbal-pos';
+      const icon=row.totalBalance<0?'⚠️':row.totalBalance<2.5?'🟡':'✅';
+      const periodHdr=row.isPeriodStart?`<tr><td colspan="7" style="background:var(--navy);color:rgba(255,255,255,.7);font-size:.66rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.4rem 1rem">Période Syntec ${row.label.split(' ')[1]} → Mai ${parseInt(row.label.split(' ')[1])+1}</td></tr>`:'';
       return periodHdr+`<tr class="${row.isFuture?'mrow-fut':''} ${row.isCurrent?'mrow-cur':''}">
         <td style="font-weight:${row.isCurrent?'600':'400'};white-space:nowrap">${row.isCurrent?'<span style="color:var(--accent);font-size:.7rem">▶ </span>':''}${row.label}</td>
         <td class="mono" style="text-align:right;color:${row.credit>0?'var(--green-dk)':'var(--text-3)'}">${row.credit>0?'+'+row.credit.toFixed(1)+' j':'—'}</td>
         <td class="mono" style="text-align:right;color:${row.debit>0?'var(--red)':'var(--text-3)'}">${row.debit>0?'−'+row.debit.toFixed(1)+' j':'—'}</td>
-        <td class="mono" style="text-align:right;color:${row.pending>0?'var(--orange)':'var(--text-3)'}">${row.pending>0?'⏳ −'+row.pending.toFixed(1)+' j':'—'}</td>
-        <td class="mono" style="text-align:right"><span class="${bc}">${row.balance.toFixed(1)} j</span>${!row.isFuture?' <span style="font-size:.72rem">'+icon+'</span>':''}</td>
+        <td class="mono" style="text-align:right;      <td class="mono" style="text-align:right;color:${row.rttCredit>0?'var(--purple)':'var(--text-3)'}">${row.rttCredit>0?'+'+row.rttCredit.toFixed(1)+' j':'—'}</td>
+      <td class="mono" style="text-align:right;color:${row.rttDebit>0?'var(--red)':'var(--text-3)'}">${row.rttDebit>0?'−'+row.rttDebit.toFixed(1)+' j':'—'}</td>
+color:${row.pending>0?'var(--orange)':'var(--text-3)'}">${row.pending>0?'⏳ −'+row.pending.toFixed(1)+' j':'—'}</td>
+        <td class="mono" style="text-align:right"><span class="${bc}">${row.totalBalance.toFixed(1)} j</span>${!row.isFuture?' <span style="font-size:.72rem">'+icon+'</span>':''}</td>
       </tr>`;
     }).join('');
     return`<div class="comp-card">
