@@ -588,9 +588,9 @@ function renderComptes(){
       <td style="font-weight:${row.isCurrent?'600':'400'};white-space:nowrap">${row.isCurrent?'<span style="color:var(--accent);font-size:.7rem">▶ </span>':''}${row.label}</td>
       <td class="mono" style="text-align:right;color:${row.credit>0?'var(--green-dk)':'var(--text-3)'}">${row.credit>0?'+'+row.credit.toFixed(1)+' j':'—'}</td>
       <td class="mono" style="text-align:right;color:${row.debit>0?'var(--red)':'var(--text-3)'}">${row.debit>0?'−'+row.debit.toFixed(1)+' j':'—'}</td>
-      <td class="mono" style="text-align:right;      <td class="mono" style="text-align:right;color:${row.rttCredit>0?'var(--purple)':'var(--text-3)'}">${row.rttCredit>0?'+'+row.rttCredit.toFixed(1)+' j':'—'}</td>
+      <td class="mono" style="text-align:right;color:${row.rttCredit>0?'var(--purple)':'var(--text-3)'}">${row.rttCredit>0?'+'+row.rttCredit.toFixed(1)+' j':'—'}</td>
       <td class="mono" style="text-align:right;color:${row.rttDebit>0?'var(--red)':'var(--text-3)'}">${row.rttDebit>0?'−'+row.rttDebit.toFixed(1)+' j':'—'}</td>
-color:${row.pending>0?'var(--orange)':'var(--text-3)'}">${row.pending>0?'⏳ −'+row.pending.toFixed(1)+' j':'—'}</td>
+      <td class="mono" style="text-align:right;color:${row.pending>0?'var(--orange)':'var(--text-3)'}">${row.pending>0?'⏳ −'+row.pending.toFixed(1)+' j':'—'}</td>
       <td class="mono" style="text-align:right"><span class="${bc}">${row.totalBalance.toFixed(1)} j</span>${!row.isFuture?' <span style="font-size:.72rem">'+icon+'</span>':''}</td>
     </tr>`;
   }).join('');
