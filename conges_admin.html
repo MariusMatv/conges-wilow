@@ -98,6 +98,7 @@ tbody td{padding:.68rem 1rem;vertical-align:middle;}
 .badge-pink{background:var(--pink-lt);color:var(--pink);}
 .badge-gray{background:var(--bg);color:var(--text-2);}
 .badge-accent{background:var(--accent-lt);color:var(--accent);}
+.tbl-dash th,.tbl-dash td{padding-left:.55rem;padding-right:.55rem;}
 .prog-wrap{background:var(--border);border-radius:999px;height:4px;overflow:hidden;margin-top:.3rem;}
 .prog-bar{height:100%;border-radius:999px;transition:width .4s;}
 .mono{font-variant-numeric:tabular-nums;}
@@ -220,7 +221,7 @@ textarea{resize:vertical;min-height:70px;}
   <div class="card">
     <div class="card-hd"><span class="card-title">👥 Soldes par collaborateur</span><span id="dash-hd-sub" style="font-size:.72rem;color:var(--text-3)"></span></div>
     <div class="table-wrap">
-      <table>
+      <table class="tbl-dash">
         <thead id="th-dash"></thead>
         <tbody id="tb-dash"></tbody>
       </table>
@@ -450,7 +451,12 @@ function cpSnapshot(emp){
     soldePeriode:Math.round((report+bonus+droits-pris-aVenir-attente)*100)/100};
 }
 // Solde RTT du mois en cours, aligné sur l'onglet Comptes (report inclus)
-function rttSolde(emp){if(emp.hours<=35)return null;const rows=getMonthlyAccount(emp);const cur=rows.find(r=>r.isCurrent)||rows.filter(r=>!r.isFuture).at(-1);return cur?Math.round(cur.rttRunning*100)/100:0;}
+// Ligne du mois en cours dans le compte mensuel (source unique pour les soldes fin de mois)
+function moisCourantRow(emp){const rows=getMonthlyAccount(emp);return rows.find(r=>r.isCurrent)||rows.filter(r=>!r.isFuture).at(-1)||null;}
+// Solde RTT / jours de repos à la fin du mois en cours, aligné sur l'onglet Comptes
+function rttSolde(emp,row){if(emp.hours<=35)return null;const cur=row||moisCourantRow(emp);return cur?Math.round(cur.rttRunning*100)/100:0;}
+// Solde TOUT COMPRIS (CP + RTT/repos) à la fin du mois en cours
+function soldeFinMois(emp,row){const cur=row||moisCourantRow(emp);return cur?Math.round(cur.totalBalance*100)/100:0;}
 function getMonthlyAccount(emp){
   const now=today(),currentPS=getPeriodStart(now),pe=new Date(currentPS.getFullYear()+1,4,31,23,59,59);
   const arrival=parseD(emp.arrival);
@@ -496,16 +502,18 @@ function renderDash(){
   const T=k=>snaps.reduce((a,x)=>a+x.s[k],0);
   const totDroits=T('report')+T('bonus')+T('droits'),totPris=T('pris'),totAVenir=T('aVenir');
   const totSoldeAcq=T('soldeAcquis'),totSoldePer=T('soldePeriode');
-  const totRTT=S.employees.reduce((a,e)=>a+(rttSolde(e)||0),0);
+  const rows=new Map(S.employees.map(e=>[e.name,moisCourantRow(e)]));
+  const totRTT=S.employees.reduce((a,e)=>a+(rttSolde(e,rows.get(e.name))||0),0);
+  const totFinMois=S.employees.reduce((a,e)=>a+soldeFinMois(e,rows.get(e.name)),0);
   const pendingN=(S.requests||[]).filter(r=>r.status==='pending').length;
   const K=(stripe,icon,label,val,cls,sub)=>`<div class="kpi"><div class="kpi-stripe" style="background:${stripe}"></div><span class="kpi-icon">${icon}</span><div class="kpi-label">${label}</div><div class="kpi-value ${cls||''}">${val}</div><div class="kpi-sub">${sub}</div></div>`;
   const j=v=>`${v.toFixed(1)}<span style="font-size:1rem;font-weight:500"> j</span>`;
   document.getElementById("kpis").innerHTML=
-    K('var(--accent)','👥','Équipe',S.employees.length,'',"collaborateurs actifs")+
     K('var(--green)','📈','Droits CP période',j(totDroits),'green',`report N-1 + acquisition ${y1}-${y2} + crédits`)+
     K('var(--orange)','📤','CP pris à ce jour',j(totPris),'orange',`du 01/06/${y1} au ${fmtDate(localISO(now))}`)+
     K('var(--purple)','📅','CP posés à venir',j(totAVenir),'accent',`déjà validés, pas encore pris`)+
-    K(totSoldeAcq<0?'var(--red)':'var(--green)',totSoldeAcq<0?'⚠️':'✅','Solde acquis',j(totSoldeAcq),totSoldeAcq<0?'red':'green',`droits acquis à fin ${moisCourant} − CP pris`)+
+    K(totSoldeAcq<0?'var(--red)':'var(--green)',totSoldeAcq<0?'⚠️':'✅','Solde CP acquis',j(totSoldeAcq),totSoldeAcq<0?'red':'green',`droits acquis à fin ${moisCourant} − CP pris`)+
+    K(totFinMois<0?'var(--red)':'var(--teal)','🧮',`Total dispo fin ${MOIS_LONG[now.getMonth()]}`,j(totFinMois),totFinMois<0?'red':'accent',`CP + RTT / repos, tout compris`)+
     K(totSoldePer<0?'var(--red)':'var(--green)','🎯','Solde fin de période',j(totSoldePer),totSoldePer<0?'red':'green',`restant au 31/05/${y2}, congés posés déduits`)+
     K('var(--accent)','🔵','RTT / Repos',j(totRTT),'accent',"39h + forfait jours")+
     K(pendingN>0?'var(--orange)':'var(--border-strong)','✉️','En attente',pendingN,pendingN>0?'orange':'gray',pendingN>0?"à traiter":"aucune demande");
@@ -514,17 +522,18 @@ function renderDash(){
   document.getElementById("th-dash").innerHTML=`<tr>
     <th>Collaborateur</th>
     <th style="text-align:right">Report N-1</th>
-    <th style="text-align:right">Droits ${y1}-${y2}</th>
-    <th style="text-align:right">Acquis à fin ${MOIS_LONG[now.getMonth()]}</th>
-    <th style="text-align:right">Pris à ce jour</th>
-    <th style="text-align:right">Posés à venir</th>
-    <th style="text-align:right">Solde acquis</th>
-    <th style="text-align:right">Solde au 31/05/${y2}</th>
+    <th style="text-align:right">Droits ${String(y1).slice(2)}-${String(y2).slice(2)}</th>
+    <th style="text-align:right">Acquis fin ${MOIS_LONG[now.getMonth()].slice(0,4)}.</th>
+    <th style="text-align:right">Pris</th>
+    <th style="text-align:right">À venir</th>
+    <th style="text-align:right">Solde CP acquis</th>
+    <th style="text-align:right;color:var(--teal)">Total dispo fin ${MOIS_LONG[now.getMonth()].slice(0,4)}.</th>
+    <th style="text-align:right">Solde CP 31/05/${String(y2).slice(2)}</th>
     <th style="text-align:right">RTT / Repos</th>
-    <th style="text-align:right">Sans solde / École</th></tr>`;
+    <th style="text-align:right">Autres</th></tr>`;
   const tbody=document.getElementById("tb-dash");tbody.innerHTML="";
   snaps.forEach(({e:emp,s:c})=>{
-    const rtt=rttSolde(emp);
+    const row=rows.get(emp.name),rtt=rttSolde(emp,row),finMois=soldeFinMois(emp,row);
     const css=sumAbs(emp.name,"Congé sans solde"),ecole=emp.type==="Alternance"?sumAbs(emp.name,"Congé école"):null;
     const dispo=c.report+c.bonus+c.droits;
     const pct=dispo>0?Math.min(100,(c.pris+c.aVenir)/dispo*100):0;
@@ -534,25 +543,27 @@ function renderDash(){
     const cls=v=>v<0?"neg":v>5?"pos":"mid";
     const dash=`<span style="color:var(--text-3)">—</span>`;
     tbody.innerHTML+=`<tr>
-      <td><div style="display:flex;align-items:center;gap:.55rem"><div class="av" style="width:32px;height:32px;font-size:.68rem;background:${empColor(emp.name)}">${initials(emp.name)}</div><div><div style="font-weight:600">${emp.name}</div><div style="margin-top:.15rem;white-space:nowrap"><span class="badge ${tb}">${tl}</span></div><div style="font-size:.7rem;color:var(--text-3);white-space:nowrap">Arrivée ${fmtDate(emp.arrival)}</div></div></div></td>
+      <td><div style="display:flex;align-items:center;gap:.55rem"><div class="av" style="width:32px;height:32px;font-size:.68rem;background:${empColor(emp.name)}">${initials(emp.name)}</div><div><div style="font-weight:600">${emp.name}</div><div style="margin-top:.15rem;white-space:nowrap"><span class="badge ${tb}">${tl}</span></div><div style="font-size:.68rem;color:var(--text-3);white-space:nowrap">Arrivée ${fmtDate(emp.arrival)}</div></div></div></td>
       <td class="mono" style="text-align:right"><span style="color:${c.report>0?'var(--green-dk)':c.report<0?'var(--red)':'var(--text-3)'}">${c.report!==0?(c.report>0?'+':'')+c.report.toFixed(1)+' j':dash}</span>${c.bonus>0?`<div style="font-size:.7rem">${(emp.credit||0)>0?`<span style="color:var(--orange-dk)">🎁 +${(emp.credit).toFixed(1)} j</span> `:''}${(emp.recup||0)>0?`<span style="color:var(--teal)">🔄 +${(emp.recup).toFixed(1)} j</span>`:''}</div>`:''}</td>
       <td class="mono" style="text-align:right">${c.droits.toFixed(1)} j</td>
       <td class="mono" style="text-align:right;color:var(--text-2)">${c.acquis.toFixed(1)} j</td>
       <td style="text-align:right"><div class="mono" style="color:var(--orange-dk)">${c.pris.toFixed(1)} j</div><div class="prog-wrap" style="width:64px;margin-left:auto"><div class="prog-bar" style="width:${pct}%;background:${(c.pris+c.aVenir)>dispo?"var(--red)":"var(--accent)"}"></div></div></td>
       <td class="mono" style="text-align:right">${c.aVenir>0?`<span style="color:var(--purple)">${c.aVenir.toFixed(1)} j</span>`:dash}${c.attente>0?`<div style="font-size:.7rem;color:var(--orange)">⏳ ${c.attente.toFixed(1)} j</div>`:''}</td>
       <td style="text-align:right"><span class="${cls(c.soldeAcquis)}">${c.soldeAcquis.toFixed(1)} j</span></td>
+      <td style="text-align:right;background:var(--teal-lt)"><span style="font-weight:700;font-size:1.05em;color:${finMois<0?'var(--red)':'var(--teal)'}">${finMois.toFixed(1)} j</span></td>
       <td style="text-align:right"><span class="${cls(c.soldePeriode)}" style="font-size:1.05em">${c.soldePeriode.toFixed(1)} j</span></td>
       <td class="mono" style="text-align:right;color:var(--purple)">${rtt!==null?rttLabel(emp)+' '+rtt.toFixed(1)+' j':dash}</td>
-      <td class="mono" style="text-align:right;font-size:.78rem">${css>0?`<span style="color:var(--pink)">${css.toFixed(1)} j sans solde</span>`:''}${css>0&&ecole>0?'<br>':''}${ecole>0?`<span style="color:var(--teal)">${ecole.toFixed(1)} j école</span>`:''}${css<=0&&!(ecole>0)?dash:''}</td>
+      <td class="mono" style="text-align:right;font-size:.78rem">${css>0?`<span style="color:var(--pink)">${css.toFixed(1)} j s.solde</span>`:''}${css>0&&ecole>0?'<br>':''}${ecole>0?`<span style="color:var(--teal)">${ecole.toFixed(1)} j école</span>`:''}${css<=0&&!(ecole>0)?dash:''}</td>
     </tr>`;
   });
   const rttEmps=S.employees.filter(e=>e.hours>35);
   const rttNote=rttEmps.map(e=>`<strong>${rttLabel(e)} ${e.name}</strong> (${e.forfait?'forfait jours':e.hours+'h depuis le '+fmtDate(e.rttSince||e.arrival)}) : solde <strong>${(rttSolde(e)||0).toFixed(1)} j</strong>`).join(' — ');
   document.getElementById("dash-legend").innerHTML=
     `<div class="alert alert-yellow"><span>ℹ️</span><div>
-      <strong>Comment lire les deux soldes :</strong><br>
-      • <strong>Solde acquis</strong> = report N-1 + crédits + CP acquis jusqu'à fin ${moisCourant} − CP déjà pris. C'est le solde <em>comptable</em> à date : il peut être négatif si des congés d'été ont été pris par anticipation sur des droits pas encore acquis.<br>
-      • <strong>Solde au 31/05/${y2}</strong> = report N-1 + crédits + droits complets de la période (${CP_AN} j) − CP pris − CP déjà posés à venir − demandes en attente. C'est ce qu'il <em>restera réellement</em> à poser d'ici la fin de la période.<br>
+      <strong>Comment lire les soldes :</strong><br>
+      • <strong>Solde CP acquis</strong> = report N-1 + crédits + CP acquis jusqu'à fin ${moisCourant} − CP déjà pris. Congés payés uniquement. C'est le solde <em>comptable</em> à date : il peut être négatif si des congés d'été ont été pris par anticipation sur des droits pas encore acquis.<br>
+      • <strong>Total dispo fin ${MOIS_LONG[now.getMonth()]}</strong> = le précédent + le solde RTT / jours de repos, et en déduisant aussi les congés posés d'ici la fin du mois. <strong>C'est le solde réellement disponible aujourd'hui, tous compteurs confondus.</strong> Identique au « Solde fin de mois » de l'onglet Comptes.<br>
+      • <strong>Solde CP au 31/05/${y2}</strong> = report N-1 + crédits + droits complets de la période (${CP_AN} j) − CP pris − CP déjà posés à venir − demandes en attente. C'est ce qu'il <em>restera réellement</em> à poser d'ici la fin de la période.<br>
       <strong>Règles :</strong> acquisition ${(CP_AN/12).toFixed(2).replace('.',',')} j ouvrés/mois, soit ${CP_AN} j ouvrés/an (= 2,5 j et 30 j ouvrables Syntec) · période 1er juin → 31 mai · reliquat CP reporté sur la période suivante.
       ${rttNote?'<br><strong>RTT / repos :</strong> '+rttNote+'.':''}
     </div></div>`;
