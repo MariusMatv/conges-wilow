@@ -363,7 +363,8 @@ textarea{resize:vertical;min-height:70px;}
   <div class="sv-tips"><b>Bon à savoir</b><ul>
     <li>L'année de congés va du <b>1er juin au 31 mai</b>. Chaque mois travaillé vous donne environ <b>2,1 jours</b> de congés payés (25 jours ouvrés par an, convention Syntec).</li>
     <li>Les jours non pris au 31 mai sont <b>reportés</b> sur l'année suivante.</li>
-    <li>Vous pouvez poser des congés <b>par anticipation</b> (avant de les avoir acquis) : le « solde fin de mois » peut alors être négatif, c'est normal tant que le chiffre principal reste positif.</li>
+    <li>Le gros chiffre, ce sont les jours <b>déjà gagnés</b> moins ceux pris ou posés jusqu'à la fin du mois. La <b>prévision au 31 mai</b> ajoute les jours que vous allez encore gagner d'ici là.</li>
+    <li>Vous pouvez poser des congés <b>par anticipation</b>, avant de les avoir gagnés : le gros chiffre devient alors négatif (en rouge). C'est possible tant que la prévision au 31 mai reste positive.</li>
   </ul></div>
 </div>
 
@@ -627,7 +628,7 @@ function histView(emp){
   let h=`<div class="hv-bar"><div class="hv-group">${pill(kind==='CP','Congés payés',`setHV(${emp.id},'kind','CP')`)}${hasRTT?pill(kind==='RTT',rttLabel(emp),`setHV(${emp.id},'kind','RTT')`):''}</div>`
     +(years.length>1?`<div class="hv-group">${years.map(y=>pill(y===year,`${y}-${String(y+1).slice(2)}`,`setHV(${emp.id},'year',${y})`)).join('')}</div>`:'')+`</div>`;
   if(isCur){const c=kind==='CP'?sn.cp:sn.rtt;
-    h+=`<div class="hv-sum"><div><span>Solde fin ${MONTHS_FR[today().getMonth()].toLowerCase()}</span><b>${fj(c.finMois)} j</b></div><div><span>Pris</span><b>${fj(c.pris)} j</b></div><div><span>À venir</span><b>${fj(c.aVenir+(kind==='CP'?c.attente:0))} j</b></div><div class="hv-main"><span>Reste à poser au 31/05</span><b>${fj(c.finPeriode)} j</b></div></div>`;}
+    h+=`<div class="hv-sum"><div class="hv-main"><span>Disponible fin ${MONTHS_FR[today().getMonth()].toLowerCase()}</span><b style="${c.finMois<0?'color:var(--red)':''}">${fj(c.finMois)} j</b></div><div><span>Pris depuis le 1er juin</span><b>${fj(c.pris)} j</b></div><div><span>Posés à venir</span><b>${fj(c.aVenir+(kind==='CP'?c.attente:0))} j</b></div><div><span>Prévision au 31/05</span><b>${fj(c.finPeriode)} j</b></div></div>`;}
   let shownToday=false;
   h+=`<div class="hv-list">`+(list.length?list.map(e=>{
     let sep='';if(isCur&&!shownToday&&e.date>nowISO){shownToday=true;sep=`<div class="hv-today"><span>Aujourd'hui · ${dLabel(nowISO)}</span></div>`;}
@@ -752,19 +753,19 @@ function renderSolde(){
     const rest=Math.max(0,c.finPeriode);
     const den=Math.max(total,c.pris+c.aVenir+att+rest)||1;
     const seg=(v,col,extra='')=>v>0?`<span style="width:${v/den*100}%;background:${col};${extra}"></span>`:'';
-    const numCol=c.finPeriode<0?'var(--red)':'var(--text)';
+    const numCol=c.finMois<0?'var(--red)':'var(--text)';
     const lines=[
       [c.report,'Reste de l\'année précédente',1],[c.bonus||0,'Jours offerts / récupérés',1],
       [c.droits,`Droits de l'année (${isRtt?'11':'25'} j)`,1],[c.pris,'Déjà pris',-1],[c.aVenir,'Posés à venir',-1],[att,'Demandes en attente',-1]
     ].filter(l=>l[0]).map(([v,l,sg])=>`<div class="bk-row"><span>${l}</span><span class="mono" style="color:${sg>0?'var(--green-dk)':'var(--red)'}">${sg>0?'+':'−'} ${j(Math.abs(v))} j</span></div>`).join('');
     return `<div class="sv-card">
       <div class="sv-kind"><span class="sv-dot" style="background:${color}"></span>${title}</div>
-      <div class="sv-num" style="color:${numCol}">${j(c.finPeriode)}<small>jours</small></div>
-      <div class="sv-what">${c.finPeriode<0?'de dépassement':'encore à poser'} d'ici le ${finTxt}</div>
+      <div class="sv-num" style="color:${numCol}">${j(c.finMois)}<small>jours</small></div>
+      <div class="sv-what">${c.finMois<0?`d'avance prise sur vos droits (fin ${moisLbl})`:`disponibles à fin ${moisLbl}`}</div>
       <div class="sv-bar">${seg(c.pris,'#9DB0B1')}${seg(c.aVenir,'#F2A541')}${seg(att,'#F2A541','opacity:.45')}${seg(rest,color)}</div>
-      <div class="sv-legend">${c.pris?`<span><i style="background:#9DB0B1"></i>Pris ${j(c.pris)} j</span>`:''}${c.aVenir?`<span><i style="background:#F2A541"></i>Posés à venir ${j(c.aVenir)} j</span>`:''}${att?`<span><i style="background:#F2A541;opacity:.45"></i>En attente ${j(att)} j</span>`:''}<span><i style="background:${color}"></i>Restant ${j(rest)} j</span></div>
-      <div class="sv-now">Solde fin ${moisLbl} : <strong>${j(c.finMois)} j</strong>${c.finMois<0?' · congés pris par anticipation':''}${isRtt&&c.attente?`<br>⏳ ${j(c.attente)} j en attente de validation, pas encore déduits`:''}</div>
-      <details><summary>Comment c'est calculé ?</summary><div style="margin-top:.5rem">${lines}<div class="bk-row bk-total"><span>Encore à poser d'ici le ${finTxt}</span><span class="mono">${j(c.finPeriode)} j</span></div></div></details>
+      <div class="sv-legend">${c.pris?`<span><i style="background:#9DB0B1"></i>Pris ${j(c.pris)} j</span>`:''}${c.aVenir?`<span><i style="background:#F2A541"></i>Posés à venir ${j(c.aVenir)} j</span>`:''}${att?`<span><i style="background:#F2A541;opacity:.45"></i>En attente ${j(att)} j</span>`:''}<span><i style="background:${color}"></i>Restant au 31/05 ${j(rest)} j</span></div>
+      <div class="sv-now">Prévision au ${finTxt} : <strong>${j(c.finPeriode)} j</strong><br><span style="font-size:.76rem">avec les jours que vous allez encore gagner, moins les congés déjà posés</span>${isRtt&&c.attente?`<br>⏳ ${j(c.attente)} j en attente de validation, pas encore déduits`:''}</div>
+      <details><summary>Comment c'est calculé ?</summary><div style="margin-top:.5rem">${lines}<div class="bk-row bk-total"><span>Prévision au ${finTxt}</span><span class="mono">${j(c.finPeriode)} j</span></div></div></details>
     </div>`;
   };
   const css=absBetween(ME.name,'Congé sans solde',sn.ps,sn.pe);
@@ -871,7 +872,7 @@ function onReqDatesChange(){
   document.getElementById('pp-grid').innerHTML=`
     <div class="pp-stat"><div class="pp-val" style="color:var(--green-dk)">${balAtDate.toFixed(1)} j</div><div class="pp-lbl">Disponible fin de ce mois-là</div></div>
     ${jours>0?`<div class="pp-stat"><div class="pp-val" style="color:${sc}">${afterRequest.toFixed(1)} j</div><div class="pp-lbl">Solde après absence</div></div>`:''}
-    ${jours>0&&inPeriod?`<div class="pp-stat"><div class="pp-val" style="color:${finAfter<0?'var(--red)':'var(--green-dk)'}">${finAfter.toFixed(1)} j</div><div class="pp-lbl">Reste à poser au 31/05</div></div>`:''}
+    ${jours>0&&inPeriod?`<div class="pp-stat"><div class="pp-val" style="color:${finAfter<0?'var(--red)':'var(--green-dk)'}">${finAfter.toFixed(1)} j</div><div class="pp-lbl">Prévision au 31/05</div></div>`:''}
     ${pendingAtDate>0?`<div class="pp-stat"><div class="pp-val" style="color:var(--orange)">${pendingAtDate.toFixed(1)} j</div><div class="pp-lbl">En attente</div></div>`:''}`;
   // Warning si solde insuffisant
   const warn=document.getElementById('req-submit-warning');
