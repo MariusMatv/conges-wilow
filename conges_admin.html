@@ -587,7 +587,7 @@ function renderComptes(){
     const tb=hasRTT?"badge-accent":isAlt?"badge-teal":"badge-blue";
     const tl=hasRTT?(emp.forfait?'Forfait jours':`CDI ${emp.hours}h`):isAlt?'Alternant':emp.type;
     const rttBalance=hasRTT?(curRow?.rttRunning??0):0;
-    const totalDispo=currentBalance;
+    const totalDispo=curRow?.totalBalance??0;
     const tableRows=rows.map(row=>{
       const bc=row.totalBalance<0?'mbal-neg':row.totalBalance<2.5?'mbal-warn':'mbal-pos';
       const icon=row.totalBalance<0?'⚠️':row.totalBalance<2.5?'🟡':'✅';
