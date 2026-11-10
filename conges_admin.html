@@ -5,34 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Congés · Admin · Wilow</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#F5F4FD;--surface:#FFFFFF;--border:#E6E3F4;--border-strong:#C9C4E3;
-  --accent:#6C5CE7;--accent-lt:#EDE9FF;--accent-dk:#4A3BB5;
-  --navy:#120E2B;--text:#1D1640;--text-2:#6B6484;--text-3:#A59EC0;
+  --bg:#F3F7F7;--surface:#FFFFFF;--border:#DCE7E7;--border-strong:#BCD0D0;
+  --accent:#0B868D;--accent-lt:#E3F3F3;--accent-dk:#086A70;
+  --navy:#0C2B2E;--text:#12292B;--text-2:#56696B;--text-3:#8FA3A4;
   --green:#059669;--green-lt:#ECFDF5;--green-dk:#047857;
   --red:#DC2626;--red-lt:#FEF2F2;--red-dk:#B91C1C;
   --orange:#D97706;--orange-lt:#FFFBEB;--orange-dk:#92400E;
-  --purple:#7C3AED;--purple-lt:#F5F3FF;
+  --purple:#5B5FC7;--purple-lt:#EEEFFB;
   --yellow:#CA8A04;--yellow-lt:#FEFCE8;
   --pink:#DB2777;--pink-lt:#FDF2F8;
   --teal:#0D9488;--teal-lt:#F0FDFA;
   --blue:#2563EB;--blue-lt:#EFF6FF;
   --r:12px;--r-lg:16px;
-  --sh:0 1px 2px rgba(18,14,43,.04),0 4px 16px rgba(108,92,231,.07);
-  --sh-md:0 4px 20px rgba(108,92,231,.13);
+  --sh:0 1px 2px rgba(12,43,46,.04),0 4px 16px rgba(11,134,141,.07);
+  --sh-md:0 4px 20px rgba(11,134,141,.13);
   --sh-lg:0 20px 60px rgba(18,14,43,.2);
 }
 html{font-size:15px;}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;}
+body{font-family:'Instrument Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;}
 #loader{position:fixed;inset:0;background:var(--navy);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.25rem;}
 #loader.hidden{display:none;}
 .ld-logo{display:flex;align-items:center;gap:.65rem;}
 .ld-mark{width:40px;height:40px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
 .ld-name{font-size:1.2rem;font-weight:700;color:#fff;letter-spacing:-.03em;}
-.ld-badge{background:rgba(108,92,231,.35);color:rgba(255,255,255,.8);font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .5rem;border-radius:5px;margin-left:.2rem;}
+.ld-badge{background:rgba(11,134,141,.35);color:rgba(255,255,255,.8);font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .5rem;border-radius:5px;margin-left:.2rem;}
 .ld-spin{width:28px;height:28px;border:2.5px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .ld-text{font-size:.78rem;color:rgba(255,255,255,.4);font-weight:500;}
@@ -42,7 +42,7 @@ header{background:var(--navy);height:62px;display:flex;align-items:center;justif
 .logo{display:flex;align-items:center;gap:.6rem;flex-shrink:0;}
 .logo-mark{width:32px;height:32px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
 .logo-name{font-weight:700;font-size:.95rem;letter-spacing:-.025em;color:#fff;}
-.logo-badge{background:rgba(108,92,231,.4);color:rgba(255,255,255,.85);font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .5rem;border-radius:5px;border:1px solid rgba(108,92,231,.5);}
+.logo-badge{background:rgba(11,134,141,.4);color:rgba(255,255,255,.85);font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .5rem;border-radius:5px;border:1px solid rgba(11,134,141,.5);}
 .hdr-right{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;}
 .sync-pill{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:.28rem .7rem;font-size:.71rem;font-weight:500;color:rgba(255,255,255,.65);}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:#10B981;flex-shrink:0;}
@@ -112,7 +112,7 @@ tbody td{padding:.68rem 1rem;vertical-align:middle;}
 label{font-size:.7rem;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em;}
 label .opt{font-weight:400;text-transform:none;color:var(--text-3);}
 input,select,textarea{border:1.5px solid var(--border);border-radius:8px;padding:.5rem .75rem;font-family:'Inter',sans-serif;font-size:.85rem;color:var(--text);background:var(--surface);transition:border-color .15s,box-shadow .15s;outline:none;width:100%;}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,92,231,.1);}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,134,141,.1);}
 textarea{resize:vertical;min-height:70px;}
 .hint{font-size:.69rem;color:var(--text-3);font-style:italic;}
 .cal-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
@@ -145,7 +145,7 @@ textarea{resize:vertical;min-height:70px;}
 .alert-blue{background:var(--blue-lt);border:1px solid #BFDBFE;color:#1E40AF;}
 .alert-green{background:var(--green-lt);border:1px solid #A7F3D0;color:var(--green-dk);}
 .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border-radius:8px;border:none;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;line-height:1;}
-.btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 4px rgba(108,92,231,.3);}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 4px rgba(11,134,141,.3);}
 .btn-primary:hover{background:var(--accent-dk);transform:translateY(-1px);}
 .btn-outline{background:var(--surface);color:var(--text-2);border:1.5px solid var(--border);}
 .btn-outline:hover{background:var(--bg);border-color:var(--border-strong);}
@@ -186,6 +186,101 @@ textarea{resize:vertical;min-height:70px;}
 #toast.show{transform:translateX(-50%) translateY(0);}
 @media(max-width:640px){header{padding:0 1rem;height:54px;}main{padding:1rem;}.kpi-grid{grid-template-columns:repeat(2,1fr);}nav{padding:0 1rem;}nav button{padding:.75rem .85rem;font-size:.78rem;}}
 #file-import{display:none;}
+.sv-hello{font-size:1.45rem;font-weight:700;letter-spacing:-.02em;margin:.2rem 0 .2rem;}
+.sv-sub{color:var(--text-2);font-size:.88rem;margin-bottom:1.2rem;}
+.sv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1rem;margin-bottom:1.2rem;}
+.sv-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.4rem 1.5rem;box-shadow:var(--sh);}
+.sv-kind{display:flex;align-items:center;gap:.5rem;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);}
+.sv-dot{width:10px;height:10px;border-radius:50%;}
+.sv-num{font-size:3rem;font-weight:700;letter-spacing:-.04em;line-height:1;margin:.7rem 0 .25rem;}
+.sv-num small{font-size:1.1rem;font-weight:600;margin-left:.25rem;letter-spacing:0;}
+.sv-what{font-size:.9rem;color:var(--text-2);}
+.sv-bar{display:flex;height:12px;border-radius:999px;overflow:hidden;background:var(--bg);margin:1.1rem 0 .7rem;}
+.sv-bar span{height:100%;}
+.sv-legend{display:flex;flex-wrap:wrap;gap:.35rem 1rem;font-size:.78rem;color:var(--text-2);}
+.sv-legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:.35rem;vertical-align:-1px;}
+.sv-now{margin-top:1rem;padding:.7rem .85rem;background:var(--bg);border-radius:10px;font-size:.83rem;color:var(--text-2);line-height:1.45;}
+.sv-now strong{color:var(--text);}
+.sv-card details{margin-top:.9rem;}
+.sv-card summary{cursor:pointer;font-size:.82rem;font-weight:600;color:var(--accent);list-style:none;}
+.sv-card summary::-webkit-details-marker{display:none;}
+.sv-card summary::before{content:"▸ ";}
+.sv-card details[open] summary::before{content:"▾ ";}
+.sv-tips{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.1rem 1.4rem;margin-bottom:1.2rem;font-size:.85rem;color:var(--text-2);line-height:1.55;}
+.sv-tips b{color:var(--text);}
+.sv-tips ul{margin:.4rem 0 0 1.1rem;}
+.bk-row{display:flex;justify-content:space-between;gap:1rem;padding:.5rem 0;border-bottom:1px solid var(--border);font-size:.85rem;color:var(--text-2,var(--text));}
+.bk-row .mono{font-variant-numeric:tabular-nums;font-weight:600;}
+.bk-total{border-bottom:none;border-top:2px solid var(--text);margin-top:.15rem;padding-top:.65rem;font-weight:700;color:var(--text);font-size:.92rem;}
+.bk-note{font-size:.74rem;color:var(--text-3);margin-top:.6rem;line-height:1.45;}
+.bk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-bottom:1.2rem;}
+.bh-big{font-size:2.4rem!important;}
+.bh-hint{font-size:.78rem;color:rgba(255,255,255,.75);margin-top:.45rem;}
+.hist{width:100%;border-collapse:collapse;font-size:.85rem;}
+.hist th{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);font-weight:600;text-align:right;padding:.6rem .9rem;border-bottom:1px solid var(--border);background:var(--surface);}
+.hist th:first-child,.hist td:first-child{text-align:left;}
+.hist td{padding:.55rem .9rem;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap;}
+.hist tr.h-per td{background:var(--bg);color:var(--text-2);font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:.45rem .9rem;}
+.hist tr.h-cur td{background:var(--accent-lt);font-weight:600;}
+.hist tr.h-fut td{color:var(--text-3);}
+.hist .mv{display:inline-block;font-variant-numeric:tabular-nums;font-size:.8rem;margin-left:.45rem;}
+.hist .mv.p{color:var(--green-dk);} .hist .mv.m{color:var(--red);} .hist .mv.w{color:var(--orange);}
+.hist .bal{font-weight:700;font-variant-numeric:tabular-nums;}
+.hist .bal.neg{color:var(--red);}
+.hist-sep{border-left:2px solid var(--border);}
+.h-kpis{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;}
+.h-kpi{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:.55rem .95rem;}
+.h-kpi b{display:block;font-size:1.1rem;font-variant-numeric:tabular-nums;}
+.h-kpi span{font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);}
+.tm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.9rem;margin-bottom:1.2rem;}
+.tm-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.05rem 1.15rem;box-shadow:var(--sh);cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+.tm-card:hover{border-color:var(--accent);box-shadow:var(--sh-md);}
+.tm-top{display:flex;align-items:center;gap:.65rem;margin-bottom:.8rem;}
+.tm-name{font-weight:700;font-size:.95rem;}
+.tm-type{font-size:.72rem;color:var(--text-3);}
+.tm-num{font-size:2rem;font-weight:700;letter-spacing:-.03em;line-height:1;}
+.tm-num small{font-size:.85rem;font-weight:600;margin-left:.2rem;}
+.tm-lbl{font-size:.76rem;color:var(--text-2);margin-top:.2rem;}
+.tm-card .sv-bar{height:8px;margin:.75rem 0 .6rem;}
+.tm-line{font-size:.78rem;color:var(--text-2);display:flex;justify-content:space-between;padding:.18rem 0;}
+.tm-line b{color:var(--text);font-variant-numeric:tabular-nums;}
+.sec-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-2);margin:0 0 .6rem;}
+.todo{background:var(--surface);border:1px solid var(--orange);border-radius:var(--r-lg);padding:.4rem 1.15rem;margin-bottom:1.3rem;box-shadow:var(--sh);}
+.todo-row{display:flex;align-items:center;gap:.8rem;padding:.75rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.todo-row:last-child{border-bottom:none;}
+.todo-info{flex:1;min-width:220px;font-size:.85rem;}
+.todo-info .sub{font-size:.76rem;color:var(--text-2);margin-top:.15rem;}
+.todo-btns{display:flex;gap:.4rem;}
+.abs-strip{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.3rem;}
+.abs-chip{display:flex;align-items:center;gap:.45rem;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:.3rem .75rem .3rem .3rem;font-size:.8rem;}
+.abs-chip .when{color:var(--text-3);font-size:.72rem;}
+.hv-bar{display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;}
+.hv-group{display:inline-flex;background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px;}
+.hv-pill{border:none;background:transparent;font:inherit;font-size:.8rem;font-weight:600;color:var(--text-2);padding:.35rem .85rem;border-radius:999px;cursor:pointer;}
+.hv-pill.on{background:var(--surface);color:var(--accent-dk);box-shadow:0 1px 3px rgba(12,43,46,.12);}
+.hv-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1rem;}
+.hv-sum>div{background:var(--bg);border-radius:10px;padding:.6rem .8rem;}
+.hv-sum span{display:block;font-size:.7rem;color:var(--text-2);margin-bottom:.15rem;}
+.hv-sum b{font-size:1.15rem;font-variant-numeric:tabular-nums;}
+.hv-sum .hv-main{background:var(--accent-lt);}
+.hv-sum .hv-main b{color:var(--accent-dk);}
+.hv-list{border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.hv-row{display:grid;grid-template-columns:32px 1fr auto 78px;align-items:center;gap:.75rem;padding:.65rem .9rem;border-bottom:1px solid var(--border);background:var(--surface);}
+.hv-row:last-child{border-bottom:none;}
+.hv-row.fut{background:#FAFCFC;}
+.hv-row.fut .hv-lbl,.hv-row.fut .hv-amt,.hv-row.fut .hv-bal{opacity:.6;}
+.hv-ic{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;}
+.hv-ic.pos{background:var(--green-lt);color:var(--green-dk);} .hv-ic.neg{background:var(--red-lt);color:var(--red);} .hv-ic.wait{background:var(--orange-lt);color:var(--orange);}
+.hv-lbl{font-size:.86rem;font-weight:600;}
+.hv-sub{font-size:.74rem;color:var(--text-3);margin-top:.1rem;}
+.hv-tag{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:var(--bg);color:var(--text-3);border-radius:4px;padding:.05rem .35rem;margin-left:.3rem;vertical-align:1px;}
+.hv-amt{font-weight:700;font-variant-numeric:tabular-nums;font-size:.88rem;white-space:nowrap;}
+.hv-amt.pos{color:var(--green-dk);} .hv-amt.neg{color:var(--red);} .hv-amt.wait{color:var(--orange);}
+.hv-bal{text-align:right;font-variant-numeric:tabular-nums;font-size:.82rem;color:var(--text-2);white-space:nowrap;}
+.hv-today{display:flex;align-items:center;gap:.6rem;padding:.35rem .9rem;background:var(--accent-lt);}
+.hv-today span{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-dk);}
+.hv-foot{font-size:.74rem;color:var(--text-3);margin-top:.6rem;}
+@media(max-width:640px){.hv-sum{grid-template-columns:repeat(2,1fr);}.hv-row{grid-template-columns:28px 1fr auto;}.hv-bal{grid-column:2/4;text-align:left;font-size:.72rem;margin-top:-.4rem;}}
 </style>
 </head>
 <body>
@@ -206,8 +301,8 @@ textarea{resize:vertical;min-height:70px;}
   </div>
 </header>
 <nav>
-  <button class="active" onclick="goPage('dashboard',this)">📊 Dashboard</button>
-  <button onclick="goPage('comptes',this)">📅 Comptes</button>
+  <button class="active" onclick="goPage('dashboard',this)">📊 Tableau de bord</button>
+  <button onclick="goPage('comptes',this)">📅 Historique</button>
   <button onclick="goPage('calendar',this)">🗓 Calendrier</button>
   <button onclick="goPage('absences',this)">📋 Absences</button>
   <button onclick="goPage('demandes',this)" id="nav-demandes">✉️ Demandes <span class="nav-badge" id="badge-demandes" style="display:none">0</span></button>
@@ -216,25 +311,13 @@ textarea{resize:vertical;min-height:70px;}
 <main>
 <!-- DASHBOARD -->
 <div id="page-dashboard" class="page active">
-  <div class="kpi-grid" id="kpis"></div>
-  <div id="dash-asof"></div>
-  <div class="card">
-    <div class="card-hd"><span class="card-title">👥 Soldes par collaborateur</span><span id="dash-hd-sub" style="font-size:.72rem;color:var(--text-3)"></span></div>
-    <div class="table-wrap">
-      <table class="tbl-dash">
-        <thead id="th-dash"></thead>
-        <tbody id="tb-dash"></tbody>
-      </table>
-    </div>
-  </div>
-  <div id="dash-legend"></div>
-  <div id="note-legal"></div>
+  <div id="dash-root"></div>
 </div>
 <!-- COMPTES MENSUELS -->
 <div id="page-comptes" class="page">
   <div class="ph">
-    <div><div class="ph-title">📅 Comptes mensuels</div><div class="ph-sub">Solde CP mois par mois · Crédits, débits et projections · Période Syntec 1er juin → 31 mai</div></div>
-    <div class="filter-bar"><select id="fil-comptes-emp" onchange="renderComptes()"><option value="">Tous les employés</option></select></div>
+    <div><div class="ph-title">📅 Historique</div><div class="ph-sub">Relevé des jours gagnés et pris, avec le solde après chaque mouvement.</div></div>
+    <div class="filter-bar"><select id="fil-comptes-emp" onchange="renderComptes()"><option value="">Tous les collaborateurs</option></select></div>
   </div>
   <div id="comptes-list"></div>
 </div>
@@ -457,6 +540,113 @@ function moisCourantRow(emp){const rows=getMonthlyAccount(emp);return rows.find(
 function rttSolde(emp,row){if(emp.hours<=35)return null;const cur=row||moisCourantRow(emp);return cur?Math.round(cur.rttRunning*100)/100:0;}
 // Solde TOUT COMPRIS (CP + RTT/repos) à la fin du mois en cours
 function soldeFinMois(emp,row){const cur=row||moisCourantRow(emp);return cur?Math.round(cur.totalBalance*100)/100:0;}
+function absBetween(name,type,d0,d1){if(d1<d0)return 0;const a0=localISO(d0),a1=localISO(d1);return S.absences.filter(a=>a.name===name&&a.type===type&&a.start>=a0&&a.start<=a1).reduce((s,a)=>s+(+a.jours||0),0);}
+function pendingBetween(name,type,d0,d1){const a0=localISO(d0),a1=localISO(d1);return (S.requests||[]).filter(r=>r.name===name&&r.type===type&&r.status==='pending'&&r.start>=a0&&r.start<=a1).reduce((s,r)=>s+(+r.jours||0),0);}
+const r2=x=>Math.round(x*100)/100;
+// Photographie complète des compteurs d'un collaborateur, alignée par construction sur getMonthlyAccount()
+function soldeSnapshot(emp){
+  const now=today(),ps=getPeriodStart(now),pe=periodEnd(ps),arr=parseD(emp.arrival);
+  const rows=getMonthlyAccount(emp);
+  const cur=rows.find(r=>r.isCurrent)||rows.filter(r=>!r.isFuture).at(-1);
+  const last=rows.at(-1);
+  const prev=rows.filter(r=>r.mKey<localISO(ps).slice(0,7)).at(-1);
+  const aps=arr?getPeriodStart(arr):ps,veille=new Date(ps.getTime()-864e5);
+  const demain=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  const cp={
+    report:aps<ps?r2(cpCredits(emp,aps,veille)-absBetween(emp.name,'CP',aps,veille)):0,
+    bonus:r2((emp.credit||0)+(emp.recup||0)),
+    droits:cpCredits(emp,ps,pe),
+    pris:absBetween(emp.name,'CP',ps,now),
+    aVenir:absBetween(emp.name,'CP',demain,pe),
+    attente:pendingBetween(emp.name,'CP',ps,pe),
+    finMois:r2(cur?.balance??0),
+    finPeriode:r2(last?.balance??0)
+  };
+  const hasRTT=emp.hours>35;
+  const rtt=hasRTT?{
+    report:r2(prev?.rttRunning??0),
+    droits:rttAcquis(emp,pe),
+    pris:absBetween(emp.name,'RTT',ps,now),
+    aVenir:absBetween(emp.name,'RTT',demain,pe),
+    attente:pendingBetween(emp.name,'RTT',ps,pe),
+    finMois:r2(cur?.rttRunning??0),
+    finPeriode:r2(last?.rttRunning??0)
+  }:null;
+  return{ps,pe,cur,last,rows,cp,rtt};
+}
+
+/* ---- Historique mois par mois (commun admin / employé) ---- */
+const fj=v=>(Math.round(v*10)/10).toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1});
+function histTable(emp,rows){
+  const hasRTT=emp.hours>35,arr=parseD(emp.arrival);
+  const mv=(v,cls,sign)=>v>0?`<span class="mv ${cls}">${sign}${fj(v)}</span>`:'';
+  const body=rows.filter(r=>{const[y,m]=r.mKey.split('-').map(Number);return !arr||new Date(y,m,0)>=arr;}).map(r=>{
+    const per=r.isPeriodStart?`<tr class="h-per"><td colspan="${hasRTT?5:3}">Année ${r.label.split(' ')[1]} → ${parseInt(r.label.split(' ')[1])+1}</td></tr>`:'';
+    const cls=r.isCurrent?'h-cur':r.isFuture?'h-fut':'';
+    return per+`<tr class="${cls}"><td>${r.isCurrent?'▸ ':''}${r.label}</td>
+      <td>${mv(r.credit,'p','+')}${mv(r.debit,'m','−')}${mv(r.pending,'w','⏳ −')}${!r.credit&&!r.debit&&!r.pending?'<span class="mv" style="color:var(--text-3)">·</span>':''}</td>
+      <td><span class="bal ${r.balance<0?'neg':''}">${fj(r.balance)} j</span></td>
+      ${hasRTT?`<td class="hist-sep">${mv(r.rttCredit,'p','+')}${mv(r.rttDebit,'m','−')}${!r.rttCredit&&!r.rttDebit?'<span class="mv" style="color:var(--text-3)">·</span>':''}</td><td><span class="bal ${r.rttRunning<0?'neg':''}">${fj(r.rttRunning)} j</span></td>`:''}
+    </tr>`;}).join('');
+  return `<div class="table-wrap"><table class="hist"><thead><tr><th>Mois</th><th>Congés payés</th><th>Solde CP</th>${hasRTT?`<th class="hist-sep">${rttLabel(emp)}</th><th>Solde ${rttLabel(emp)}</th>`:''}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+/* ---- Historique façon relevé de compte (commun admin / employé) ---- */
+const HV={};
+function setHV(id,k,v){HV[id]=Object.assign(HV[id]||{},{[k]:v});renderComptes();}
+const MOIS_COURT=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const dLabel=iso=>{const d=parseD(iso);return `${d.getDate()} ${MOIS_COURT[d.getMonth()]} ${d.getFullYear()}`;};
+const rangeLabel=(s,e)=>s===e?`le ${dLabel(s)}`:`du ${dLabel(s)} au ${dLabel(e)}`;
+function mvtEntries(emp,kind,ps){
+  const pe=periodEnd(ps),p0=localISO(ps),p1=localISO(pe);
+  const rows=getMonthlyAccount(emp);
+  const before=rows.filter(r=>r.mKey<p0.slice(0,7)).at(-1);
+  const inP=rows.filter(r=>r.mKey>=p0.slice(0,7)&&r.mKey<=p1.slice(0,7));
+  const out=[];let opening;
+  if(kind==='CP'){
+    opening=before?before.balance:((emp.credit||0)+(emp.recup||0));
+    if(!before&&opening)out.push({date:p0,label:'Jours offerts / récupérés',amt:opening,kind:'open'});
+    else if(before)out.push({date:p0,label:`Report de l'année ${ps.getFullYear()-1}-${ps.getFullYear()}`,sub:'Jours non pris au 31 mai, reportés',amt:before.balance,kind:'open'});
+    inP.forEach(r=>{if(r.credit>0){const[y,m]=r.mKey.split('-').map(Number);out.push({date:localISO(new Date(y,m,0)),label:`Jours gagnés en ${MONTHS_FR[m-1].toLowerCase()} ${y}`,sub:r.credit<2.08?'Mois d\'arrivée, au prorata':'',amt:r.credit,kind:'gain'});}});
+  }else{
+    opening=before?before.rttRunning:0;
+    if(before&&opening)out.push({date:p0,label:`Report de l'année ${ps.getFullYear()-1}-${ps.getFullYear()}`,amt:opening,kind:'open'});
+    inP.forEach(r=>{if(r.rttCredit>0){const[y,m]=r.mKey.split('-').map(Number);out.push({date:localISO(new Date(y,m,0)),label:`${rttLabel(emp)} gagnés en ${MONTHS_FR[m-1].toLowerCase()} ${y}`,amt:r.rttCredit,kind:'gain'});}});
+  }
+  S.absences.filter(a=>a.name===emp.name&&a.type===kind&&a.start>=p0&&a.start<=p1).forEach(a=>out.push({date:a.start,label:kind==='CP'?'Congés payés posés':(rttLabel(emp)+' posés'),sub:rangeLabel(a.start,a.end),amt:-(+a.jours||0),kind:'take'}));
+  (S.requests||[]).filter(r=>r.name===emp.name&&r.type===kind&&r.status==='pending'&&r.start>=p0&&r.start<=p1).forEach(r=>out.push({date:r.start,label:'Demande en attente de validation',sub:rangeLabel(r.start,r.end),amt:-(+r.jours||0),kind:'pending',noCount:kind!=='CP'}));
+  const ord={open:0,take:1,pending:1,gain:2};
+  out.sort((a,b)=>a.date.localeCompare(b.date)||ord[a.kind]-ord[b.kind]);
+  let bal=0;out.forEach(e=>{if(!e.noCount)bal+=e.amt;e.bal=Math.round(bal*100)/100;});
+  return out;
+}
+function histView(emp){
+  const st=HV[emp.id]||{},hasRTT=emp.hours>35,kind=hasRTT&&st.kind==='RTT'?'RTT':'CP';
+  const curPS=getPeriodStart(today()),arr=parseD(emp.arrival),firstPS=arr?getPeriodStart(arr):curPS;
+  const years=[];for(let y=firstPS.getFullYear();y<=curPS.getFullYear();y++)years.push(y);
+  const year=st.year&&years.includes(st.year)?st.year:curPS.getFullYear();
+  const ps=new Date(year,5,1),nowISO=todayISO();
+  const list=mvtEntries(emp,kind,ps);
+  const sn=soldeSnapshot(emp),isCur=year===curPS.getFullYear();
+  const pill=(on,lbl,js)=>`<button class="hv-pill ${on?'on':''}" onclick="${js}">${lbl}</button>`;
+  let h=`<div class="hv-bar"><div class="hv-group">${pill(kind==='CP','Congés payés',`setHV(${emp.id},'kind','CP')`)}${hasRTT?pill(kind==='RTT',rttLabel(emp),`setHV(${emp.id},'kind','RTT')`):''}</div>`
+    +(years.length>1?`<div class="hv-group">${years.map(y=>pill(y===year,`${y}-${String(y+1).slice(2)}`,`setHV(${emp.id},'year',${y})`)).join('')}</div>`:'')+`</div>`;
+  if(isCur){const c=kind==='CP'?sn.cp:sn.rtt;
+    h+=`<div class="hv-sum"><div><span>Solde fin ${MONTHS_FR[today().getMonth()].toLowerCase()}</span><b>${fj(c.finMois)} j</b></div><div><span>Pris</span><b>${fj(c.pris)} j</b></div><div><span>À venir</span><b>${fj(c.aVenir+(kind==='CP'?c.attente:0))} j</b></div><div class="hv-main"><span>Reste à poser au 31/05</span><b>${fj(c.finPeriode)} j</b></div></div>`;}
+  let shownToday=false;
+  h+=`<div class="hv-list">`+(list.length?list.map(e=>{
+    let sep='';if(isCur&&!shownToday&&e.date>nowISO){shownToday=true;sep=`<div class="hv-today"><span>Aujourd'hui · ${dLabel(nowISO)}</span></div>`;}
+    const fut=e.date>nowISO,ic=e.kind==='gain'?'＋':e.kind==='open'?'↻':e.kind==='pending'?'⏳':'－';
+    const cls=e.amt>=0?'pos':e.kind==='pending'?'wait':'neg';
+    return sep+`<div class="hv-row ${fut?'fut':''}"><div class="hv-ic ${cls}">${ic}</div><div class="hv-txt"><div class="hv-lbl">${e.label}${fut&&e.kind!=='pending'?' <span class="hv-tag">prévu</span>':''}</div><div class="hv-sub">${e.kind==='take'||e.kind==='pending'?e.sub:(e.sub?e.sub+' · ':'')+dLabel(e.date)}</div></div><div class="hv-amt ${cls}">${e.amt>=0?'+':'−'} ${fj(Math.abs(e.amt))} j</div><div class="hv-bal">${e.noCount?'<span style="color:var(--text-3)">non déduit</span>':`<span style="${e.bal<0?'color:var(--red)':''}">${e.bal<0?'−':''}${fj(Math.abs(e.bal))} j</span>`}</div></div>`;
+  }).join(''):`<div style="padding:1rem;color:var(--text-3)">Aucun mouvement.</div>`)+(isCur&&!shownToday?`<div class="hv-today"><span>Aujourd'hui · ${dLabel(nowISO)}</span></div>`:'')+`</div>`;
+  h+=`<div class="hv-foot">Colonne de droite : le solde après chaque mouvement. Les lignes « prévu » sont des jours que vous gagnerez ou des congés déjà posés.</div>`;
+  return h;
+}
+function histKpis(emp){
+  const sn=soldeSnapshot(emp),m=MONTHS_FR[today().getMonth()].toLowerCase();
+  const k=(v,l,c)=>`<div class="h-kpi"><b style="color:${c||(v<0?'var(--red)':'var(--text)')}">${fj(v)} j</b><span>${l}</span></div>`;
+  return `<div class="h-kpis">${k(sn.cp.finPeriode,'CP à poser d\'ici le 31/05','var(--accent-dk)')}${k(sn.cp.finMois,'CP acquis fin '+m)}${sn.rtt?k(sn.rtt.finPeriode,rttLabel(emp)+' à poser d\'ici le 31/05','var(--purple)')+k(sn.rtt.finMois,rttLabel(emp)+' acquis fin '+m):''}</div>`;
+}
 function getMonthlyAccount(emp){
   const now=today(),currentPS=getPeriodStart(now),pe=new Date(currentPS.getFullYear()+1,4,31,23,59,59);
   const arrival=parseD(emp.arrival);
@@ -494,142 +684,71 @@ function goPage(id,btn){
   document.getElementById("page-"+id).classList.add("active");btn.classList.add("active");
   ({dashboard:renderDash,comptes:renderComptes,calendar:renderCal,absences:renderAbs,demandes:renderDemandes,params:renderParams})[id]?.();
 }
+function openCompte(name){renderComptes();const sel=document.getElementById('fil-comptes-emp');sel.value=name;goPage('comptes',[...document.querySelectorAll('nav button')].find(b=>(b.getAttribute('onclick')||'').includes("'comptes'")));window.scrollTo(0,0);}
 function renderDash(){
-  const now=today(),ps=getPeriodStart(now),pe=periodEnd(ps);
-  const y1=ps.getFullYear(),y2=y1+1;
-  const moisCourant=MOIS_LONG[now.getMonth()]+' '+now.getFullYear();
-  const snaps=S.employees.map(e=>({e,s:cpSnapshot(e)}));
-  const T=k=>snaps.reduce((a,x)=>a+x.s[k],0);
-  const totDroits=T('report')+T('bonus')+T('droits'),totPris=T('pris'),totAVenir=T('aVenir');
-  const totSoldeAcq=T('soldeAcquis'),totSoldePer=T('soldePeriode');
-  const rows=new Map(S.employees.map(e=>[e.name,moisCourantRow(e)]));
-  const totRTT=S.employees.reduce((a,e)=>a+(rttSolde(e,rows.get(e.name))||0),0);
-  const totFinMois=S.employees.reduce((a,e)=>a+soldeFinMois(e,rows.get(e.name)),0);
-  const pendingN=(S.requests||[]).filter(r=>r.status==='pending').length;
-  const K=(stripe,icon,label,val,cls,sub)=>`<div class="kpi"><div class="kpi-stripe" style="background:${stripe}"></div><span class="kpi-icon">${icon}</span><div class="kpi-label">${label}</div><div class="kpi-value ${cls||''}">${val}</div><div class="kpi-sub">${sub}</div></div>`;
-  const j=v=>`${v.toFixed(1)}<span style="font-size:1rem;font-weight:500"> j</span>`;
-  document.getElementById("kpis").innerHTML=
-    K('var(--green)','📈','Droits CP période',j(totDroits),'green',`report N-1 + acquisition ${y1}-${y2} + crédits`)+
-    K('var(--orange)','📤','CP pris à ce jour',j(totPris),'orange',`du 01/06/${y1} au ${fmtDate(localISO(now))}`)+
-    K('var(--purple)','📅','CP posés à venir',j(totAVenir),'accent',`déjà validés, pas encore pris`)+
-    K(totSoldeAcq<0?'var(--red)':'var(--green)',totSoldeAcq<0?'⚠️':'✅','Solde CP acquis',j(totSoldeAcq),totSoldeAcq<0?'red':'green',`droits acquis à fin ${moisCourant} − CP pris`)+
-    K(totFinMois<0?'var(--red)':'var(--teal)','🧮',`Total dispo fin ${MOIS_LONG[now.getMonth()]}`,j(totFinMois),totFinMois<0?'red':'accent',`CP + RTT / repos, tout compris`)+
-    K(totSoldePer<0?'var(--red)':'var(--green)','🎯','Solde fin de période',j(totSoldePer),totSoldePer<0?'red':'green',`restant au 31/05/${y2}, congés posés déduits`)+
-    K('var(--accent)','🔵','RTT / Repos',j(totRTT),'accent',"39h + forfait jours")+
-    K(pendingN>0?'var(--orange)':'var(--border-strong)','✉️','En attente',pendingN,pendingN>0?'orange':'gray',pendingN>0?"à traiter":"aucune demande");
-  document.getElementById("dash-asof").innerHTML=`<div class="alert alert-blue"><span>🗓️</span><div><strong>Période Syntec en cours : 1er juin ${y1} → 31 mai ${y2}.</strong> Chiffres arrêtés au <strong>${fmtDate(localISO(now))}</strong>. Les CP sont crédités par mois entier : la colonne « Acquis » va jusqu'à <strong>fin ${moisCourant}</strong> inclus.</div></div>`;
-  document.getElementById("dash-hd-sub").textContent=`En jours ouvrés · arrêté au ${fmtDate(localISO(now))}`;
-  document.getElementById("th-dash").innerHTML=`<tr>
-    <th>Collaborateur</th>
-    <th style="text-align:right">Report N-1</th>
-    <th style="text-align:right">Droits ${String(y1).slice(2)}-${String(y2).slice(2)}</th>
-    <th style="text-align:right">Acquis fin ${MOIS_LONG[now.getMonth()].slice(0,4)}.</th>
-    <th style="text-align:right">Pris</th>
-    <th style="text-align:right">À venir</th>
-    <th style="text-align:right">Solde CP acquis</th>
-    <th style="text-align:right;color:var(--teal)">Total dispo fin ${MOIS_LONG[now.getMonth()].slice(0,4)}.</th>
-    <th style="text-align:right">Solde CP 31/05/${String(y2).slice(2)}</th>
-    <th style="text-align:right">RTT / Repos</th>
-    <th style="text-align:right">Autres</th></tr>`;
-  const tbody=document.getElementById("tb-dash");tbody.innerHTML="";
-  snaps.forEach(({e:emp,s:c})=>{
-    const row=rows.get(emp.name),rtt=rttSolde(emp,row),finMois=soldeFinMois(emp,row);
-    const css=sumAbs(emp.name,"Congé sans solde"),ecole=emp.type==="Alternance"?sumAbs(emp.name,"Congé école"):null;
-    const dispo=c.report+c.bonus+c.droits;
-    const pct=dispo>0?Math.min(100,(c.pris+c.aVenir)/dispo*100):0;
-    const isAlt=emp.type==="Alternance",hasRTT=emp.hours>35;
-    const tb=hasRTT?"badge-accent":isAlt?"badge-teal":"badge-blue";
-    const tl=hasRTT?(emp.forfait?'Forfait jours':`CDI ${emp.hours}h`):isAlt?"Alternant":emp.type;
-    const cls=v=>v<0?"neg":v>5?"pos":"mid";
-    const dash=`<span style="color:var(--text-3)">—</span>`;
-    tbody.innerHTML+=`<tr>
-      <td><div style="display:flex;align-items:center;gap:.55rem"><div class="av" style="width:32px;height:32px;font-size:.68rem;background:${empColor(emp.name)}">${initials(emp.name)}</div><div><div style="font-weight:600">${emp.name}</div><div style="margin-top:.15rem;white-space:nowrap"><span class="badge ${tb}">${tl}</span></div><div style="font-size:.68rem;color:var(--text-3);white-space:nowrap">Arrivée ${fmtDate(emp.arrival)}</div></div></div></td>
-      <td class="mono" style="text-align:right"><span style="color:${c.report>0?'var(--green-dk)':c.report<0?'var(--red)':'var(--text-3)'}">${c.report!==0?(c.report>0?'+':'')+c.report.toFixed(1)+' j':dash}</span>${c.bonus>0?`<div style="font-size:.7rem">${(emp.credit||0)>0?`<span style="color:var(--orange-dk)">🎁 +${(emp.credit).toFixed(1)} j</span> `:''}${(emp.recup||0)>0?`<span style="color:var(--teal)">🔄 +${(emp.recup).toFixed(1)} j</span>`:''}</div>`:''}</td>
-      <td class="mono" style="text-align:right">${c.droits.toFixed(1)} j</td>
-      <td class="mono" style="text-align:right;color:var(--text-2)">${c.acquis.toFixed(1)} j</td>
-      <td style="text-align:right"><div class="mono" style="color:var(--orange-dk)">${c.pris.toFixed(1)} j</div><div class="prog-wrap" style="width:64px;margin-left:auto"><div class="prog-bar" style="width:${pct}%;background:${(c.pris+c.aVenir)>dispo?"var(--red)":"var(--accent)"}"></div></div></td>
-      <td class="mono" style="text-align:right">${c.aVenir>0?`<span style="color:var(--purple)">${c.aVenir.toFixed(1)} j</span>`:dash}${c.attente>0?`<div style="font-size:.7rem;color:var(--orange)">⏳ ${c.attente.toFixed(1)} j</div>`:''}</td>
-      <td style="text-align:right"><span class="${cls(c.soldeAcquis)}">${c.soldeAcquis.toFixed(1)} j</span></td>
-      <td style="text-align:right;background:var(--teal-lt)"><span style="font-weight:700;font-size:1.05em;color:${finMois<0?'var(--red)':'var(--teal)'}">${finMois.toFixed(1)} j</span></td>
-      <td style="text-align:right"><span class="${cls(c.soldePeriode)}" style="font-size:1.05em">${c.soldePeriode.toFixed(1)} j</span></td>
-      <td class="mono" style="text-align:right;color:var(--purple)">${rtt!==null?rttLabel(emp)+' '+rtt.toFixed(1)+' j':dash}</td>
-      <td class="mono" style="text-align:right;font-size:.78rem">${css>0?`<span style="color:var(--pink)">${css.toFixed(1)} j s.solde</span>`:''}${css>0&&ecole>0?'<br>':''}${ecole>0?`<span style="color:var(--teal)">${ecole.toFixed(1)} j école</span>`:''}${css<=0&&!(ecole>0)?dash:''}</td>
-    </tr>`;
-  });
-  const rttEmps=S.employees.filter(e=>e.hours>35);
-  const rttNote=rttEmps.map(e=>`<strong>${rttLabel(e)} ${e.name}</strong> (${e.forfait?'forfait jours':e.hours+'h depuis le '+fmtDate(e.rttSince||e.arrival)}) : solde <strong>${(rttSolde(e)||0).toFixed(1)} j</strong>`).join(' — ');
-  document.getElementById("dash-legend").innerHTML=
-    `<div class="alert alert-yellow"><span>ℹ️</span><div>
-      <strong>Comment lire les soldes :</strong><br>
-      • <strong>Solde CP acquis</strong> = report N-1 + crédits + CP acquis jusqu'à fin ${moisCourant} − CP déjà pris. Congés payés uniquement. C'est le solde <em>comptable</em> à date : il peut être négatif si des congés d'été ont été pris par anticipation sur des droits pas encore acquis.<br>
-      • <strong>Total dispo fin ${MOIS_LONG[now.getMonth()]}</strong> = le précédent + le solde RTT / jours de repos, et en déduisant aussi les congés posés d'ici la fin du mois. <strong>C'est le solde réellement disponible aujourd'hui, tous compteurs confondus.</strong> Identique au « Solde fin de mois » de l'onglet Comptes.<br>
-      • <strong>Solde CP au 31/05/${y2}</strong> = report N-1 + crédits + droits complets de la période (${CP_AN} j) − CP pris − CP déjà posés à venir − demandes en attente. C'est ce qu'il <em>restera réellement</em> à poser d'ici la fin de la période.<br>
-      <strong>Règles :</strong> acquisition ${(CP_AN/12).toFixed(2).replace('.',',')} j ouvrés/mois, soit ${CP_AN} j ouvrés/an (= 2,5 j et 30 j ouvrables Syntec) · période 1er juin → 31 mai · reliquat CP reporté sur la période suivante.
-      ${rttNote?'<br><strong>RTT / repos :</strong> '+rttNote+'.':''}
-    </div></div>`;
-  document.getElementById("note-legal").innerHTML="";
+  const now=today(),ps=getPeriodStart(now),pe=periodEnd(ps),nowISO=todayISO();
+  const moisLbl=MONTHS_FR[now.getMonth()].toLowerCase();
+  const snaps=S.employees.map(e=>({e,sn:soldeSnapshot(e)}));
+  let h=`<div class="sv-hello">Équipe Wilow</div><div class="sv-sub">Année de congés du 1er juin ${ps.getFullYear()} au 31 mai ${pe.getFullYear()} · chiffres au ${fmtDate(nowISO)}</div>`;
+  // À traiter
+  const pend=(S.requests||[]).filter(r=>r.status==='pending').sort((a,b)=>a.start.localeCompare(b.start));
+  if(pend.length){
+    h+=`<div class="sec-title">⏳ À traiter (${pend.length})</div><div class="todo">`+pend.map(r=>{
+      const emp=S.employees.find(e=>e.name===r.name),sn=emp?soldeSnapshot(emp):null;
+      let after='';
+      if(sn&&r.type==='CP')after=`Après validation : <b>${fj(sn.cp.finPeriode)} j</b> de CP à poser d'ici le 31/05`;
+      else if(sn&&sn.rtt&&r.type==='RTT')after=`Après validation : <b>${fj(sn.rtt.finPeriode-r.jours)} j</b> de ${rttLabel(emp)} à poser d'ici le 31/05`;
+      const warn=after&&((r.type==='CP'&&sn.cp.finPeriode<0)||(r.type==='RTT'&&sn.rtt&&sn.rtt.finPeriode-r.jours<0));
+      return `<div class="todo-row"><div class="av" style="width:34px;height:34px;font-size:.7rem;background:${empColor(r.name)}">${initials(r.name)}</div>
+        <div class="todo-info"><strong>${r.name}</strong> · ${r.type} · ${r.start===r.end?fmtDate(r.start):fmtDate(r.start)+' → '+fmtDate(r.end)} · <strong>${r.jours} j</strong>
+          ${r.comment?`<div class="sub">💬 ${r.comment}</div>`:''}${after?`<div class="sub" style="${warn?'color:var(--red)':''}">${warn?'⚠️ ':''}${after}</div>`:''}</div>
+        <div class="todo-btns"><button class="btn btn-sm btn-approve" onclick="approveRequest(${r.id})">✅ Valider</button><button class="btn btn-sm btn-reject" onclick="openRejectModal(${r.id})">✕ Refuser</button></div></div>`;
+    }).join('')+`</div>`;
+  }
+  // Absents cette semaine
+  const dow=(now.getDay()+6)%7,mon=new Date(now.getFullYear(),now.getMonth(),now.getDate()-dow),sun=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+6);
+  const w0=localISO(mon),w1=localISO(sun);
+  const abs=S.absences.filter(a=>a.start<=w1&&a.end>=w0).sort((a,b)=>a.start.localeCompare(b.start));
+  h+=`<div class="sec-title">📅 Absents cette semaine</div><div class="abs-strip">`+(abs.length?abs.map(a=>{const today_=a.start<=nowISO&&a.end>=nowISO;return `<div class="abs-chip" style="${today_?'border-color:var(--accent);background:var(--accent-lt)':''}"><div class="av" style="width:24px;height:24px;font-size:.6rem;background:${empColor(a.name)}">${initials(a.name)}</div><strong>${a.name}</strong> ${a.type}<span class="when">${a.start===a.end?fmtDate(a.start).slice(0,5):fmtDate(a.start).slice(0,5)+' → '+fmtDate(a.end).slice(0,5)}${today_?' · aujourd\'hui':''}</span></div>`}).join(''):`<span style="color:var(--text-3);font-size:.85rem">Personne cette semaine.</span>`)+`</div>`;
+  // Équipe
+  h+=`<div class="sec-title">👥 Soldes de l'équipe <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--text-3)">· cliquer sur une personne pour son historique</span></div><div class="tm-grid">`+snaps.map(({e,sn})=>{
+    const c=sn.cp,total=Math.max(0,c.report+c.bonus+c.droits),rest=Math.max(0,c.finPeriode),den=Math.max(total,c.pris+c.aVenir+c.attente+rest)||1;
+    const seg=(v,col,x='')=>v>0?`<span style="width:${v/den*100}%;background:${col};${x}"></span>`:'';
+    const type=e.hours>35?(e.forfait?'Forfait jours':`${e.type} ${e.hours}h`):e.type;
+    const css=absBetween(e.name,'Congé sans solde',ps,pe);
+    return `<div class="tm-card" onclick="openCompte('${e.name.replace(/'/g,"\\'")}')">
+      <div class="tm-top"><div class="av" style="width:34px;height:34px;font-size:.7rem;background:${empColor(e.name)}">${initials(e.name)}</div><div><div class="tm-name">${e.name}</div><div class="tm-type">${type} · arrivée ${fmtDate(e.arrival)}</div></div></div>
+      <div class="tm-num" style="color:${c.finPeriode<0?'var(--red)':'var(--text)'}">${fj(c.finPeriode)}<small>j</small></div>
+      <div class="tm-lbl">de CP à poser d'ici le 31/05</div>
+      <div class="sv-bar">${seg(c.pris,'#9DB0B1')}${seg(c.aVenir,'#F2A541')}${seg(c.attente,'#F2A541','opacity:.45')}${seg(rest,'var(--accent)')}</div>
+      <div class="tm-line"><span>Solde CP fin ${moisLbl}</span><b style="${c.finMois<0?'color:var(--red)':''}">${fj(c.finMois)} j</b></div>
+      ${sn.rtt?`<div class="tm-line"><span>${rttLabel(e)} au 31/05 / fin ${moisLbl}</span><b style="color:var(--purple)">${fj(sn.rtt.finPeriode)} / ${fj(sn.rtt.finMois)} j</b></div>`:''}
+      ${c.attente?`<div class="tm-line"><span>En attente</span><b style="color:var(--orange)">${fj(c.attente)} j</b></div>`:''}
+      ${css?`<div class="tm-line"><span>Sans solde</span><b style="color:var(--pink)">${fj(css)} j</b></div>`:''}
+    </div>`;
+  }).join('')+`</div>`;
+  h+=`<div class="sv-tips"><b>Comment lire</b><ul>
+    <li><b>CP à poser d'ici le 31/05</b> : report de l'année précédente + 25 j de l'année − pris − posés à venir − demandes en attente. C'est le chiffre que voit le salarié.</li>
+    <li><b>Solde CP fin ${moisLbl}</b> : jours gagnés jusqu'à la fin du mois moins ce qui a été pris ou posé ce mois-ci. Négatif = congés pris par anticipation, c'est normal.</li>
+    <li>Barre : <span style="color:#7d9192">gris</span> pris · <span style="color:#d98a1e">orange</span> posés à venir / en attente · <span style="color:var(--accent)">bleu</span> restant.</li>
+  </ul></div>`;
+  document.getElementById('dash-root').innerHTML=h;
+  updateBadge();
 }
 function renderComptes(){
   const sel=document.getElementById('fil-comptes-emp');const curVal=sel.value;
-  sel.innerHTML=`<option value="">Tous les employés</option>`+S.employees.map(e=>`<option value="${e.name}" ${e.name===curVal?'selected':''}>${e.name}</option>`).join('');
-  sel.value=curVal;
-  const emps=curVal?S.employees.filter(e=>e.name===curVal):S.employees;
+  const pick=S.employees.some(e=>e.name===curVal)?curVal:(S.employees[0]?.name||'');
+  sel.innerHTML=S.employees.map(e=>`<option value="${e.name}" ${e.name===pick?'selected':''}>${e.name}</option>`).join('');
+  sel.value=pick;
+  const emps=S.employees.filter(e=>e.name===pick);
   const container=document.getElementById('comptes-list');
-  if(!emps.length){container.innerHTML=`<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">Aucun employé</div></div>`;return;}
+  if(!emps.length){container.innerHTML=`<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">Aucun collaborateur</div></div>`;return;}
   container.innerHTML=emps.map(emp=>{
-    const rows=getMonthlyAccount(emp);
-    const debitTotal=rows.filter(r=>!r.isFuture).reduce((s,r)=>s+r.debit,0);
-    const pendingTotal=rows.reduce((s,r)=>s+r.pending,0);
-    const curRow=rows.find(r=>r.isCurrent)||rows.filter(r=>!r.isFuture).at(-1);
-    const currentBalance=curRow?.balance??0;
-    const projBalance=rows.at(-1)?.balance??0;
-    const isAlt=emp.type==='Alternance',hasRTT=emp.hours>35;
-    const tb=hasRTT?"badge-accent":isAlt?"badge-teal":"badge-blue";
-    const tl=hasRTT?(emp.forfait?'Forfait jours':`CDI ${emp.hours}h`):isAlt?'Alternant':emp.type;
-    const rttBalance=hasRTT?(curRow?.rttRunning??0):0;
-    const totalDispo=curRow?.totalBalance??0;
-    const tableRows=rows.map(row=>{
-      const bc=row.totalBalance<0?'mbal-neg':row.totalBalance<2.5?'mbal-warn':'mbal-pos';
-      const icon=row.totalBalance<0?'⚠️':row.totalBalance<2.5?'🟡':'✅';
-      const periodHdr=row.isPeriodStart?`<tr><td colspan="7" style="background:var(--navy);color:rgba(255,255,255,.7);font-size:.66rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.4rem 1rem">Période Syntec ${row.label.split(' ')[1]} → Mai ${parseInt(row.label.split(' ')[1])+1}</td></tr>`:'';
-      return periodHdr+`<tr class="${row.isFuture?'mrow-fut':''} ${row.isCurrent?'mrow-cur':''}">
-        <td style="font-weight:${row.isCurrent?'600':'400'};white-space:nowrap">${row.isCurrent?'<span style="color:var(--accent);font-size:.7rem">▶ </span>':''}${row.label}</td>
-        <td class="mono" style="text-align:right;color:${row.credit>0?'var(--green-dk)':'var(--text-3)'}">${row.credit>0?'+'+row.credit.toFixed(1)+' j':'—'}</td>
-        <td class="mono" style="text-align:right;color:${row.debit>0?'var(--red)':'var(--text-3)'}">${row.debit>0?'−'+row.debit.toFixed(1)+' j':'—'}</td>
-        <td class="mono" style="text-align:right;color:${row.rttCredit>0?'var(--purple)':'var(--text-3)'}">${row.rttCredit>0?'+'+row.rttCredit.toFixed(1)+' j':'—'}</td>
-        <td class="mono" style="text-align:right;color:${row.rttDebit>0?'var(--red)':'var(--text-3)'}">${row.rttDebit>0?'−'+row.rttDebit.toFixed(1)+' j':'—'}</td>
-        <td class="mono" style="text-align:right;color:${row.pending>0?'var(--orange)':'var(--text-3)'}">${row.pending>0?'⏳ −'+row.pending.toFixed(1)+' j':'—'}</td>
-        <td class="mono" style="text-align:right"><span class="${bc}">${row.totalBalance.toFixed(1)} j</span>${!row.isFuture?' <span style="font-size:.72rem">'+icon+'</span>':''}</td>
-      </tr>`;
-  }).join('');
-    return`<div class="comp-card">
-      <div class="comp-hd">
-        <div class="comp-emp">
-          <div class="av" style="width:40px;height:40px;font-size:.8rem;background:${empColor(emp.name)}">${initials(emp.name)}</div>
-          <div>
-            <div style="font-weight:700;font-size:.95rem">${emp.name}</div>
-            <div class="comp-meta">
-              <span class="badge ${tb}">${tl}</span>
-              <span class="badge badge-gray">Arrivée ${fmtDate(emp.arrival)}</span>
-              ${emp.credit>0?`<span class="badge badge-orange">🎁 +${emp.credit} j</span>`:''}
-              ${(emp.recup||0)>0?`<span class="badge badge-teal">🔄 +${emp.recup} j récup</span>`:''}
-            </div>
-          </div>
-        </div>
-        <div class="comp-stats">
-          <div class="comp-stat"><div class="comp-stat-val" style="color:var(--red)">${debitTotal.toFixed(1)} j</div><div class="comp-stat-lbl">CP posés</div></div>
-          ${pendingTotal>0?`<div class="comp-stat"><div class="comp-stat-val" style="color:var(--orange)">${pendingTotal.toFixed(1)} j</div><div class="comp-stat-lbl">En attente</div></div>`:''}
-          <div class="comp-stat"><div class="comp-stat-val" style="color:${currentBalance<0?'var(--red)':currentBalance<2.5?'var(--orange)':'var(--accent)'}">${currentBalance.toFixed(1)} j</div><div class="comp-stat-lbl">Solde CP</div></div>
-          ${hasRTT?`<div class="comp-stat"><div class="comp-stat-val" style="color:var(--purple)">${rttBalance.toFixed(1)} j</div><div class="comp-stat-lbl">Solde RTT</div></div>`:''}
-          <div class="comp-stat" style="${hasRTT?'border-left:2px solid var(--accent);padding-left:.75rem':''}"><div class="comp-stat-val" style="color:${totalDispo<0?'var(--red)':totalDispo<2.5?'var(--orange)':'var(--green-dk)'}">${totalDispo.toFixed(1)} j</div><div class="comp-stat-lbl">Total dispo</div></div>
-          <div class="comp-stat"><div class="comp-stat-val" style="color:${projBalance<0?'var(--red)':projBalance<5?'var(--orange)':'var(--green-dk)'}">${projBalance.toFixed(1)} j</div><div class="comp-stat-lbl">Fin période CP</div></div>
-        </div>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>Mois</th><th style="text-align:right">CP acquis</th><th style="text-align:right">CP posés</th><th style="text-align:right">RTT acquis</th><th style="text-align:right">RTT posés</th><th style="text-align:right">En attente</th><th style="text-align:right">Solde fin de mois</th></tr></thead>
-        <tbody>${tableRows}</tbody>
-      </table></div>
-    </div>`;
+    const type=emp.hours>35?(emp.forfait?'Forfait jours':`${emp.type} ${emp.hours}h`):emp.type;
+    return `<div class="card" style="margin-bottom:1.2rem"><div class="card-body">
+      <div class="tm-top"><div class="av" style="width:38px;height:38px;font-size:.75rem;background:${empColor(emp.name)}">${initials(emp.name)}</div><div><div class="tm-name">${emp.name}</div><div class="tm-type">${type} · arrivée ${fmtDate(emp.arrival)}${emp.credit>0?` · 🎁 +${emp.credit} j`:''}${(emp.recup||0)>0?` · 🔄 +${emp.recup} j`:''}</div></div></div>
+      ${histView(emp)}
+    </div></div>`;
   }).join('');
 }
 let calY=today().getFullYear(),calM=today().getMonth(),calFilter=null;
@@ -703,7 +822,7 @@ function renderDemandes(){
 }
 function approveRequest(id){const req=(S.requests||[]).find(r=>r.id===id);if(!req)return;req.status='approved';req.reviewedAt=todayISO();S.absences.push({id:S.nextAbsId++,name:req.name,type:req.type,start:req.start,end:req.end,jours:req.jours,ferier:req.ferier,comment:(req.comment||"")+(req.comment?" — ":"")+"[approuvée]"});save();renderDemandes();renderDash();updateBadge();toast(`✅ Demande de ${req.name} approuvée`);}
 function openRejectModal(id){document.getElementById("reject-id").value=id;document.getElementById("reject-note").value="";openModal("mod-reject");}
-function confirmReject(){const id=+document.getElementById("reject-id").value,note=document.getElementById("reject-note").value.trim();const req=(S.requests||[]).find(r=>r.id===id);if(!req)return;req.status='rejected';req.reviewedAt=todayISO();req.reviewNote=note;save();closeModal("mod-reject");renderDemandes();updateBadge();toast(`✕ Demande de ${req.name} refusée`);}
+function confirmReject(){const id=+document.getElementById("reject-id").value,note=document.getElementById("reject-note").value.trim();const req=(S.requests||[]).find(r=>r.id===id);if(!req)return;req.status='rejected';req.reviewedAt=todayISO();req.reviewNote=note;save();closeModal("mod-reject");renderDemandes();renderDash();updateBadge();toast(`✕ Demande de ${req.name} refusée`);}
 function deleteRequest(id){if(!confirm("Supprimer cette demande ?"))return;S.requests=(S.requests||[]).filter(r=>r.id!==id);save();renderDemandes();updateBadge();toast("🗑 Demande supprimée");}
 function renderParams(){
   document.getElementById("tb-params").innerHTML=S.employees.map(emp=>{
