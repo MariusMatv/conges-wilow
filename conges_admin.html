@@ -631,7 +631,7 @@ function histView(emp){
   let h=`<div class="hv-bar"><div class="hv-group">${pill(kind==='CP','Congés payés',`setHV(${emp.id},'kind','CP')`)}${hasRTT?pill(kind==='RTT',rttLabel(emp),`setHV(${emp.id},'kind','RTT')`):''}</div>`
     +(years.length>1?`<div class="hv-group">${years.map(y=>pill(y===year,`${y}-${String(y+1).slice(2)}`,`setHV(${emp.id},'year',${y})`)).join('')}</div>`:'')+`</div>`;
   if(isCur){const c=kind==='CP'?sn.cp:sn.rtt;
-    h+=`<div class="hv-sum"><div><span>Solde fin ${MONTHS_FR[today().getMonth()].toLowerCase()}</span><b>${fj(c.finMois)} j</b></div><div><span>Pris</span><b>${fj(c.pris)} j</b></div><div><span>À venir</span><b>${fj(c.aVenir+(kind==='CP'?c.attente:0))} j</b></div><div class="hv-main"><span>Reste à poser au 31/05</span><b>${fj(c.finPeriode)} j</b></div></div>`;}
+    h+=`<div class="hv-sum"><div class="hv-main"><span>Disponible fin ${MONTHS_FR[today().getMonth()].toLowerCase()}</span><b style="${c.finMois<0?'color:var(--red)':''}">${fj(c.finMois)} j</b></div><div><span>Pris depuis le 1er juin</span><b>${fj(c.pris)} j</b></div><div><span>Posés à venir</span><b>${fj(c.aVenir+(kind==='CP'?c.attente:0))} j</b></div><div><span>Prévision au 31/05</span><b>${fj(c.finPeriode)} j</b></div></div>`;}
   let shownToday=false;
   h+=`<div class="hv-list">`+(list.length?list.map(e=>{
     let sep='';if(isCur&&!shownToday&&e.date>nowISO){shownToday=true;sep=`<div class="hv-today"><span>Aujourd'hui · ${dLabel(nowISO)}</span></div>`;}
@@ -696,9 +696,10 @@ function renderDash(){
     h+=`<div class="sec-title">⏳ À traiter (${pend.length})</div><div class="todo">`+pend.map(r=>{
       const emp=S.employees.find(e=>e.name===r.name),sn=emp?soldeSnapshot(emp):null;
       let after='';
-      if(sn&&r.type==='CP')after=`Après validation : <b>${fj(sn.cp.finPeriode)} j</b> de CP à poser d'ici le 31/05`;
-      else if(sn&&sn.rtt&&r.type==='RTT')after=`Après validation : <b>${fj(sn.rtt.finPeriode-r.jours)} j</b> de ${rttLabel(emp)} à poser d'ici le 31/05`;
-      const warn=after&&((r.type==='CP'&&sn.cp.finPeriode<0)||(r.type==='RTT'&&sn.rtt&&sn.rtt.finPeriode-r.jours<0));
+      const row=sn?sn.rows.find(x=>x.mKey===r.start.slice(0,7)):null;const mo=MONTHS_FR[+r.start.slice(5,7)-1].toLowerCase();
+      if(sn&&row&&r.type==='CP')after=`Après validation : <b>${fj(row.balance)} j</b> de CP disponibles fin ${mo} · prévision au 31/05 : <b>${fj(sn.cp.finPeriode)} j</b>`;
+      else if(sn&&row&&sn.rtt&&r.type==='RTT')after=`Après validation : <b>${fj(row.rttRunning-r.jours)} j</b> de ${rttLabel(emp)} fin ${mo} · prévision au 31/05 : <b>${fj(sn.rtt.finPeriode-r.jours)} j</b>`;
+      const warn=after&&((r.type==='CP'&&(row.balance<0||sn.cp.finPeriode<0))||(r.type==='RTT'&&(row.rttRunning-r.jours<0||sn.rtt.finPeriode-r.jours<0)));
       return `<div class="todo-row"><div class="av" style="width:34px;height:34px;font-size:.7rem;background:${empColor(r.name)}">${initials(r.name)}</div>
         <div class="todo-info"><strong>${r.name}</strong> · ${r.type} · ${r.start===r.end?fmtDate(r.start):fmtDate(r.start)+' → '+fmtDate(r.end)} · <strong>${r.jours} j</strong>
           ${r.comment?`<div class="sub">💬 ${r.comment}</div>`:''}${after?`<div class="sub" style="${warn?'color:var(--red)':''}">${warn?'⚠️ ':''}${after}</div>`:''}</div>
@@ -718,19 +719,19 @@ function renderDash(){
     const css=absBetween(e.name,'Congé sans solde',ps,pe);
     return `<div class="tm-card" onclick="openCompte('${e.name.replace(/'/g,"\\'")}')">
       <div class="tm-top"><div class="av" style="width:34px;height:34px;font-size:.7rem;background:${empColor(e.name)}">${initials(e.name)}</div><div><div class="tm-name">${e.name}</div><div class="tm-type">${type} · arrivée ${fmtDate(e.arrival)}</div></div></div>
-      <div class="tm-num" style="color:${c.finPeriode<0?'var(--red)':'var(--text)'}">${fj(c.finPeriode)}<small>j</small></div>
-      <div class="tm-lbl">de CP à poser d'ici le 31/05</div>
+      <div class="tm-num" style="color:${c.finMois<0?'var(--red)':'var(--text)'}">${fj(c.finMois)}<small>j</small></div>
+      <div class="tm-lbl">de CP disponibles fin ${moisLbl}</div>
       <div class="sv-bar">${seg(c.pris,'#9DB0B1')}${seg(c.aVenir,'#F2A541')}${seg(c.attente,'#F2A541','opacity:.45')}${seg(rest,'var(--accent)')}</div>
-      <div class="tm-line"><span>Solde CP fin ${moisLbl}</span><b style="${c.finMois<0?'color:var(--red)':''}">${fj(c.finMois)} j</b></div>
-      ${sn.rtt?`<div class="tm-line"><span>${rttLabel(e)} au 31/05 / fin ${moisLbl}</span><b style="color:var(--purple)">${fj(sn.rtt.finPeriode)} / ${fj(sn.rtt.finMois)} j</b></div>`:''}
+      <div class="tm-line"><span>Prévision CP au 31/05</span><b style="${c.finPeriode<0?'color:var(--red)':''}">${fj(c.finPeriode)} j</b></div>
+      ${sn.rtt?`<div class="tm-line"><span>${rttLabel(e)} fin ${moisLbl} · au 31/05</span><b style="color:var(--purple)">${fj(sn.rtt.finMois)} · ${fj(sn.rtt.finPeriode)} j</b></div>`:''}
       ${c.attente?`<div class="tm-line"><span>En attente</span><b style="color:var(--orange)">${fj(c.attente)} j</b></div>`:''}
       ${css?`<div class="tm-line"><span>Sans solde</span><b style="color:var(--pink)">${fj(css)} j</b></div>`:''}
     </div>`;
   }).join('')+`</div>`;
   h+=`<div class="sv-tips"><b>Comment lire</b><ul>
-    <li><b>CP à poser d'ici le 31/05</b> : report de l'année précédente + 25 j de l'année − pris − posés à venir − demandes en attente. C'est le chiffre que voit le salarié.</li>
-    <li><b>Solde CP fin ${moisLbl}</b> : jours gagnés jusqu'à la fin du mois moins ce qui a été pris ou posé ce mois-ci. Négatif = congés pris par anticipation, c'est normal.</li>
-    <li>Barre : <span style="color:#7d9192">gris</span> pris · <span style="color:#d98a1e">orange</span> posés à venir / en attente · <span style="color:var(--accent)">bleu</span> restant.</li>
+    <li><b>Gros chiffre</b> : CP réellement gagnés jusqu'à fin ${moisLbl}, moins ceux pris ou posés jusque-là. Négatif = congés pris par anticipation. C'est aussi le gros chiffre que voit le salarié.</li>
+    <li><b>Prévision au 31/05</b> : ajoute les jours encore à gagner d'ici le 31/05 et retire les congés déjà posés et les demandes en attente.</li>
+    <li>Barre : <span style="color:#7d9192">gris</span> pris · <span style="color:#d98a1e">orange</span> posés à venir / en attente · <span style="color:var(--accent)">bleu</span> restant au 31/05, sur l'année complète.</li>
   </ul></div>`;
   document.getElementById('dash-root').innerHTML=h;
   updateBadge();
