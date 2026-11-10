@@ -153,6 +153,22 @@ main{flex:1;padding:1.5rem;max-width:1080px;width:100%;margin:0 auto;}
 .bk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-bottom:1.2rem;}
 .bh-big{font-size:2.4rem!important;}
 .bh-hint{font-size:.78rem;color:rgba(255,255,255,.75);margin-top:.45rem;}
+.hist{width:100%;border-collapse:collapse;font-size:.85rem;}
+.hist th{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);font-weight:600;text-align:right;padding:.6rem .9rem;border-bottom:1px solid var(--border);background:var(--surface);}
+.hist th:first-child,.hist td:first-child{text-align:left;}
+.hist td{padding:.55rem .9rem;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap;}
+.hist tr.h-per td{background:var(--bg);color:var(--text-2);font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:.45rem .9rem;}
+.hist tr.h-cur td{background:var(--accent-lt);font-weight:600;}
+.hist tr.h-fut td{color:var(--text-3);}
+.hist .mv{display:inline-block;font-variant-numeric:tabular-nums;font-size:.8rem;margin-left:.45rem;}
+.hist .mv.p{color:var(--green-dk);} .hist .mv.m{color:var(--red);} .hist .mv.w{color:var(--orange);}
+.hist .bal{font-weight:700;font-variant-numeric:tabular-nums;}
+.hist .bal.neg{color:var(--red);}
+.hist-sep{border-left:2px solid var(--border);}
+.h-kpis{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;}
+.h-kpi{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:.55rem .95rem;}
+.h-kpi b{display:block;font-size:1.1rem;font-variant-numeric:tabular-nums;}
+.h-kpi span{font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);}
 .pp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.6rem;}
 .pp-stat{background:rgba(255,255,255,.7);border-radius:9px;padding:.55rem .8rem;border:1px solid rgba(11,134,141,.15);}
 .pp-val{font-size:1.15rem;font-weight:700;letter-spacing:-.03em;}
@@ -264,6 +280,33 @@ textarea{resize:vertical;min-height:70px;}
 
 /* ── Responsive ── */
 @media(max-width:640px){header{padding:0 1rem;height:54px;}main{padding:1rem;}.kpi-grid{grid-template-columns:repeat(2,1fr);}nav{padding:0 1rem;}nav button{padding:.75rem .85rem;font-size:.78rem;}.bh-grid{grid-template-columns:repeat(2,1fr);}.login-card{padding:1.75rem;}}
+.hv-bar{display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;}
+.hv-group{display:inline-flex;background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px;}
+.hv-pill{border:none;background:transparent;font:inherit;font-size:.8rem;font-weight:600;color:var(--text-2);padding:.35rem .85rem;border-radius:999px;cursor:pointer;}
+.hv-pill.on{background:var(--surface);color:var(--accent-dk);box-shadow:0 1px 3px rgba(12,43,46,.12);}
+.hv-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1rem;}
+.hv-sum>div{background:var(--bg);border-radius:10px;padding:.6rem .8rem;}
+.hv-sum span{display:block;font-size:.7rem;color:var(--text-2);margin-bottom:.15rem;}
+.hv-sum b{font-size:1.15rem;font-variant-numeric:tabular-nums;}
+.hv-sum .hv-main{background:var(--accent-lt);}
+.hv-sum .hv-main b{color:var(--accent-dk);}
+.hv-list{border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.hv-row{display:grid;grid-template-columns:32px 1fr auto 78px;align-items:center;gap:.75rem;padding:.65rem .9rem;border-bottom:1px solid var(--border);background:var(--surface);}
+.hv-row:last-child{border-bottom:none;}
+.hv-row.fut{background:#FAFCFC;}
+.hv-row.fut .hv-lbl,.hv-row.fut .hv-amt,.hv-row.fut .hv-bal{opacity:.6;}
+.hv-ic{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;}
+.hv-ic.pos{background:var(--green-lt);color:var(--green-dk);} .hv-ic.neg{background:var(--red-lt);color:var(--red);} .hv-ic.wait{background:var(--orange-lt);color:var(--orange);}
+.hv-lbl{font-size:.86rem;font-weight:600;}
+.hv-sub{font-size:.74rem;color:var(--text-3);margin-top:.1rem;}
+.hv-tag{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:var(--bg);color:var(--text-3);border-radius:4px;padding:.05rem .35rem;margin-left:.3rem;vertical-align:1px;}
+.hv-amt{font-weight:700;font-variant-numeric:tabular-nums;font-size:.88rem;white-space:nowrap;}
+.hv-amt.pos{color:var(--green-dk);} .hv-amt.neg{color:var(--red);} .hv-amt.wait{color:var(--orange);}
+.hv-bal{text-align:right;font-variant-numeric:tabular-nums;font-size:.82rem;color:var(--text-2);white-space:nowrap;}
+.hv-today{display:flex;align-items:center;gap:.6rem;padding:.35rem .9rem;background:var(--accent-lt);}
+.hv-today span{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-dk);}
+.hv-foot{font-size:.74rem;color:var(--text-3);margin-top:.6rem;}
+@media(max-width:640px){.hv-sum{grid-template-columns:repeat(2,1fr);}.hv-row{grid-template-columns:28px 1fr auto;}.hv-bal{grid-column:2/4;text-align:left;font-size:.72rem;margin-top:-.4rem;}}
 </style>
 </head>
 <body>
@@ -320,14 +363,14 @@ textarea{resize:vertical;min-height:70px;}
   <div class="sv-tips"><b>Bon à savoir</b><ul>
     <li>L'année de congés va du <b>1er juin au 31 mai</b>. Chaque mois travaillé vous donne environ <b>2,1 jours</b> de congés payés (25 jours ouvrés par an, convention Syntec).</li>
     <li>Les jours non pris au 31 mai sont <b>reportés</b> sur l'année suivante.</li>
-    <li>Vous pouvez poser des congés <b>par anticipation</b> (avant de les avoir acquis) : le compteur « acquis à ce jour » peut alors être négatif, c'est normal tant que le chiffre principal reste positif.</li>
+    <li>Vous pouvez poser des congés <b>par anticipation</b> (avant de les avoir acquis) : le « solde fin de mois » peut alors être négatif, c'est normal tant que le chiffre principal reste positif.</li>
   </ul></div>
 </div>
 
 <!-- COMPTES MENSUELS -->
 <div id="page-comptes" class="page">
   <div class="ph">
-    <div><div class="ph-title">📅 Mes comptes mensuels</div><div class="ph-sub">Solde CP + RTT — passé et projection jusqu'en mai</div></div>
+    <div><div class="ph-title">📅 Mon historique</div><div class="ph-sub">Le relevé de vos jours gagnés et pris, comme un relevé de compte</div></div>
   </div>
   <div class="card">
     <div class="card-body" id="comptes-body"></div>
@@ -527,6 +570,79 @@ function soldeSnapshot(emp){
   }:null;
   return{ps,pe,cur,last,rows,cp,rtt};
 }
+
+/* ---- Historique mois par mois (commun admin / employé) ---- */
+const fj=v=>(Math.round(v*10)/10).toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1});
+function histTable(emp,rows){
+  const hasRTT=emp.hours>35,arr=parseD(emp.arrival);
+  const mv=(v,cls,sign)=>v>0?`<span class="mv ${cls}">${sign}${fj(v)}</span>`:'';
+  const body=rows.filter(r=>{const[y,m]=r.mKey.split('-').map(Number);return !arr||new Date(y,m,0)>=arr;}).map(r=>{
+    const per=r.isPeriodStart?`<tr class="h-per"><td colspan="${hasRTT?5:3}">Année ${r.label.split(' ')[1]} → ${parseInt(r.label.split(' ')[1])+1}</td></tr>`:'';
+    const cls=r.isCurrent?'h-cur':r.isFuture?'h-fut':'';
+    return per+`<tr class="${cls}"><td>${r.isCurrent?'▸ ':''}${r.label}</td>
+      <td>${mv(r.credit,'p','+')}${mv(r.debit,'m','−')}${mv(r.pending,'w','⏳ −')}${!r.credit&&!r.debit&&!r.pending?'<span class="mv" style="color:var(--text-3)">·</span>':''}</td>
+      <td><span class="bal ${r.balance<0?'neg':''}">${fj(r.balance)} j</span></td>
+      ${hasRTT?`<td class="hist-sep">${mv(r.rttCredit,'p','+')}${mv(r.rttDebit,'m','−')}${!r.rttCredit&&!r.rttDebit?'<span class="mv" style="color:var(--text-3)">·</span>':''}</td><td><span class="bal ${r.rttRunning<0?'neg':''}">${fj(r.rttRunning)} j</span></td>`:''}
+    </tr>`;}).join('');
+  return `<div class="table-wrap"><table class="hist"><thead><tr><th>Mois</th><th>Congés payés</th><th>Solde CP</th>${hasRTT?`<th class="hist-sep">${rttLabel(emp)}</th><th>Solde ${rttLabel(emp)}</th>`:''}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+/* ---- Historique façon relevé de compte (commun admin / employé) ---- */
+const HV={};
+function setHV(id,k,v){HV[id]=Object.assign(HV[id]||{},{[k]:v});renderComptes();}
+const MOIS_COURT=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const dLabel=iso=>{const d=parseD(iso);return `${d.getDate()} ${MOIS_COURT[d.getMonth()]} ${d.getFullYear()}`;};
+const rangeLabel=(s,e)=>s===e?`le ${dLabel(s)}`:`du ${dLabel(s)} au ${dLabel(e)}`;
+function mvtEntries(emp,kind,ps){
+  const pe=periodEnd(ps),p0=localISO(ps),p1=localISO(pe);
+  const rows=getMonthlyAccount(emp);
+  const before=rows.filter(r=>r.mKey<p0.slice(0,7)).at(-1);
+  const inP=rows.filter(r=>r.mKey>=p0.slice(0,7)&&r.mKey<=p1.slice(0,7));
+  const out=[];let opening;
+  if(kind==='CP'){
+    opening=before?before.balance:((emp.credit||0)+(emp.recup||0));
+    if(!before&&opening)out.push({date:p0,label:'Jours offerts / récupérés',amt:opening,kind:'open'});
+    else if(before)out.push({date:p0,label:`Report de l'année ${ps.getFullYear()-1}-${ps.getFullYear()}`,sub:'Jours non pris au 31 mai, reportés',amt:before.balance,kind:'open'});
+    inP.forEach(r=>{if(r.credit>0){const[y,m]=r.mKey.split('-').map(Number);out.push({date:localISO(new Date(y,m,0)),label:`Jours gagnés en ${MONTHS_FR[m-1].toLowerCase()} ${y}`,sub:r.credit<2.08?'Mois d\'arrivée, au prorata':'',amt:r.credit,kind:'gain'});}});
+  }else{
+    opening=before?before.rttRunning:0;
+    if(before&&opening)out.push({date:p0,label:`Report de l'année ${ps.getFullYear()-1}-${ps.getFullYear()}`,amt:opening,kind:'open'});
+    inP.forEach(r=>{if(r.rttCredit>0){const[y,m]=r.mKey.split('-').map(Number);out.push({date:localISO(new Date(y,m,0)),label:`${rttLabel(emp)} gagnés en ${MONTHS_FR[m-1].toLowerCase()} ${y}`,amt:r.rttCredit,kind:'gain'});}});
+  }
+  S.absences.filter(a=>a.name===emp.name&&a.type===kind&&a.start>=p0&&a.start<=p1).forEach(a=>out.push({date:a.start,label:kind==='CP'?'Congés payés posés':(rttLabel(emp)+' posés'),sub:rangeLabel(a.start,a.end),amt:-(+a.jours||0),kind:'take'}));
+  (S.requests||[]).filter(r=>r.name===emp.name&&r.type===kind&&r.status==='pending'&&r.start>=p0&&r.start<=p1).forEach(r=>out.push({date:r.start,label:'Demande en attente de validation',sub:rangeLabel(r.start,r.end),amt:-(+r.jours||0),kind:'pending',noCount:kind!=='CP'}));
+  const ord={open:0,take:1,pending:1,gain:2};
+  out.sort((a,b)=>a.date.localeCompare(b.date)||ord[a.kind]-ord[b.kind]);
+  let bal=0;out.forEach(e=>{if(!e.noCount)bal+=e.amt;e.bal=Math.round(bal*100)/100;});
+  return out;
+}
+function histView(emp){
+  const st=HV[emp.id]||{},hasRTT=emp.hours>35,kind=hasRTT&&st.kind==='RTT'?'RTT':'CP';
+  const curPS=getPeriodStart(today()),arr=parseD(emp.arrival),firstPS=arr?getPeriodStart(arr):curPS;
+  const years=[];for(let y=firstPS.getFullYear();y<=curPS.getFullYear();y++)years.push(y);
+  const year=st.year&&years.includes(st.year)?st.year:curPS.getFullYear();
+  const ps=new Date(year,5,1),nowISO=todayISO();
+  const list=mvtEntries(emp,kind,ps);
+  const sn=soldeSnapshot(emp),isCur=year===curPS.getFullYear();
+  const pill=(on,lbl,js)=>`<button class="hv-pill ${on?'on':''}" onclick="${js}">${lbl}</button>`;
+  let h=`<div class="hv-bar"><div class="hv-group">${pill(kind==='CP','Congés payés',`setHV(${emp.id},'kind','CP')`)}${hasRTT?pill(kind==='RTT',rttLabel(emp),`setHV(${emp.id},'kind','RTT')`):''}</div>`
+    +(years.length>1?`<div class="hv-group">${years.map(y=>pill(y===year,`${y}-${String(y+1).slice(2)}`,`setHV(${emp.id},'year',${y})`)).join('')}</div>`:'')+`</div>`;
+  if(isCur){const c=kind==='CP'?sn.cp:sn.rtt;
+    h+=`<div class="hv-sum"><div><span>Solde fin ${MONTHS_FR[today().getMonth()].toLowerCase()}</span><b>${fj(c.finMois)} j</b></div><div><span>Pris</span><b>${fj(c.pris)} j</b></div><div><span>À venir</span><b>${fj(c.aVenir+(kind==='CP'?c.attente:0))} j</b></div><div class="hv-main"><span>Reste à poser au 31/05</span><b>${fj(c.finPeriode)} j</b></div></div>`;}
+  let shownToday=false;
+  h+=`<div class="hv-list">`+(list.length?list.map(e=>{
+    let sep='';if(isCur&&!shownToday&&e.date>nowISO){shownToday=true;sep=`<div class="hv-today"><span>Aujourd'hui · ${dLabel(nowISO)}</span></div>`;}
+    const fut=e.date>nowISO,ic=e.kind==='gain'?'＋':e.kind==='open'?'↻':e.kind==='pending'?'⏳':'－';
+    const cls=e.amt>=0?'pos':e.kind==='pending'?'wait':'neg';
+    return sep+`<div class="hv-row ${fut?'fut':''}"><div class="hv-ic ${cls}">${ic}</div><div class="hv-txt"><div class="hv-lbl">${e.label}${fut&&e.kind!=='pending'?' <span class="hv-tag">prévu</span>':''}</div><div class="hv-sub">${e.kind==='take'||e.kind==='pending'?e.sub:(e.sub?e.sub+' · ':'')+dLabel(e.date)}</div></div><div class="hv-amt ${cls}">${e.amt>=0?'+':'−'} ${fj(Math.abs(e.amt))} j</div><div class="hv-bal">${e.noCount?'<span style="color:var(--text-3)">non déduit</span>':`<span style="${e.bal<0?'color:var(--red)':''}">${e.bal<0?'−':''}${fj(Math.abs(e.bal))} j</span>`}</div></div>`;
+  }).join(''):`<div style="padding:1rem;color:var(--text-3)">Aucun mouvement.</div>`)+(isCur&&!shownToday?`<div class="hv-today"><span>Aujourd'hui · ${dLabel(nowISO)}</span></div>`:'')+`</div>`;
+  h+=`<div class="hv-foot">Colonne de droite : le solde après chaque mouvement. Les lignes « prévu » sont des jours que vous gagnerez ou des congés déjà posés.</div>`;
+  return h;
+}
+function histKpis(emp){
+  const sn=soldeSnapshot(emp),m=MONTHS_FR[today().getMonth()].toLowerCase();
+  const k=(v,l,c)=>`<div class="h-kpi"><b style="color:${c||(v<0?'var(--red)':'var(--text)')}">${fj(v)} j</b><span>${l}</span></div>`;
+  return `<div class="h-kpis">${k(sn.cp.finPeriode,'CP à poser d\'ici le 31/05','var(--accent-dk)')}${k(sn.cp.finMois,'CP acquis fin '+m)}${sn.rtt?k(sn.rtt.finPeriode,rttLabel(emp)+' à poser d\'ici le 31/05','var(--purple)')+k(sn.rtt.finMois,rttLabel(emp)+' acquis fin '+m):''}</div>`;
+}
 function notifySlack(req){
   if(!SLACK_WEBHOOK_URL)return;
   try{
@@ -647,7 +763,7 @@ function renderSolde(){
       <div class="sv-what">${c.finPeriode<0?'de dépassement':'encore à poser'} d'ici le ${finTxt}</div>
       <div class="sv-bar">${seg(c.pris,'#9DB0B1')}${seg(c.aVenir,'#F2A541')}${seg(att,'#F2A541','opacity:.45')}${seg(rest,color)}</div>
       <div class="sv-legend">${c.pris?`<span><i style="background:#9DB0B1"></i>Pris ${j(c.pris)} j</span>`:''}${c.aVenir?`<span><i style="background:#F2A541"></i>Posés à venir ${j(c.aVenir)} j</span>`:''}${att?`<span><i style="background:#F2A541;opacity:.45"></i>En attente ${j(att)} j</span>`:''}<span><i style="background:${color}"></i>Restant ${j(rest)} j</span></div>
-      <div class="sv-now">Acquis à ce jour (fin ${moisLbl}) : <strong>${j(c.finMois)} j</strong>${c.finMois<0?' · congés pris par anticipation':''}${isRtt&&c.attente?`<br>⏳ ${j(c.attente)} j en attente de validation, pas encore déduits`:''}</div>
+      <div class="sv-now">Solde fin ${moisLbl} : <strong>${j(c.finMois)} j</strong>${c.finMois<0?' · congés pris par anticipation':''}${isRtt&&c.attente?`<br>⏳ ${j(c.attente)} j en attente de validation, pas encore déduits`:''}</div>
       <details><summary>Comment c'est calculé ?</summary><div style="margin-top:.5rem">${lines}<div class="bk-row bk-total"><span>Encore à poser d'ici le ${finTxt}</span><span class="mono">${j(c.finPeriode)} j</span></div></div></details>
     </div>`;
   };
@@ -664,46 +780,9 @@ function renderSolde(){
 /* ── Comptes page ── */
 function renderComptes(){
   if(!ME)return;
-  const rows=getMonthlyAccount(ME);
-  const debitTotal=rows.filter(r=>!r.isFuture).reduce((s,r)=>s+r.debit,0);
-  const pendingTotal=rows.reduce((s,r)=>s+r.pending,0);
-  const curRow=rows.find(r=>r.isCurrent)||rows.filter(r=>!r.isFuture).at(-1);
-  const currentBalance=curRow?.balance??0;
-  const projBalance=rows.at(-1)?.balance??0;
-  const hasRTT=ME.hours>35;
-  const rttBalance=hasRTT?(curRow?.rttRunning??0):0;
-  const totalDispo=curRow?.totalBalance??0;
-  const tableRows=rows.map(row=>{
-    const bc=row.totalBalance<0?'mbal-neg':row.totalBalance<2.5?'mbal-warn':'mbal-pos';
-    const icon=row.totalBalance<0?'⚠️':row.totalBalance<2.5?'🟡':'✅';
-    const periodHdr=row.isPeriodStart?`<tr><td colspan="7" style="background:var(--navy);color:rgba(255,255,255,.7);font-size:.66rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.4rem 1rem">Période Syntec ${row.label.split(' ')[1]} → Mai ${parseInt(row.label.split(' ')[1])+1}</td></tr>`:'';
-    return periodHdr+`<tr class="${row.isFuture?'mrow-fut':''} ${row.isCurrent?'mrow-cur':''}">
-      <td style="font-weight:${row.isCurrent?'600':'400'};white-space:nowrap">${row.isCurrent?'<span style="color:var(--accent);font-size:.7rem">▶ </span>':''}${row.label}</td>
-      <td class="mono" style="text-align:right;color:${row.credit>0?'var(--green-dk)':'var(--text-3)'}">${row.credit>0?'+'+row.credit.toFixed(1)+' j':'—'}</td>
-      <td class="mono" style="text-align:right;color:${row.debit>0?'var(--red)':'var(--text-3)'}">${row.debit>0?'−'+row.debit.toFixed(1)+' j':'—'}</td>
-      <td class="mono" style="text-align:right;color:${row.rttCredit>0?'var(--purple)':'var(--text-3)'}">${row.rttCredit>0?'+'+row.rttCredit.toFixed(1)+' j':'—'}</td>
-      <td class="mono" style="text-align:right;color:${row.rttDebit>0?'var(--red)':'var(--text-3)'}">${row.rttDebit>0?'−'+row.rttDebit.toFixed(1)+' j':'—'}</td>
-      <td class="mono" style="text-align:right;color:${row.pending>0?'var(--orange)':'var(--text-3)'}">${row.pending>0?'⏳ −'+row.pending.toFixed(1)+' j':'—'}</td>
-      <td class="mono" style="text-align:right"><span class="${bc}">${row.totalBalance.toFixed(1)} j</span>${!row.isFuture?' <span style="font-size:.72rem">'+icon+'</span>':''}</td>
-    </tr>`;
-  }).join('');
-  document.getElementById('comptes-body').innerHTML=`
-    <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.2rem;">
-      <div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--red)">${debitTotal.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">Posés</div></div>
-      ${pendingTotal>0?`<div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--orange)">${pendingTotal.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">En attente</div></div>`:''}
-      <div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:${currentBalance<0?'var(--red)':currentBalance<2.5?'var(--orange)':'var(--accent)'}">${currentBalance.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">CP fin de mois</div></div>
-      ${hasRTT?`<div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--purple)">${rttBalance.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">RTT fin de mois</div></div>`:''}
-      <div style="background:var(--accent-lt);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--accent);text-align:center"><div style="font-size:1rem;font-weight:700;color:${totalDispo<0?'var(--red)':totalDispo<2.5?'var(--orange)':'var(--green-dk)'}">${totalDispo.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">CP + RTT fin de mois</div></div>
-      <div style="background:var(--bg);border-radius:9px;padding:.55rem 1rem;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:${projBalance<0?'var(--red)':projBalance<5?'var(--orange)':'var(--green-dk)'}">${projBalance.toFixed(1)} j</div><div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-top:.1rem">CP au 31/05</div></div>
-    </div>
-    <div class="table-wrap"><table>
-      <thead><tr><th>Mois</th><th style="text-align:right">CP acquis</th><th style="text-align:right">CP posés</th><th style="text-align:right">RTT acquis</th><th style="text-align:right">RTT posés</th><th style="text-align:right">En attente</th><th style="text-align:right">Solde CP + RTT</th></tr></thead>
-      <tbody>${tableRows}</tbody>
-    </table></div>
-    <div class="alert alert-blue" style="margin-top:1rem"><span>💡</span><div>Les mois en italique sont des projections. Le solde fin de période dépend de vos futurs congés.</div></div>`;
+  document.getElementById('comptes-body').innerHTML=histView(ME);
 }
 
-/* ── Calendar ── */
 let calY=today().getFullYear(),calM=today().getMonth();
 function chgMonth(d){calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}renderCal();}
 function renderCal(){
